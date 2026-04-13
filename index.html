@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Monitor v1.6.1 | Deep AI Scan</title>
+    <title>Monitor v1.6.2 | Hybrid Intelligence</title>
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-xl mx-auto">
 
     <header class="border-b border-slate-800 pb-4 mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-lg sm:text-xl font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v1.6.1</h1>
-            <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-[0.2em]">Deep Intelligence Scan</p>
+            <h1 class="text-lg sm:text-xl font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v1.6.2</h1>
+            <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-[0.2em]">Data Sync: Active</p>
         </div>
-        <span class="bg-green-900/20 text-green-500 px-2 py-1 rounded-full text-[9px] font-bold border border-green-800/50 uppercase">Live Intelligence</span>
+        <span class="bg-blue-900/20 text-blue-400 px-2 py-1 rounded-full text-[9px] font-bold border border-blue-800/50 uppercase">System Live</span>
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-center">
@@ -31,113 +31,96 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 flex flex-col items-center">
-            <h3 class="text-[10px] sm:text-xs mb-4 text-yellow-500 font-bold uppercase tracking-widest">Hormuz Pulse</h3>
-            <div id="hormuz-circle" class="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
-                <span id="hormuz-value" class="text-xl sm:text-2xl font-bold">0%</span>
+            <h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-4">Hormuz Pulse</h3>
+            <div id="hormuz-circle" class="w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
+                <span id="hormuz-value" class="text-2xl font-bold">0%</span>
             </div>
-            <p id="hormuz-label" class="mt-4 text-[9px] sm:text-[10px] text-slate-500 italic text-center leading-tight">Analizando activos...</p>
+            <p id="hormuz-label" class="mt-4 text-[10px] text-slate-500 italic text-center">Sincronizando...</p>
         </div>
 
         <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 flex flex-col items-center">
-            <h3 class="text-[10px] sm:text-xs mb-4 text-orange-400 font-bold uppercase tracking-widest">Taco Trade (IA)</h3>
-            <div id="taco-circle" class="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
-                <span id="taco-value" class="text-xl sm:text-2xl font-bold">0%</span>
+            <h3 class="text-[10px] text-orange-400 font-bold uppercase tracking-widest mb-4">Taco Trade (IA)</h3>
+            <div id="taco-circle" class="w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
+                <span id="taco-value" class="text-2xl font-bold">0%</span>
             </div>
-            <p id="taco-label" class="mt-4 text-[9px] sm:text-[10px] text-slate-500 italic text-center leading-tight">Procesando sentimiento...</p>
+            <p id="taco-label" class="mt-4 text-[10px] text-slate-500 italic text-center">Analizando...</p>
         </div>
     </div>
 
-    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg">
-        <div class="flex justify-between items-center mb-3">
-            <h3 class="text-[9px] text-slate-400 uppercase tracking-widest flex items-center">
-                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-ping"></span> Live IA Analysis
-            </h3>
-            <span id="friction-mult-display" class="text-[9px] bg-slate-800 text-blue-400 px-2 py-0.5 rounded border border-slate-700 font-bold">Mult. Fricción: x1.0</span>
+    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <div class="flex justify-between items-center mb-3 text-[9px]">
+            <h3 class="text-slate-400 uppercase tracking-widest">Live IA Analysis</h3>
+            <span id="friction-mult-display" class="text-blue-400 font-bold">Mult. Fricción: x1.0</span>
         </div>
-        <div id="news-feed" class="text-[10px] sm:text-[11px] space-y-2 max-h-[25vh] md:max-h-40 overflow-y-auto pr-2 scrollbar-thin">
-            Iniciando escaneo de noticias globales...
+        <div id="news-feed" class="text-[10px] space-y-2 max-h-40 overflow-y-auto pr-2">
+            Iniciando escaneo...
         </div>
     </div>
 
     <script>
-        const TWELVE_DATA_KEY = '269d17eafe284411b6e5da2768325a1a';
-        const NEWS_API_KEY = '269d17eafe284411b6e5da2768325a1a'; 
+        const KEY = '269d17eafe284411b6e5da2768325a1a'; // Tu llave de Twelve Data
         
-        const aiKeywords = {
-            'irán': 45, 'iran': 45, 'cierre': 35, 'negociaciones': 25,
-            'trump': 15, 'aranceles': 30, 'guerra': 40, 'petróleo': 20,
-            'sanciones': 30, 'crisis': 25, 'ataque': 45, 'tensión': 20
-        };
-
         async function updateMarketData() {
             try {
                 // 1. Obtener Precios
-                const prices = {};
                 const symbols = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
+                let prices = {};
                 for (const s of symbols) {
-                    const r = await fetch(`https://api.twelvedata.com/price?symbol=${s}&apikey=${TWELVE_DATA_KEY}`);
+                    const r = await fetch(`https://api.twelvedata.com/price?symbol=${s}&apikey=${KEY}`);
                     const d = await r.json();
                     prices[s] = parseFloat(d.price) || 0;
                 }
 
-                document.getElementById('gold-price').innerText = prices['XAUT/USD'] > 0 ? `$${prices['XAUT/USD'].toFixed(2)}` : 'Sync...';
-                document.getElementById('btc-price').innerText = prices['BTC/USD'] > 0 ? `$${prices['BTC/USD'].toLocaleString()}` : 'Sync...';
-                document.getElementById('eur-price').innerText = prices['EUR/USD'] > 0 ? `$${prices['EUR/USD'].toFixed(4)}` : 'Sync...';
+                const gold = prices['XAUT/USD'];
+                const btc = prices['BTC/USD'];
+                const eur = prices['EUR/USD'];
 
-                // 2. Obtener Noticias Reales
-                const newsRes = await fetch(`https://newsapi.org/v2/top-headlines?category=business&language=es&apiKey=${NEWS_API_KEY}`);
-                const newsData = await newsRes.json();
-                const articles = newsData.articles || [];
+                document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Sync...';
+                document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Sync...';
+                document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Sync...';
 
-                // 3. Procesamiento IA de Noticias Reales (Escaneo Profundo)
+                // 2. Lógica de Respaldo IA (Analiza los datos reales para generar noticias)
+                const feed = document.getElementById('news-feed');
+                feed.innerHTML = '';
+                let friction = 1.0;
                 let aiScore = 0;
-                let frictionMult = 1.0;
-                const feedContainer = document.getElementById('news-feed');
-                feedContainer.innerHTML = '';
 
-                articles.forEach((art, index) => {
-                    let impact = 0;
-                    const text = (art.title + " " + (art.description || "")).toLowerCase();
-                    
-                    Object.keys(aiKeywords).forEach(key => {
-                        if(text.includes(key)) {
-                            impact += aiKeywords[key];
-                            frictionMult += 0.10;
-                        }
-                    });
+                const scenarios = [];
+                if (gold > 4700) {
+                    scenarios.push({t: "XAUT rompe resistencia crítica de $4700", p: 40});
+                    friction += 0.25;
+                }
+                if (eur < 1.18 && eur > 0) {
+                    scenarios.push({t: "Fortaleza del Dólar impacta paridad EUR/USD", p: 20});
+                    friction += 0.15;
+                }
+                if (btc > 74000) {
+                    scenarios.push({t: "BTC mantiene soporte ante volatilidad", p: 15});
+                    friction += 0.10;
+                }
 
-                    let finalImpact = impact * frictionMult;
-                    aiScore += finalImpact;
-
-                    if (index < 5 && art.title) {
-                        const p = document.createElement('p');
-                        p.className = "border-l-2 border-slate-700 pl-2 py-1 hover:bg-slate-800 transition-colors";
-                        p.innerHTML = `
-                            <span class="text-slate-500 font-bold text-[8px]">[IA_SCAN]:</span> 
-                            ${art.title.substring(0, 75)}... 
-                            <span class="text-blue-400 font-bold ml-1">+${finalImpact.toFixed(1)}</span>
-                        `;
-                        feedContainer.appendChild(p);
-                    }
+                scenarios.forEach(s => {
+                    aiScore += (s.p * friction);
+                    const p = document.createElement('p');
+                    p.className = "border-l-2 border-slate-700 pl-2 py-1";
+                    p.innerHTML = `<span class="text-slate-500">[DATA_SCAN]:</span> ${s.t} <span class="text-blue-400 font-bold">+${(s.p * friction).toFixed(1)}</span>`;
+                    feed.appendChild(p);
                 });
 
-                document.getElementById('friction-mult-display').innerText = `Mult. Fricción: x${frictionMult.toFixed(2)}`;
+                document.getElementById('friction-mult-display').innerText = `Mult. Fricción: x${friction.toFixed(2)}`;
 
-                // 4. Lógica de Círculos
+                // 3. Actualizar Círculos
                 let hormuzHeat = 0;
-                const gold = prices['XAUT/USD'];
-                if (gold > 4700) hormuzHeat += 35;
-                if (gold > 4715) hormuzHeat += 15;
-                if (prices['EUR/USD'] < 1.18 && prices['EUR/USD'] > 0) hormuzHeat += 20;
-
-                let tacoHeat = Math.min((aiScore / 2.5), 100);
+                if (gold > 4700) hormuzHeat += 40;
+                if (gold > 4720) hormuzHeat += 20;
+                if (eur < 1.18 && eur > 0) hormuzHeat += 20;
 
                 updateCircle('hormuz', hormuzHeat, "Hormuz: Estable");
-                updateCircle('taco', tacoHeat, "Taco: Neutro");
+                updateCircle('taco', (aiScore / 1.5), "Taco: Neutro");
 
-            } catch (e) { console.log("Error en Sync:", e); }
+            } catch (e) { console.log(e); }
         }
 
         function updateCircle(id, val, text) {
@@ -148,17 +131,17 @@
             disp.innerText = `${val}%`;
 
             if (val >= 60) {
-                circ.className = `w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-red-600 shadow-[0_0_15px_rgba(220,38,38,0.4)] flex items-center justify-center transition-all duration-700`;
-                lab.innerText = "ALERTA: Tensión Alta";
-                lab.className = "mt-4 text-[9px] sm:text-[10px] text-red-500 font-bold animate-pulse text-center";
+                circ.className = `w-28 h-28 rounded-full border-8 border-red-600 shadow-[0_0_15px_rgba(220,38,38,0.4)] flex items-center justify-center transition-all duration-700`;
+                lab.innerText = "ALERTA: Tensión Detectada";
+                lab.className = "mt-4 text-[10px] text-red-500 font-bold animate-pulse text-center";
             } else if (val >= 30) {
-                circ.className = `w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-orange-500 flex items-center justify-center transition-all duration-700`;
-                lab.innerText = "AVISO: Fricción Detectada";
-                lab.className = "mt-4 text-[9px] sm:text-[10px] text-orange-400 text-center";
+                circ.className = `w-28 h-28 rounded-full border-8 border-orange-500 flex items-center justify-center transition-all duration-700`;
+                lab.innerText = "AVISO: Fricción Activa";
+                lab.className = "mt-4 text-[10px] text-orange-400 text-center";
             } else {
-                circ.className = `w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700`;
+                circ.className = `w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700`;
                 lab.innerText = text;
-                lab.className = "mt-4 text-[9px] sm:text-[10px] text-slate-500 italic text-center";
+                lab.className = "mt-4 text-[10px] text-slate-500 italic text-center";
             }
         }
 
