@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Monitor v1.6.3 | Anti-Crash System</title>
+    <title>Monitor v1.6.4 | Strict Memory System</title>
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-xl mx-auto">
 
     <header class="border-b border-slate-800 pb-4 mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-lg sm:text-xl font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v1.6.3</h1>
+            <h1 class="text-lg sm:text-xl font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v1.6.4</h1>
             <p id="system-status" class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-[0.2em]">Buscando conexión...</p>
         </div>
         <span id="live-badge" class="bg-blue-900/20 text-blue-400 px-2 py-1 rounded-full text-[9px] font-bold border border-blue-800/50 uppercase">System Live</span>
@@ -62,13 +62,13 @@
     <script>
         const KEY = '269d17eafe284411b6e5da2768325a1a'; 
         
-        // Memoria a corto plazo por si la API falla
-        let lastKnown = { gold: 4725.50, btc: 74200, eur: 1.1750 };
+        // Memoria protegida (no se sobrescribe con ceros)
+        let lastKnown = { gold: 4738.50, btc: 74766.17, eur: 1.1764 };
 
         async function updateMarketData() {
             try {
                 let currentPrices = { gold: 0, btc: 0, eur: 0 };
-                let apiBlocked = false;
+                let fetchSuccess = true;
 
                 // 1. Intentar obtener datos
                 const symbols = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
@@ -76,9 +76,9 @@
                     const r = await fetch(`https://api.twelvedata.com/price?symbol=${s}&apikey=${KEY}`);
                     const d = await r.json();
                     
-                    if (d.code === 429) {
-                        apiBlocked = true;
-                        break; // Salimos del loop si estamos bloqueados
+                    if (d.code === 429 || d.status === 'error') {
+                        fetchSuccess = false;
+                        break;
                     }
                     
                     if (s === 'XAUT/USD' && d.price) currentPrices.gold = parseFloat(d.price);
@@ -86,17 +86,23 @@
                     if (s === 'EUR/USD' && d.price) currentPrices.eur = parseFloat(d.price);
                 }
 
-                // Si la API nos bloqueó, usamos los últimos datos conocidos
-                if (apiBlocked) {
+                // 1.5 Validación estricta: Rechazar si los precios son cero o nulos
+                if (currentPrices.gold <= 0 || currentPrices.btc <= 0 || currentPrices.eur <= 0) {
+                    fetchSuccess = false;
+                }
+
+                // Si falló algo o nos mandaron ceros, usamos la memoria segura
+                if (!fetchSuccess) {
                     currentPrices = lastKnown;
-                    document.getElementById('system-status').innerText = "API LIMIT REACHED - USING BACKUP DATA";
+                    document.getElementById('system-status').innerText = "API LIMIT OR ERROR - USING BACKUP DATA";
                     document.getElementById('system-status').classList.replace('text-slate-400', 'text-orange-500');
                     document.getElementById('live-badge').className = "bg-orange-900/20 text-orange-400 px-2 py-1 rounded-full text-[9px] font-bold border border-orange-800/50 uppercase";
                     document.getElementById('live-badge').innerText = "OFFLINE MODE";
                 } else {
-                    lastKnown = currentPrices; // Guardamos por si falla la próxima
+                    lastKnown = currentPrices; // Solo guardamos en memoria si son datos reales y válidos
                     document.getElementById('system-status').innerText = "DATA SYNC: ACTIVE";
-                    document.getElementById('system-status').classList.replace('text-orange-500', 'text-slate-400');
+                    document.getElementById('system-status').classList.remove('text-orange-500');
+                    document.getElementById('system-status').classList.add('text-slate-400');
                     document.getElementById('live-badge').className = "bg-green-900/20 text-green-500 px-2 py-1 rounded-full text-[9px] font-bold border border-green-800/50 uppercase";
                     document.getElementById('live-badge').innerText = "SYSTEM LIVE";
                 }
@@ -175,7 +181,6 @@
             }
         }
 
-        // Ejecutar inmediatamente y luego cada 90 segundos
         updateMarketData();
         setInterval(updateMarketData, 90000);
     </script>
