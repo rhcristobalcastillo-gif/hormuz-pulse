@@ -47,15 +47,12 @@
 
     <script>
         const API_KEY = '1943e6176ad54469b00c88773080d5b4'; 
-        // Cambiamos a símbolos más universales para el plan gratuito
         const SYMBOLS = 'XAUT/USD,BTC/USD,EUR/USD'; 
 
         async function updateMarketData() {
             try {
-                // Consultamos uno por uno para evitar que un error en uno bloquee a los demás
                 const symbolsArray = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
                 let results = {};
-
                 for (const sym of symbolsArray) {
                     const resp = await fetch(`https://api.twelvedata.com/price?symbol=${sym}&apikey=${API_KEY}`);
                     const resData = await resp.json();
@@ -66,17 +63,16 @@
                 const btc = results['BTC/USD'];
                 const eur = results['EUR/USD'];
 
-                // Actualizar interfaz
-                document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Esperando API...';
-                document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Esperando API...';
-                document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Esperando API...';
+                document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Sincronizando...';
+                document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Sincronizando...';
+                document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Sincronizando...';
 
-                // Lógica de Calor (Solo se activa si hay datos reales)
+                // LÓGICA DE CALOR RE-CALIBRADA
                 let heatLevel = 0;
                 if (gold > 0) {
-                    if (gold > 2300) heatLevel += 40;
-                    if (btc > 0 && btc < 65000) heatLevel += 40;
-                    if (eur > 0 && eur < 1.09) heatLevel += 20;
+                    if (gold > 4800) heatLevel += 40;        // Umbral ajustado
+                    if (btc > 0 && btc < 68000) heatLevel += 40; 
+                    if (eur > 0 && eur < 1.07) heatLevel += 20;  
                 }
 
                 const heatDisplay = document.getElementById('heat-value');
@@ -85,7 +81,6 @@
 
                 heatDisplay.innerText = `${heatLevel}%`;
 
-                // Colores dinámicos
                 if (heatLevel >= 80) {
                     label.innerText = "ALERTA: Fuga masiva a refugios";
                     circle.className = "w-32 h-32 rounded-full border-8 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center justify-center transition-all duration-500";
@@ -102,5 +97,5 @@
         setInterval(updateMarketData, 60000);
         updateMarketData(); 
     </script>
-    </body>
+</body>
 </html>
