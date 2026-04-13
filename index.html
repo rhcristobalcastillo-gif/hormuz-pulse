@@ -3,44 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Hormuz Pulse | Geopolitical Monitor</title>
+    <title>Hormuz Pulse | XAUT Edition</title>
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono p-6">
 
     <header class="border-b border-slate-800 pb-4 mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-orange-500 tracking-tighter">HORMUZ_PULSE v1.0</h1>
-            <p class="text-xs text-slate-500">REAL-TIME MANIPULATION SENSOR</p>
+            <h1 class="text-2xl font-bold text-yellow-500 tracking-tighter">HORMUZ_PULSE v1.1</h1>
+            <p class="text-xs text-slate-500">GOLD & LIQUIDITY SENSOR</p>
         </div>
         <div id="status-badge">
-            <span class="bg-red-900/30 text-red-500 px-3 py-1 rounded-full text-xs animate-pulse font-bold">MONITORING LIVE</span>
+            <span class="bg-red-900/30 text-red-500 px-3 py-1 rounded-full text-xs animate-pulse font-bold">MONITORING ASSETS</span>
         </div>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
         <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col items-center justify-center">
-            <h3 class="text-sm mb-4">MANIPULATION HEAT</h3>
-            <div id="heat-circle" class="w-32 h-32 rounded-full border-8 border-orange-600 flex items-center justify-center transition-all duration-500">
+            <h3 class="text-sm mb-4 text-yellow-500">MANIPULATION HEAT</h3>
+            <div id="heat-circle" class="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500">
                 <span id="heat-value" class="text-3xl font-bold">0%</span>
             </div>
-            <p id="logic-label" class="mt-4 text-xs text-slate-500 italic">Calculating friction...</p>
+            <p id="logic-label" class="mt-4 text-xs text-slate-500 italic text-center">Analizando correlación Oro/BTC...</p>
         </div>
 
         <div class="md:col-span-2 bg-slate-900 p-6 rounded-xl border border-slate-800">
-            <h3 class="text-sm mb-4 uppercase text-slate-400">Market Sensors</h3>
+            <h3 class="text-sm mb-4 uppercase text-slate-400">Geopolitical Risk Sensors</h3>
             <div class="space-y-4">
                 <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span>BRENT CRUDE (OIL)</span>
-                    <span id="oil-price" class="font-bold text-orange-400">Loading...</span>
+                    <span class="text-yellow-400">TETHER GOLD (XAUT)</span>
+                    <span id="gold-price" class="font-bold">Cargando...</span>
                 </div>
                 <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span>IBEX 35</span>
-                    <span id="ibex-price" class="font-bold text-slate-300">Loading...</span>
+                    <span>BITCOIN (RISK ON/OFF)</span>
+                    <span id="btc-price" class="font-bold text-orange-400">Cargando...</span>
                 </div>
                 <div class="flex justify-between">
-                    <span>DXY (US DOLLAR)</span>
-                    <span id="dxy-price" class="font-bold text-blue-400">Loading...</span>
+                    <span>EUR/USD (FIAT STABILITY)</span>
+                    <span id="eur-price" class="font-bold text-blue-400">Cargando...</span>
                 </div>
             </div>
         </div>
@@ -48,63 +47,52 @@
 
     <script>
         const API_KEY = '1943e6176ad54469b00c88773080d5b4'; 
-        // 1. SOLUCIÓN: Pedir exactamente los símbolos que nuestro motor va a leer
-        const SYMBOLS = 'BRENT,IBEX35,DXY'; 
+        const SYMBOLS = 'XAUT/USD,BTC/USD,EUR/USD'; 
 
         async function updateMarketData() {
-            console.log("Actualizando motor de fricción...");
             try {
                 const response = await fetch(`https://api.twelvedata.com/price?symbol=${SYMBOLS}&apikey=${API_KEY}`);
                 const data = await response.json();
                 
-                // Esto nos dejará ver en la consola (F12) exactamente qué envía la API
-                console.log("Datos crudos de la API:", data);
-                
-                // 2. ASIGNACIÓN CORRECTA
-                const oil = data.BRENT ? parseFloat(data.BRENT.price) : 0;
-                const ibex = data.IBEX35 ? parseFloat(data.IBEX35.price) : 0;
-                const dxy = data.DXY ? parseFloat(data.DXY.price) : 0;
+                const gold = data['XAUT/USD'] ? parseFloat(data['XAUT/USD'].price) : 0;
+                const btc = data['BTC/USD'] ? parseFloat(data['BTC/USD'].price) : 0;
+                const eur = data['EUR/USD'] ? parseFloat(data['EUR/USD'].price) : 0;
 
-                // 3. ACTUALIZACIÓN VISUAL
-                // Si el valor es mayor a 0 lo muestra, si no, avisa de error en la API
-                document.getElementById('oil-price').innerText = oil > 0 ? `$${oil.toFixed(2)}` : 'Error API (Restringido)';
-                document.getElementById('ibex-price').innerText = ibex > 0 ? `${ibex.toFixed(2)}` : 'Error API (Restringido)';
-                document.getElementById('dxy-price').innerText = dxy > 0 ? `${dxy.toFixed(3)}` : 'Error API (Restringido)';
+                document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Error API';
+                document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Error API';
+                document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Error API';
 
-                // 4. LÓGICA DE CALOR (TU ESTRATEGIA)
                 let heatLevel = 0;
 
-                if (oil > 100) heatLevel += 50;
-                if (ibex > 0 && ibex < 18100) heatLevel += 30;
-                if (dxy > 105) heatLevel += 20;
+                // LÓGICA DE CALOR ACTUALIZADA
+                if (gold > 2350) heatLevel += 40; // El oro sube por refugio
+                if (btc < 64000) heatLevel += 40; // Bitcoin cae (fuga de capital)
+                if (eur < 1.08) heatLevel += 20;  // Debilidad en divisas tradicionales
 
-                // 5. ACTUALIZAR EL CÍRCULO
                 const heatDisplay = document.getElementById('heat-value');
                 const circle = document.getElementById('heat-circle');
                 const label = document.getElementById('logic-label');
 
                 heatDisplay.innerText = `${heatLevel}%`;
 
-                if (heatLevel >= 90) {
-                    label.innerText = "CRÍTICO: Manipulación Estratégica Máxima";
-                    label.className = "mt-4 text-xs text-red-500 font-bold animate-pulse";
+                if (heatLevel >= 80) {
+                    label.innerText = "ALERTA: Fuga masiva a refugios (ORO)";
+                    label.className = "mt-4 text-xs text-red-500 font-bold animate-pulse text-center";
                     circle.className = "w-32 h-32 rounded-full border-8 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center justify-center transition-all duration-500";
-                } else if (heatLevel >= 50) {
-                    label.innerText = "RIESGO: Especulación Geopolítica";
-                    label.className = "mt-4 text-xs text-orange-400 font-medium";
+                } else if (heatLevel >= 40) {
+                    label.innerText = "AVISO: Movimientos defensivos detectados";
+                    label.className = "mt-4 text-xs text-orange-400 font-medium text-center";
                     circle.className = "w-32 h-32 rounded-full border-8 border-orange-500 shadow-[0_0_20px_rgba(234,88,12,0.5)] flex items-center justify-center transition-all duration-500";
                 } else {
                     label.innerText = "Mercado en Calma Relativa";
-                    label.className = "mt-4 text-xs text-slate-500";
+                    label.className = "mt-4 text-xs text-slate-500 text-center";
                     circle.className = "w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500";
                 }
-
-            } catch (error) {
-                console.error("Fallo crítico en el motor:", error);
-            }
+            } catch (error) { console.error(error); }
         }
 
-        // El motor corre cada 60 segundos
         setInterval(updateMarketData, 60000);
         updateMarketData(); 
     </script>
+</body>
+</html>
