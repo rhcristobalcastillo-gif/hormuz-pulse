@@ -2,81 +2,83 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Hormuz & Taco v1.5 | Geopolitical Tension Sensor</title>
+    <title>Global Friction Monitor v1.5.1 | Universal Responsive</title>
 </head>
-<body class="bg-slate-950 text-slate-200 font-mono p-4">
+<body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-xl mx-auto">
 
     <header class="border-b border-slate-800 pb-4 mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-bold text-yellow-500 tracking-tighter uppercase">Global Friction Monitor v1.5</h1>
-            <p class="text-[10px] text-slate-400 uppercase tracking-[0.2em]">High Sensitivity: Gold & Geopolitics</p>
+            <h1 class="text-lg sm:text-xl font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v1.5.1</h1>
+            <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-[0.2em]">High Sensitivity & AI Sentiment</p>
         </div>
         <div id="status-badge">
-            <span class="bg-red-900/20 text-red-500 px-3 py-1 rounded-full text-[10px] animate-pulse font-bold border border-red-800/50">TENSION MONITOR ACTIVE</span>
+            <span class="bg-red-900/20 text-red-500 px-2 py-1 rounded-full text-[9px] animate-pulse font-bold border border-red-800/50">TENSION_LIVE</span>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-800 shadow-inner">
-            <span class="text-[10px] text-yellow-600 block mb-1 uppercase font-bold tracking-widest">XAUT (GOLD)</span>
-            <span id="gold-price" class="text-lg font-bold text-yellow-100">--</span>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-center">
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 shadow-inner">
+            <span class="text-[9px] text-yellow-600 block mb-1 uppercase font-bold">XAUT (GOLD)</span>
+            <span id="gold-price" class="text-base sm:text-lg font-bold text-yellow-100">--</span>
         </div>
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-800 shadow-inner">
-            <span class="text-[10px] text-orange-600 block mb-1 uppercase font-bold tracking-widest">BTC (RISK)</span>
-            <span id="btc-price" class="text-lg font-bold text-orange-100">--</span>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 shadow-inner">
+            <span class="text-[9px] text-orange-600 block mb-1 uppercase font-bold">BTC (RISK)</span>
+            <span id="btc-price" class="text-base sm:text-lg font-bold text-orange-100">--</span>
         </div>
-        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-800 shadow-inner">
-            <span class="text-[10px] text-blue-600 block mb-1 uppercase font-bold tracking-widest">EUR/USD (FIAT)</span>
-            <span id="eur-price" class="text-lg font-bold text-blue-100">--</span>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 shadow-inner">
+            <span class="text-[9px] text-blue-600 block mb-1 uppercase font-bold">EUR/USD (FIAT)</span>
+            <span id="eur-price" class="text-base sm:text-lg font-bold text-blue-100">--</span>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col items-center">
-            <h3 class="text-xs mb-4 text-yellow-500 font-bold uppercase tracking-widest">Hormuz Pulse (Geopolítica)</h3>
-            <div id="hormuz-circle" class="w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
-                <span id="hormuz-value" class="text-2xl font-bold">0%</span>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 mb-6">
+        
+        <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 flex flex-col items-center">
+            <h3 class="text-[10px] sm:text-xs mb-4 text-yellow-500 font-bold uppercase tracking-widest">Hormuz Pulse</h3>
+            <div id="hormuz-circle" class="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
+                <span id="hormuz-value" class="text-xl sm:text-2xl font-bold">0%</span>
             </div>
-            <p id="hormuz-label" class="mt-4 text-[10px] text-slate-500 italic text-center leading-tight">Analizando...</p>
+            <p id="hormuz-label" class="mt-4 text-[9px] sm:text-[10px] text-slate-500 italic text-center leading-tight">Analizando activos...</p>
         </div>
 
-        <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col items-center">
-            <h3 class="text-xs mb-4 text-orange-400 font-bold uppercase tracking-widest">Taco Trade (AI Sentiment)</h3>
-            <div id="taco-circle" class="w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
-                <span id="taco-value" class="text-2xl font-bold">0%</span>
+        <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 flex flex-col items-center">
+            <h3 class="text-[10px] sm:text-xs mb-4 text-orange-400 font-bold uppercase tracking-widest">Taco Trade (AI)</h3>
+            <div id="taco-circle" class="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700">
+                <span id="taco-value" class="text-xl sm:text-2xl font-bold">0%</span>
             </div>
-            <p id="taco-label" class="mt-4 text-[10px] text-slate-500 italic text-center leading-tight">Analizando...</p>
+            <p id="taco-label" class="mt-4 text-[9px] sm:text-[10px] text-slate-500 italic text-center leading-tight">Procesando IA...</p>
         </div>
+
     </div>
 
     <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-        <div class="flex justify-between items-center mb-3 text-[10px]">
-            <h3 class="text-slate-400 uppercase tracking-widest flex items-center">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="text-[9px] text-slate-400 uppercase tracking-widest flex items-center">
                 <span class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-ping"></span> IA Brain Activity
             </h3>
-            <span id="friction-mult-display" class="bg-slate-800 text-blue-400 px-2 py-0.5 rounded">Mult. Fricción: x1.0</span>
+            <span id="friction-mult-display" class="text-[9px] bg-slate-800 text-blue-400 px-2 py-0.5 rounded border border-slate-700 font-bold">Mult. Fricción: x1.0</span>
         </div>
-        <div id="news-feed" class="text-[11px] space-y-2 max-h-40 overflow-y-auto pr-2 scrollbar-thin">
+        <div id="news-feed" class="text-[10px] sm:text-[11px] space-y-2 max-h-[25vh] md:max-h-40 overflow-y-auto pr-2 scrollbar-thin">
             </div>
     </div>
 
     <script>
         const API_KEY = '1943e6176ad54469b00c88773080d5b4';
         
-        // DICCIONARIO IA: Palabras clave con alto impacto diplomático
         const aiKeywords = {
             'irán': 45, 'iran': 45, 'cierre': 40, 'negociaciones': 30,
             'eeua': 20, 'aranceles': 25, 'guerra': 40, 'petróleo': 20,
-            'crisis': 25, 'sanciones': 30, 'bloqueo': 35
+            'sanciones': 30, 'bloqueo': 35
         };
 
         const fakeNews = [
-            "Irán anuncia el cierre de negociaciones con EUA tras nuevos incidentes",
-            "Oro rompe barrera de los $4715 ante tensión en Medio Oriente",
-            "Trump intensifica discurso sobre aranceles comerciales",
-            "Bitcoin muestra volatilidad ante posible riesgo geopolítico",
-            "Reportan movimientos navales inusuales en el Estrecho de Hormuz"
+            "Irán anuncia el cierre de negociaciones con EUA tras incidentes",
+            "Oro rompe barrera de los $4715 ante tensión regional",
+            "Nuevas sanciones comerciales impactan el mercado de divisas",
+            "Trump intensifica discurso sobre aranceles este viernes",
+            "Bitcoin muestra alta volatilidad por riesgo geopolítico"
         ];
 
         async function updateMarketData() {
@@ -97,7 +99,6 @@
                 document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Sync...';
                 document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Sync...';
 
-                // --- PROCESAMIENTO IA ---
                 let aiScore = 0;
                 let globalFrictionMultiplier = 1.0; 
                 const feedContainer = document.getElementById('news-feed');
@@ -112,31 +113,21 @@
                             globalFrictionMultiplier += 0.12;
                         }
                     });
-                    
                     let finalImpact = impact * globalFrictionMultiplier;
                     aiScore += finalImpact;
-
                     const p = document.createElement('p');
-                    p.className = "border-l-2 border-slate-700 pl-2 py-1";
-                    p.innerHTML = `<span class="text-slate-500">[IA]:</span> ${news} <span class="text-blue-400 font-bold ml-2">+${finalImpact.toFixed(1)}</span>`;
+                    p.className = "border-l-2 border-slate-700 pl-2 py-1 hover:bg-slate-800 transition-colors";
+                    p.innerHTML = `<span class="text-slate-500 font-bold">[IA]:</span> ${news} <span class="text-blue-400 font-bold ml-1">+${finalImpact.toFixed(1)}</span>`;
                     feedContainer.appendChild(p);
                 });
                 document.getElementById('friction-mult-display').innerText = `Mult. Fricción: x${globalFrictionMultiplier.toFixed(2)}`;
 
-                // --- RECALIBRACIÓN HORMUZ PULSE ---
                 let hormuzHeat = 0;
-                
-                // Sensibilidad al Oro (Referencia base hoy: 4640)
-                if (gold > 4700) hormuzHeat += 35; // Cruce crítico detectado
-                if (gold > 4715) hormuzHeat += 15; // Aceleración de refugio
-                
-                // Correlación con Divisas (Si el Euro está débil bajo 1.18)
+                if (gold > 4700) hormuzHeat += 35;
+                if (gold > 4715) hormuzHeat += 15;
                 if (eur < 1.18 && eur > 0) hormuzHeat += 20;
-                
-                // Sensor de pánico (Si BTC no acompaña la subida del oro)
                 if (btc < 73800 && btc > 0) hormuzHeat += 30;
 
-                // El Taco Trade ahora refleja el sentimiento de la IA sobre los anuncios
                 let tacoHeat = Math.min((aiScore / 3), 100);
 
                 updateCircle('hormuz', hormuzHeat, "Hormuz: Calma Relativa");
@@ -153,17 +144,17 @@
             disp.innerText = `${val}%`;
 
             if (val >= 60) {
-                circ.className = `w-28 h-28 rounded-full border-8 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)] flex items-center justify-center transition-all duration-700`;
+                circ.className = `w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)] flex items-center justify-center transition-all duration-700`;
                 lab.innerText = "ALERTA: Tensión Detectada";
-                lab.className = "mt-4 text-[10px] text-red-500 font-bold animate-pulse text-center";
+                lab.className = "mt-4 text-[9px] sm:text-[10px] text-red-500 font-bold animate-pulse text-center";
             } else if (val >= 35) {
-                circ.className = `w-28 h-28 rounded-full border-8 border-orange-500 flex items-center justify-center transition-all duration-700`;
+                circ.className = `w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-orange-500 flex items-center justify-center transition-all duration-700`;
                 lab.innerText = "AVISO: Movimiento Defensivo";
-                lab.className = "mt-4 text-[10px] text-orange-400 text-center";
+                lab.className = "mt-4 text-[9px] sm:text-[10px] text-orange-400 text-center";
             } else {
-                circ.className = `w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700`;
+                circ.className = `w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-700`;
                 lab.innerText = defaultText;
-                lab.className = "mt-4 text-[10px] text-slate-500 italic text-center";
+                lab.className = "mt-4 text-[9px] sm:text-[10px] text-slate-500 italic text-center";
             }
         }
 
