@@ -47,27 +47,37 @@
 
     <script>
         const API_KEY = '1943e6176ad54469b00c88773080d5b4'; 
+        // Cambiamos a símbolos más universales para el plan gratuito
         const SYMBOLS = 'XAUT/USD,BTC/USD,EUR/USD'; 
 
         async function updateMarketData() {
             try {
-                const response = await fetch(`https://api.twelvedata.com/price?symbol=${SYMBOLS}&apikey=${API_KEY}`);
-                const data = await response.json();
+                // Consultamos uno por uno para evitar que un error en uno bloquee a los demás
+                const symbolsArray = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
+                let results = {};
+
+                for (const sym of symbolsArray) {
+                    const resp = await fetch(`https://api.twelvedata.com/price?symbol=${sym}&apikey=${API_KEY}`);
+                    const resData = await resp.json();
+                    results[sym] = resData.price ? parseFloat(resData.price) : 0;
+                }
                 
-                const gold = data['XAUT/USD'] ? parseFloat(data['XAUT/USD'].price) : 0;
-                const btc = data['BTC/USD'] ? parseFloat(data['BTC/USD'].price) : 0;
-                const eur = data['EUR/USD'] ? parseFloat(data['EUR/USD'].price) : 0;
+                const gold = results['XAUT/USD'];
+                const btc = results['BTC/USD'];
+                const eur = results['EUR/USD'];
 
-                document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Error API';
-                document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Error API';
-                document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Error API';
+                // Actualizar interfaz
+                document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Esperando API...';
+                document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Esperando API...';
+                document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Esperando API...';
 
+                // Lógica de Calor (Solo se activa si hay datos reales)
                 let heatLevel = 0;
-
-                // LÓGICA DE CALOR ACTUALIZADA
-                if (gold > 2350) heatLevel += 40; // El oro sube por refugio
-                if (btc < 64000) heatLevel += 40; // Bitcoin cae (fuga de capital)
-                if (eur < 1.08) heatLevel += 20;  // Debilidad en divisas tradicionales
+                if (gold > 0) {
+                    if (gold > 2300) heatLevel += 40;
+                    if (btc > 0 && btc < 65000) heatLevel += 40;
+                    if (eur > 0 && eur < 1.09) heatLevel += 20;
+                }
 
                 const heatDisplay = document.getElementById('heat-value');
                 const circle = document.getElementById('heat-circle');
@@ -75,24 +85,22 @@
 
                 heatDisplay.innerText = `${heatLevel}%`;
 
+                // Colores dinámicos
                 if (heatLevel >= 80) {
-                    label.innerText = "ALERTA: Fuga masiva a refugios (ORO)";
-                    label.className = "mt-4 text-xs text-red-500 font-bold animate-pulse text-center";
+                    label.innerText = "ALERTA: Fuga masiva a refugios";
                     circle.className = "w-32 h-32 rounded-full border-8 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center justify-center transition-all duration-500";
                 } else if (heatLevel >= 40) {
-                    label.innerText = "AVISO: Movimientos defensivos detectados";
-                    label.className = "mt-4 text-xs text-orange-400 font-medium text-center";
+                    label.innerText = "AVISO: Movimientos defensivos";
                     circle.className = "w-32 h-32 rounded-full border-8 border-orange-500 shadow-[0_0_20px_rgba(234,88,12,0.5)] flex items-center justify-center transition-all duration-500";
                 } else {
-                    label.innerText = "Mercado en Calma Relativa";
-                    label.className = "mt-4 text-xs text-slate-500 text-center";
+                    label.innerText = gold > 0 ? "Mercado en Calma Relativa" : "Sincronizando con satélite...";
                     circle.className = "w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500";
                 }
-            } catch (error) { console.error(error); }
+            } catch (error) { console.error("Error de conexión:", error); }
         }
 
         setInterval(updateMarketData, 60000);
         updateMarketData(); 
     </script>
-</body>
+    </body>
 </html>
