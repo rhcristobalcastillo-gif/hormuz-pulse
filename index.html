@@ -3,46 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Hormuz Pulse | XAUT Edition</title>
+    <title>Hormuz Pulse & Taco Trade | Comparative Dashboard</title>
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono p-6">
 
     <header class="border-b border-slate-800 pb-4 mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-yellow-500 tracking-tighter">HORMUZ_PULSE v1.1</h1>
-            <p class="text-xs text-slate-500">GOLD & LIQUIDITY SENSOR</p>
+            <h1 class="text-2xl font-bold text-yellow-500 tracking-tighter">GLOBAL FRICTION MONITOR v1.2</h1>
+            <p class="text-xs text-slate-500">REAL-TIME RISK & POLICY SENSORS</p>
         </div>
         <div id="status-badge">
-            <span class="bg-red-900/30 text-red-500 px-3 py-1 rounded-full text-xs animate-pulse font-bold">MONITORING ASSETS</span>
+            <span class="bg-green-900/30 text-green-500 px-3 py-1 rounded-full text-xs animate-pulse font-bold">LIVE DATA SYNC</span>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col items-center justify-center">
-            <h3 class="text-sm mb-4 text-yellow-500">MANIPULATION HEAT</h3>
-            <div id="heat-circle" class="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500">
-                <span id="heat-value" class="text-3xl font-bold">0%</span>
+    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-6">
+        <h3 class="text-sm mb-4 uppercase text-slate-400">Risk Barometers (24/7 Free Tier)</h3>
+        <div class="space-y-4">
+            <div class="flex justify-between border-b border-slate-800 pb-2">
+                <span class="text-yellow-400">TETHER GOLD (XAUT)</span>
+                <span id="gold-price" class="font-bold">Cargando...</span>
             </div>
-            <p id="logic-label" class="mt-4 text-xs text-slate-500 italic text-center">Analizando correlación Oro/BTC...</p>
+            <div class="flex justify-between border-b border-slate-800 pb-2">
+                <span>BITCOIN (RISK ON/OFF)</span>
+                <span id="btc-price" class="font-bold text-orange-400">Cargando...</span>
+            </div>
+            <div class="flex justify-between">
+                <span>EUR/USD (FIAT STABILITY)</span>
+                <span id="eur-price" class="font-bold text-blue-400">Cargando...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col items-center justify-center">
+            <h3 class="text-sm mb-4 text-yellow-500">1. HORMUZ PULSE (Geopolitical Risk)</h3>
+            <div id="hormuz-circle" class="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500">
+                <span id="hormuz-value" class="text-3xl font-bold">0%</span>
+            </div>
+            <p id="hormuz-label" class="mt-4 text-xs text-slate-500 italic text-center">Analizando correlación Oro/Eur...</p>
         </div>
 
-        <div class="md:col-span-2 bg-slate-900 p-6 rounded-xl border border-slate-800">
-            <h3 class="text-sm mb-4 uppercase text-slate-400">Geopolitical Risk Sensors</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span class="text-yellow-400">TETHER GOLD (XAUT)</span>
-                    <span id="gold-price" class="font-bold">Cargando...</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span>BITCOIN (RISK ON/OFF)</span>
-                    <span id="btc-price" class="font-bold text-orange-400">Cargando...</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>EUR/USD (FIAT STABILITY)</span>
-                    <span id="eur-price" class="font-bold text-blue-400">Cargando...</span>
-                </div>
+        <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col items-center justify-center">
+            <h3 class="text-sm mb-4 text-orange-400">2. TACO TRADE (Trump Policy & Fri Risk)</h3>
+            <div id="taco-circle" class="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500">
+                <span id="taco-value" class="text-3xl font-bold">0%</span>
             </div>
+            <p id="taco-label" class="mt-4 text-xs text-slate-500 italic text-center">Analizando volatilidad del Dólar/BTC...</p>
         </div>
+
     </div>
 
     <script>
@@ -51,6 +61,7 @@
 
         async function updateMarketData() {
             try {
+                // LLAMADA A LA API
                 const symbolsArray = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
                 let results = {};
                 for (const sym of symbolsArray) {
@@ -63,33 +74,79 @@
                 const btc = results['BTC/USD'];
                 const eur = results['EUR/USD'];
 
+                // ACTUALIZACIÓN DE TEXTOS EN PANTALLA
                 document.getElementById('gold-price').innerText = gold > 0 ? `$${gold.toFixed(2)}` : 'Sincronizando...';
                 document.getElementById('btc-price').innerText = btc > 0 ? `$${btc.toLocaleString()}` : 'Sincronizando...';
                 document.getElementById('eur-price').innerText = eur > 0 ? `$${eur.toFixed(4)}` : 'Sincronizando...';
 
-                // LÓGICA DE CALOR RE-CALIBRADA
-                let heatLevel = 0;
+                // LÓGICA DE CALOR COMPARATIVA
+                let hormuzHeat = 0;
+                let tacoHeat = 0;
+
+                // Solo calculamos si hay datos reales
                 if (gold > 0) {
-                    if (gold > 4800) heatLevel += 40;        // Umbral ajustado
-                    if (btc > 0 && btc < 68000) heatLevel += 40; 
-                    if (eur > 0 && eur < 1.07) heatLevel += 20;  
+                    // LÓGICA HORMUZ PULSE (Tensión Geopolítica/Refugio)
+                    // Umbrales calibrados a tus lecturas actuales
+                    if (gold > 4800) hormuzHeat += 40;        // Fuga masiva al Oro
+                    if (eur > 0 && eur < 1.07) hormuzHeat += 30;  // Debilidad en Europa
+                    if (btc > 0 && btc < 65000) hormuzHeat += 30; // Capital huye de Cripto (Pánico)
+
+                    // LÓGICA TACO TRADE (Trump Policy & Viernes)
+                    // Umbrales calibrados para detectar "euforia" política
+                    if (eur > 0 && eur < 1.08) tacoHeat += 35;  // Dólar fuerte (Efecto Arancel)
+                    if (btc > 75000) tacoHeat += 35;            // Euphoria BTC (Efecto Desregulación)
+                    if (gold > 4850) tacoHeat += 30;            // Incertidumbre Comercial (Efecto Arancel)
+
+                    // Ajuste por cierre de Viernes (Fricción de fin de semana)
+                    const hoy = new Date();
+                    // getDay() devuelve 5 para Viernes. getHours() >= 16 es cierre de NY
+                    if (hoy.getDay() === 5 && hoy.getHours() >= 16) { 
+                        tacoHeat += 10; 
+                    }
+                    // Protegemos que el nivel de calor no supere 100%
+                    tacoHeat = Math.min(tacoHeat, 100);
                 }
 
-                const heatDisplay = document.getElementById('heat-value');
-                const circle = document.getElementById('heat-circle');
-                const label = document.getElementById('logic-label');
+                // ACTUALIZACIÓN VISUAL HORMUZ PULSE
+                const hormuzDisplay = document.getElementById('hormuz-value');
+                const hormuzCircle = document.getElementById('hormuz-circle');
+                const hormuzLabel = document.getElementById('hormuz-label');
+                hormuzDisplay.innerText = `${hormuzHeat}%`;
 
-                heatDisplay.innerText = `${heatLevel}%`;
-
-                if (heatLevel >= 80) {
-                    label.innerText = "ALERTA: Fuga masiva a refugios";
-                    circle.className = "w-32 h-32 rounded-full border-8 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center justify-center transition-all duration-500";
-                } else if (heatLevel >= 40) {
-                    label.innerText = "AVISO: Movimientos defensivos";
-                    circle.className = "w-32 h-32 rounded-full border-8 border-orange-500 shadow-[0_0_20px_rgba(234,88,12,0.5)] flex items-center justify-center transition-all duration-500";
+                if (hormuzHeat >= 80) {
+                    hormuzLabel.innerText = "ALERTA: Fuga masiva a refugios (Guerras)";
+                    hormuzCircle.className = "w-32 h-32 rounded-full border-8 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center justify-center transition-all duration-500";
+                } else if (hormuzHeat >= 40) {
+                    hormuzLabel.innerText = "AVISO: Movimientos defensivos (Tensión)";
+                    hormuzCircle.className = "w-32 h-32 rounded-full border-8 border-orange-500 shadow-[0_0_20px_rgba(234,88,12,0.5)] flex items-center justify-center transition-all duration-500";
                 } else {
-                    label.innerText = gold > 0 ? "Mercado en Calma Relativa" : "Sincronizando con satélite...";
-                    circle.className = "w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500";
+                    hormuzLabel.innerText = "Hormuz: Mercado en Calma Relativa";
+                    hormuzCircle.className = "w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500";
+                }
+
+                // ACTUALIZACIÓN VISUAL TACO TRADE SENSOR
+                const tacoDisplay = document.getElementById('taco-value');
+                const tacoCircle = document.getElementById('taco-circle');
+                const tacoLabel = document.getElementById('taco-label');
+                tacoDisplay.innerText = `${tacoHeat}%`;
+
+                // Cierre de Viernes (Label dinámico para resaltar la fricción)
+                const hoy = new Date();
+                const esViernes = hoy.getDay() === 5 && hoy.getHours() >= 16;
+                let closingWarning = esViernes ? " [Fricción Cierre de Viernes]" : "";
+
+                if (tacoHeat >= 80) {
+                    tacoLabel.innerText = `ALERTA: Trump Policy Impacto Máximo${closingWarning}`;
+                    tacoLabel.className = "mt-4 text-xs text-red-500 font-bold animate-pulse text-center";
+                    tacoCircle.className = "w-32 h-32 rounded-full border-8 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center justify-center transition-all duration-500";
+                } else if (tacoHeat >= 40) {
+                    tacoLabel.innerText = `AVISO: Trump Trade Detectado${closingWarning}`;
+                    tacoLabel.className = "mt-4 text-xs text-orange-400 font-medium text-center";
+                    tacoCircle.className = "w-32 h-32 rounded-full border-8 border-orange-500 shadow-[0_0_20px_rgba(234,88,12,0.5)] flex items-center justify-center transition-all duration-500";
+                } else {
+                    tacoLabel.innerText = `Taco Trade: Calma Política${closingWarning}`;
+                    tacoLabel.className = "mt-4 text-xs text-slate-500 text-center";
+                    tacoCircle.className = "w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center transition-all duration-500";
                 }
             } catch (error) { console.error("Error de conexión:", error); }
         }
