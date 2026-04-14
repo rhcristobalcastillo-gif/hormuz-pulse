@@ -134,31 +134,40 @@
         }
 
         function switchTab(tab) {
-            const m = document.getElementById('view-monitor'), q = document.getElementById('view-quetza');
-            const btnM = document.getElementById('tab-monitor'), btnQ = document.getElementById('tab-quetza');
-            m.style.display = tab === 'monitor' ? 'block' : 'none';
-            q.style.display = tab === 'quetza' ? 'block' : 'none';
-            if(tab==='quetza') q.classList.remove('hidden');
-            btnM.className = (tab==='monitor'?'tab-active':'text-slate-500') + ' py-2 transition-all';
-            btnQ.className = (tab==='quetza'?'tab-active':'text-slate-500') + ' py-2 transition-all';
-            if (tab === 'quetza' && !timerStarted) startTestTimer(15);
-            updateCreditDisplay();
+            const m = document.getElementById('view-monitor');
+            const q = document.getElementById('view-quetza');
+            const btnM = document.getElementById('tab-monitor');
+            const btnQ = document.getElementById('tab-quetza');
+
+            // Guardar la pestaña actual en el navegador
+            localStorage.setItem('active_tab', tab);
+
+            if (tab === 'monitor') {
+                m.style.display = 'block';
+                q.style.display = 'none';
+                btnM.className = 'tab-active py-2 transition-all';
+                btnQ.className = 'py-2 transition-all text-slate-500 hover:text-yellow-500';
+            } else {
+                m.style.display = 'none';
+                q.style.display = 'block';
+                q.classList.remove('hidden');
+                btnQ.className = 'tab-active py-2 transition-all';
+                btnM.className = 'py-2 transition-all text-slate-500 hover:text-yellow-500';
+                
+                if (!timerStarted) startTestTimer(15);
+                updateCreditDisplay();
+            }
         }
 
-        function startTestTimer(minutes) {
-            timerStarted = true;
-            let time = minutes * 60;
-            const display = document.getElementById('quetza-timer');
-            const countdown = setInterval(() => {
-                let m = Math.floor(time / 60), s = time % 60;
-                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-                if (--time < 0) {
-                    clearInterval(countdown);
-                    display.innerText = "CERRADO";
-                    document.getElementById('btn-yes').disabled = true;
-                    document.getElementById('btn-no').disabled = true;
-                }
-            }, 1000);
+        // 2. INICIALIZACIÓN AL CARGAR (Recuperar Pestaña)
+        window.onload = function() {
+            initCharts();
+            updateCreditDisplay();
+
+            // Leer qué pestaña estaba abierta antes del F5
+            const lastTab = localStorage.getItem('active_tab') || 'monitor';
+            switchTab(lastTab);
+        };
         }
 
         async function updateMarketData() {
