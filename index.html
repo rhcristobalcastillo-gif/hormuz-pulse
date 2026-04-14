@@ -70,86 +70,113 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const KEY = '269d17eafe284411b6e5da2768325a1a';
-        let history = { gold: [4830, 4832, 4835], btc: [74500, 74550, 74610], eur: [1.1790, 1.1792, 1.1795] };
-        let charts = {};
+<script>
+    const KEY = '269d17eafe284411b6e5da2768325a1a';
+    let history = { gold: [4830, 4832, 4835], btc: [74500, 74550, 74610], eur: [1.1790, 1.1792, 1.1795] };
+    let charts = {};
 
-        function initCharts() {
-            ['gold', 'btc', 'eur'].forEach(id => {
-                const ctx = document.getElementById(`${id}-chart`).getContext('2d');
-                charts[id] = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: new Array(history[id].length).fill(''),
-                        datasets: [{
-                            data: history[id],
-                            borderColor: id === 'gold' ? '#fde047' : (id === 'btc' ? '#fb923c' : '#60a5fa'),
-                            borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-                });
+    // Valores fijos para la prueba visual (80% y 72%)
+    const fixedPercentages = { hormuz: 80, taco: 72 };
+
+    function initCharts() {
+        ['gold', 'btc', 'eur'].forEach(id => {
+            const ctx = document.getElementById(`${id}-chart`).getContext('2d');
+            charts[id] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: new Array(history[id].length).fill(''),
+                    datasets: [{
+                        data: history[id],
+                        borderColor: id === 'gold' ? '#fde047' : (id === 'btc' ? '#fb923c' : '#60a5fa'),
+                        borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
             });
-        }
+        });
 
-        async function updateMarketData() {
-            const btn = document.getElementById('sync-btn');
-            btn.classList.add('btn-disabled');
-            btn.disabled = true;
-            btn.innerText = "⏳ Consultando...";
+        // Forzar colores correctos al inicio basados en los porcentajes altos
+        updateCircleColor('hormuz', fixedPercentages.hormuz);
+        updateCircleColor('taco', fixedPercentages.taco);
+    }
 
-            try {
-                const symbols = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
-                for (const s of symbols) {
-                    const r = await fetch(`https://api.twelvedata.com/price?symbol=${s}&apikey=${KEY}`);
-                    const d = await r.json();
-                    
-                    if (d.price) {
-                        const val = parseFloat(d.price);
-                        const id = s.split('/')[0].toLowerCase().replace('xaut','gold');
-                        updateUI(id, val);
-                    } else if (d.code === 429) {
-                        alert("Límite de API alcanzado. Espera unos minutos.");
-                        break;
-                    }
+    async function updateMarketData() {
+        const btn = document.getElementById('sync-btn');
+        btn.classList.add('btn-disabled');
+        btn.disabled = true;
+        btn.innerText = "⏳ Consultando...";
+
+        try {
+            const symbols = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
+            for (const s of symbols) {
+                const r = await fetch(`https://api.twelvedata.com/price?symbol=${s}&apikey=${KEY}`);
+                const d = await r.json();
+                
+                if (d.price) {
+                    const val = parseFloat(d.price);
+                    const id = s.split('/')[0].toLowerCase().replace('xaut','gold');
+                    updateUI(id, val);
+                } else if (d.code === 429) {
+                    alert("Límite de API alcanzado. Espera unos minutos.");
+                    break;
                 }
-            } catch (e) { console.log(e); }
+            }
+        } catch (e) { console.log(e); }
 
-            // Bloqueo de seguridad de 20 segundos para evitar baneos
-            let cooldown = 20;
-            const timer = setInterval(() => {
-                cooldown--;
-                btn.innerText = `Espera (${cooldown}s)`;
-                if (cooldown <= 0) {
-                    clearInterval(timer);
-                    btn.classList.remove('btn-disabled');
-                    btn.disabled = false;
-                    btn.innerText = "🔄 Sincronizar Ahora";
-                }
-            }, 1000);
+        // Cooldown de seguridad
+        let cooldown = 20;
+        const timer = setInterval(() => {
+            cooldown--;
+            btn.innerText = `Espera (${cooldown}s)`;
+            if (cooldown <= 0) {
+                clearInterval(timer);
+                btn.classList.remove('btn-disabled');
+                btn.disabled = false;
+                btn.innerText = "🔄 Sincronizar Ahora";
+            }
+        }, 1000);
+    }
+
+    function updateUI(id, val) {
+        document.getElementById(`${id}-price`).innerText = id === 'eur' ? `$${val.toFixed(4)}` : `$${val.toLocaleString()}`;
+        
+        const lastVal = history[id][history[id].length - 1];
+        const diff = (((val - lastVal) / lastVal) * 100).toFixed(2);
+        const pctEl = document.getElementById(`${id}-pct`);
+        pctEl.innerText = `${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}% desde último clic`;
+        pctEl.className = `text-[10px] ${diff > 0 ? 'text-green-400' : (diff < 0 ? 'text-red-400' : 'text-slate-500')}`;
+
+        history[id].push(val);
+        if (history[id].length > 15) history[id].shift();
+        charts[id].data.datasets[0].data = history[id];
+        charts[id].update();
+
+        const feed = document.getElementById('news-feed');
+        feed.innerHTML = `[${new Date().toLocaleTimeString()}]: Datos actualizados manualmente. Fricción alta detectada.`;
+        
+        // Actualizar colores basados en los porcentajes fijos
+        updateCircleColor('hormuz', fixedPercentages.hormuz);
+        updateCircleColor('taco', fixedPercentages.taco);
+    }
+
+    // NUEVA FUNCIÓN CORREGIDA PARA LÓGICA DE COLORES
+    function updateCircleColor(id, val) {
+        const circ = document.getElementById(`${id}-circle`);
+        
+        // Lógica de colores basada en el porcentaje
+        let colorClass = "border-blue-500"; // Azul por defecto (Bajo riesgo)
+        
+        if (val >= 75) {
+            colorClass = "border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.7)] alert-pulse"; // Rojo (Alto riesgo)
+        } else if (val >= 40) {
+            colorClass = "border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.5)]"; // Naranja (Riesgo medio)
         }
+        
+        // Aplicar las clases Tailwind al círculo
+        circ.className = `w-32 h-32 rounded-full border-[10px] ${colorClass} flex items-center justify-center transition-all duration-700`;
+    }
 
-        function updateUI(id, val) {
-            document.getElementById(`${id}-price`).innerText = id === 'eur' ? `$${val.toFixed(4)}` : `$${val.toLocaleString()}`;
-            
-            const lastVal = history[id][history[id].length - 1];
-            const diff = (((val - lastVal) / lastVal) * 100).toFixed(2);
-            const pctEl = document.getElementById(`${id}-pct`);
-            pctEl.innerText = `${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}% desde último clic`;
-            pctEl.className = `text-[10px] ${diff > 0 ? 'text-green-400' : (diff < 0 ? 'text-red-400' : 'text-slate-500')}`;
-
-            history[id].push(val);
-            if (history[id].length > 15) history[id].shift();
-            charts[id].data.datasets[0].data = history[id];
-            charts[id].update();
-
-            // Log de actividad
-            const feed = document.getElementById('news-feed');
-            feed.innerHTML = `[${new Date().toLocaleTimeString()}]: Datos actualizados manualmente. Fricción estable.`;
-        }
-
-        initCharts();
-    </script>
+    initCharts();
+</script>
 </body>
 </html>
