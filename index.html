@@ -4,67 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/near-api-js@0.44.2/dist/near-api-js.min.js"></script>
-    <title>Hormuz Pulse v2.2 | Quetza-Core</title>
+    <title>Hormuz Pulse v2.3 | Quetza Credits</title>
     <style>
         canvas { width: 100% !important; height: 40px !important; }
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
         @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 5px #fde047; } 50% { box-shadow: 0 0 20px #fde047; } }
         .btn-active { animation: pulse-gold 2s infinite; }
-        .btn-disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.5; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-xl mx-auto">
 
     <nav class="flex justify-center space-x-8 mb-8 border-b border-slate-800 pb-2 text-[10px] uppercase tracking-[0.2em]">
-        <button id="tab-monitor" onclick="switchTab('monitor')" class="tab-active py-2 transition-all">📡 Monitor Global</button>
-        <button id="tab-quetza" onclick="switchTab('quetza')" class="py-2 transition-all text-slate-500 hover:text-yellow-500">🦅 QuetzaPredict</button>
+        <button id="tab-monitor" onclick="switchTab('monitor')" class="tab-active py-2">📡 Monitor Global</button>
+        <button id="tab-quetza" onclick="switchTab('quetza')" class="py-2 text-slate-500">🦅 QuetzaPredict</button>
     </nav>
 
     <div id="view-monitor">
         <header class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-lg font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v2.2</h1>
-                <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Control Manual | Jalisco, MX</p>
+                <h1 class="text-lg font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v2.3</h1>
+                <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Créditos Quetza Habilitados</p>
             </div>
-            <button id="sync-btn" onclick="updateMarketData()" class="bg-yellow-600 text-slate-950 px-4 py-2 rounded-full text-[10px] font-black uppercase btn-active">🔄 Sincronizar</button>
+            <button onclick="updateMarketData()" class="bg-yellow-600 text-slate-950 px-4 py-2 rounded-full text-[10px] font-black uppercase btn-active">🔄 Sincronizar</button>
         </header>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
-                <span class="text-[9px] text-yellow-600 block mb-1 font-bold uppercase">XAUT (GOLD)</span>
-                <div id="gold-price" class="text-2xl font-bold text-yellow-100 mb-1">$4,835.69</div>
-                <div id="gold-pct" class="text-[10px] text-slate-500 mb-3">--</div>
+                <span class="text-[9px] text-yellow-600 block mb-1 font-bold">XAUT (GOLD)</span>
+                <div id="gold-price" class="text-2xl font-bold text-yellow-100">$4,835.69</div>
                 <canvas id="gold-chart"></canvas>
             </div>
             <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
-                <span class="text-[9px] text-orange-600 block mb-1 font-bold uppercase">BTC (RISK)</span>
-                <div id="btc-price" class="text-2xl font-bold text-orange-100 mb-1">$74,610</div>
-                <div id="btc-pct" class="text-[10px] text-slate-500 mb-3">--</div>
+                <span class="text-[9px] text-orange-600 block mb-1 font-bold">BTC (RISK)</span>
+                <div id="btc-price" class="text-2xl font-bold text-orange-100">$74,610</div>
                 <canvas id="btc-chart"></canvas>
             </div>
             <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
-                <span class="text-[9px] text-blue-600 block mb-1 font-bold uppercase">EUR/USD (FIAT)</span>
-                <div id="eur-price" class="text-2xl font-bold text-blue-100 mb-1">$1.1795</div>
-                <div id="eur-pct" class="text-[10px] text-slate-500 mb-3">--</div>
+                <span class="text-[9px] text-blue-600 block mb-1 font-bold">EUR/USD (FIAT)</span>
+                <div id="eur-price" class="text-2xl font-bold text-blue-100">$1.1795</div>
                 <canvas id="eur-chart"></canvas>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 flex flex-col items-center shadow-2xl">
-                <h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.4em] mb-6">Hormuz Pulse</h3>
-                <div id="hormuz-circle" class="w-32 h-32 rounded-full border-[10px] border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.7)] flex items-center justify-center transition-all duration-700">
-                    <span class="text-3xl font-black">80%</span>
-                </div>
-                <p class="mt-6 text-[10px] text-red-500 font-bold uppercase animate-pulse">ALERTA: TENSIÓN</p>
-            </div>
-            <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 flex flex-col items-center shadow-2xl">
-                <h3 class="text-[10px] text-orange-400 font-bold uppercase tracking-[0.4em] mb-6">Taco Trade (IA)</h3>
-                <div id="taco-circle" class="w-32 h-32 rounded-full border-[10px] border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.7)] flex items-center justify-center transition-all duration-700">
-                    <span class="text-3xl font-black">72%</span>
-                </div>
-                <p class="mt-6 text-[10px] text-orange-500 font-bold uppercase">RIESGO ELEVADO</p>
             </div>
         </div>
     </div>
@@ -73,128 +51,112 @@
         <div class="flex justify-between items-start mb-8">
             <div>
                 <h2 class="text-2xl font-black text-yellow-500 italic uppercase">QuetzaPredict MX</h2>
-                <p class="text-[8px] text-red-500 uppercase font-bold">Sin conexión a NEAR Testnet</p>
+                <button onclick="alert('Próximamente: Conecta tu Wallet NEAR para retirar ganancias')" class="text-[8px] text-blue-500 uppercase font-bold hover:underline">¿Pasar a modo Web3? Conectar Wallet</button>
             </div>
-            <div class="bg-slate-900 border border-slate-800 p-2 rounded-lg text-right">
-                <p class="text-[8px] text-slate-500 uppercase tracking-widest">Saldo fUSDT</p>
-                <p class="text-sm font-bold text-green-400">0.00 fUSDT</p>
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-right">
+                <p class="text-[8px] text-slate-500 uppercase tracking-widest">Tus Créditos Quetza</p>
+                <p id="user-credits" class="text-xl font-black text-green-400">1,000</p>
             </div>
         </div>
 
-        <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl">
+        <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl relative overflow-hidden">
             <div class="flex justify-between items-center mb-4">
-                <span id="market-status-badge" class="bg-yellow-600/20 text-yellow-500 text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest">Mercado Activo #042</span>
+                <span id="market-status-badge" class="bg-yellow-600/20 text-yellow-500 text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest">Mercado #042</span>
                 <span class="text-slate-500 text-[10px]">Cierra en: <span id="quetza-timer" class="font-bold text-yellow-500">15:00</span></span>
             </div>
-            <h3 class="text-lg font-bold mb-4 italic">¿Alcanzará el Oro (XAUT) los $4,900.00 USD en los próximos 15 min?</h3>
+            <h3 class="text-lg font-bold mb-6 italic">¿El Oro superará su precio actual en los próximos 15 min?</h3>
             
             <div class="flex space-x-3 mb-6">
-                <button id="btn-yes" onclick="alert('Iniciando transacción en Testnet para SÍ')" class="flex-1 bg-green-600 hover:bg-green-500 text-slate-950 font-black py-4 rounded-xl uppercase text-xs">Apostar SÍ</button>
-                <button id="btn-no" onclick="alert('Iniciando transacción en Testnet para NO')" class="flex-1 bg-red-600 hover:bg-red-500 text-slate-950 font-black py-4 rounded-xl uppercase text-xs">Apostar NO</button>
+                <button id="btn-yes" onclick="placeSocialBet('SÍ')" class="flex-1 bg-green-600 hover:bg-green-500 text-slate-950 font-black py-4 rounded-xl uppercase text-xs transition-transform active:scale-95">Apostar SÍ (100 pts)</button>
+                <button id="btn-no" onclick="placeSocialBet('NO')" class="flex-1 bg-red-600 hover:bg-red-500 text-slate-950 font-black py-4 rounded-xl uppercase text-xs transition-transform active:scale-95">Apostar NO (100 pts)</button>
+            </div>
+
+            <div class="border-t border-slate-800 pt-4 flex justify-between text-[10px] uppercase text-slate-500 font-bold">
+                <span>Tu Posición: <span id="user-position" class="text-white">Ninguna</span></span>
+                <span>Inversión: <span id="user-investment" class="text-white">0</span> créditos</span>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const KEY = '269d17eafe284411b6e5da2768325a1a';
-        let history = { gold: [4830, 4832, 4835], btc: [74500, 74550, 74610], eur: [1.1790, 1.1792, 1.1795] };
-        let charts = {};
+        // LÓGICA DE CRÉDITOS QUETZA
+        let credits = localStorage.getItem('quetza_credits') ? parseInt(localStorage.getItem('quetza_credits')) : 1000;
+        let myBet = { side: 'Ninguna', amount: 0 };
         let timerStarted = false;
 
-        function switchTab(tab) {
-            const monitor = document.getElementById('view-monitor');
-            const quetza = document.getElementById('view-quetza');
-            const btnM = document.getElementById('tab-monitor');
-            const btnQ = document.getElementById('tab-quetza');
+        function updateCreditDisplay() {
+            document.getElementById('user-credits').innerText = credits.toLocaleString();
+            document.getElementById('user-position').innerText = myBet.side;
+            document.getElementById('user-investment').innerText = myBet.amount;
+            localStorage.setItem('quetza_credits', credits);
+        }
 
-            if (tab === 'monitor') {
-                monitor.style.display = 'block';
-                quetza.style.display = 'none';
-                btnM.classList.add('tab-active');
-                btnQ.classList.remove('tab-active');
-                btnQ.classList.add('text-slate-500');
-            } else {
-                monitor.style.display = 'none';
-                quetza.style.display = 'block';
-                quetza.classList.remove('hidden');
-                btnQ.classList.add('tab-active');
-                btnM.classList.remove('tab-active');
-                btnM.classList.add('text-slate-500');
-                if (!timerStarted) startTestTimer(15);
+        function placeSocialBet(side) {
+            if (credits < 100) {
+                alert("¡No tienes suficientes Créditos Quetza!");
+                return;
             }
+            if (myBet.amount > 0) {
+                alert("Ya tienes una posición abierta en este mercado.");
+                return;
+            }
+
+            credits -= 100;
+            myBet.side = side;
+            myBet.amount = 100;
+            updateCreditDisplay();
+            alert(`Apuesta confirmada: 100 créditos al ${side}. ¡Suerte!`);
+        }
+
+        // NAVEGACIÓN Y OTROS (Manteniendo estabilidad v2.2)
+        function switchTab(tab) {
+            const m = document.getElementById('view-monitor');
+            const q = document.getElementById('view-quetza');
+            m.style.display = tab === 'monitor' ? 'block' : 'none';
+            q.style.display = tab === 'quetza' ? 'block' : 'none';
+            if (tab === 'quetza') {
+                q.classList.remove('hidden');
+                if (!timerStarted) startTestTimer(15);
+                updateCreditDisplay();
+            }
+            document.getElementById('tab-monitor').className = (tab === 'monitor' ? 'tab-active' : 'text-slate-500') + ' py-2';
+            document.getElementById('tab-quetza').className = (tab === 'quetza' ? 'tab-active' : 'text-slate-500') + ' py-2';
         }
 
         function startTestTimer(minutes) {
             timerStarted = true;
             let time = minutes * 60;
             const display = document.getElementById('quetza-timer');
-            const badge = document.getElementById('market-status-badge');
-            
             const countdown = setInterval(() => {
-                let m = Math.floor(time / 60);
-                let s = time % 60;
+                let m = Math.floor(time / 60), s = time % 60;
                 display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-                
                 if (--time < 0) {
                     clearInterval(countdown);
                     display.innerText = "CERRADO";
-                    badge.innerText = "MERCADO EN RESOLUCIÓN";
-                    badge.className = "bg-red-600/20 text-red-500 text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest";
-                    document.getElementById('btn-yes').className = "flex-1 bg-slate-800 text-slate-500 font-black py-4 rounded-xl uppercase text-xs btn-disabled";
-                    document.getElementById('btn-no').className = "flex-1 bg-slate-800 text-slate-500 font-black py-4 rounded-xl uppercase text-xs btn-disabled";
+                    document.getElementById('btn-yes').disabled = true;
+                    document.getElementById('btn-no').disabled = true;
+                    document.getElementById('btn-yes').classList.add('opacity-50');
+                    document.getElementById('btn-no').classList.add('opacity-50');
                 }
             }, 1000);
         }
 
-        async function updateMarketData() {
-            const btn = document.getElementById('sync-btn');
-            btn.innerText = "⏳ Consultando...";
-            btn.disabled = true;
-            
-            try {
-                const symbols = ['XAUT/USD', 'BTC/USD', 'EUR/USD'];
-                for (const s of symbols) {
-                    const r = await fetch(`https://api.twelvedata.com/price?symbol=${s}&apikey=${KEY}`);
-                    const d = await r.json();
-                    if (d.price) {
-                        const val = parseFloat(d.price);
-                        const id = s.split('/')[0].toLowerCase().replace('xaut','gold');
-                        updateUI(id, val);
-                    }
-                }
-            } catch (e) { console.log(e); }
-            
-            setTimeout(() => { btn.innerText = "🔄 Sincronizar"; btn.disabled = false; }, 20000);
-        }
-
-        function updateUI(id, val) {
-            document.getElementById(`${id}-price`).innerText = id === 'eur' ? `$${val.toFixed(4)}` : `$${val.toLocaleString()}`;
-            history[id].push(val);
-            if (history[id].length > 15) history[id].shift();
-            charts[id].data.datasets[0].data = history[id];
-            charts[id].update();
-        }
-
+        // Lógica de Gráficos (v1.9 Core)
+        let history = { gold: [4830, 4835], btc: [74500, 74610], eur: [1.1790, 1.1795] };
         function initCharts() {
             ['gold', 'btc', 'eur'].forEach(id => {
                 const ctx = document.getElementById(`${id}-chart`).getContext('2d');
-                charts[id] = new Chart(ctx, {
+                new Chart(ctx, {
                     type: 'line',
-                    data: {
-                        labels: new Array(history[id].length).fill(''),
-                        datasets: [{
-                            data: history[id],
-                            borderColor: id === 'gold' ? '#fde047' : (id === 'btc' ? '#fb923c' : '#60a5fa'),
-                            borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4
-                        }]
-                    },
+                    data: { labels: ['',''], datasets: [{ data: history[id], borderColor: id==='gold'?'#fde047':id==='btc'?'#fb923c':'#60a5fa', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
                 });
             });
         }
 
         initCharts();
+        updateCreditDisplay();
     </script>
 </body>
 </html>
