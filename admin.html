@@ -14,34 +14,34 @@
     </header>
 
     <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-red-900 mb-8">
-        <h2 class="text-lg font-bold text-white mb-4">Lanzar Nuevo Mercado</h2>
+        <h2 class="text-lg font-bold text-white mb-4">Lanzar Nuevo Mercado Global</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
                 <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Categoría</label>
                 <select id="m-cat" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
-                    <option value="🪙 Cripto">🪙 Cripto</option>
-                    <option value="🏛️ Política">🏛️ Política</option>
-                    <option value="⚽ Deportes">⚽ Deportes</option>
-                    <option value="📈 Finanzas">📈 Finanzas</option>
+                    <option value="🪙 Cripto">🪙 Cripto (Auto 2 Min)</option>
+                    <option value="📈 Finanzas">📈 Finanzas (Auto 2 Min)</option>
+                    <option value="🏛️ Política">🏛️ Política (Manual)</option>
+                    <option value="⚽ Deportes">⚽ Deportes (Manual)</option>
                 </select>
             </div>
             <div>
                 <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Activo / Tema</label>
-                <input id="m-asset" type="text" placeholder="Ej: LA Galaxy vs Toluca" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
+                <input id="m-asset" type="text" placeholder="Ej: Bitcoin, LA Galaxy..." class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
                 <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Pregunta Principal</label>
-                <input id="m-question" type="text" placeholder="¿Logrará remontar LA Galaxy al Toluca?" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
+                <input id="m-question" type="text" placeholder="¿Logrará el objetivo?" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
             <div>
-                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Símbolo TradingView (Opcional)</label>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Símbolo TradingView</label>
                 <input id="m-symbol" type="text" placeholder="Ej: BINANCE:BTCUSDT" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
         </div>
         <button onclick="createMarket()" class="w-full bg-red-900 hover:bg-red-800 text-white font-black py-3 rounded-lg uppercase text-xs tracking-widest transition-colors mt-2">
-            Desplegar Mercado
+            Desplegar Mercado Global
         </button>
     </div>
 
@@ -51,8 +51,7 @@
     </div>
 
     <script>
-        // Usamos la versión 12 de las variables para evitar conflictos con datos viejos
-        let markets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
+        let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
 
         function renderAdminMarkets() {
             const list = document.getElementById('admin-markets-list');
@@ -64,13 +63,15 @@
             list.innerHTML = markets.map((m, index) => `
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex-1">
-                        <span class="text-[9px] bg-slate-800 px-2 py-1 rounded text-yellow-500 uppercase tracking-widest">${m.cat}</span>
+                        <span class="text-[9px] bg-slate-800 px-2 py-1 rounded ${m.resolution === 'AUTO' ? 'text-blue-400' : 'text-yellow-500'} uppercase tracking-widest">
+                            ${m.cat} [${m.resolution}]
+                        </span>
                         <p class="font-bold text-white mt-2 leading-tight">${m.question}</p>
                     </div>
                     <div class="flex space-x-2 w-full md:w-auto">
                         <button onclick="resolveMarket(${index}, 'SÍ')" class="flex-1 bg-green-800 hover:bg-green-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana SÍ</button>
                         <button onclick="resolveMarket(${index}, 'NO')" class="flex-1 bg-red-800 hover:bg-red-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana NO</button>
-                        <button onclick="deleteMarket(${index})" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] px-3 py-3 rounded-lg font-bold uppercase" title="Borrar sin pagar">🗑️</button>
+                        <button onclick="deleteMarket(${index})" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] px-3 py-3 rounded-lg font-bold uppercase">🗑️</button>
                     </div>
                 </div>
             `).join('');
@@ -83,53 +84,59 @@
             const symbol = document.getElementById('m-symbol').value;
 
             if(!asset || !question) return alert("Faltan datos.");
-            markets.unshift({ id: Date.now(), cat, asset, question, symbol });
-            localStorage.setItem('q_markets_v12', JSON.stringify(markets));
+
+            // Determinar si es automático y asignarle fecha de caducidad (2 minutos = 120,000 ms)
+            const isAuto = cat.includes("Cripto") || cat.includes("Finanzas");
+            const endTime = isAuto ? Date.now() + 120000 : null;
+
+            markets.unshift({ 
+                id: Date.now(), 
+                cat: cat.split(' ')[1] + " " + cat.split(' ')[2], // Limpiar nombre
+                asset, 
+                question, 
+                symbol,
+                resolution: isAuto ? 'AUTO' : 'MANUAL',
+                endTime: endTime
+            });
+
+            localStorage.setItem('q_markets_v13', JSON.stringify(markets));
             renderAdminMarkets();
             alert("Mercado publicado con éxito.");
         }
 
-        // EL MOTOR DE LIQUIDACIÓN
         function resolveMarket(index, winningSide) {
-            if(!confirm(`¿Estás seguro de liquidar este mercado como GANA ${winningSide}? Se pagarán los premios automáticamente.`)) return;
+            if(!confirm(`¿Liquidar mercado como GANA ${winningSide}?`)) return;
 
             const m = markets[index];
-            
-            // Leemos si el usuario tenía apuestas activas en este mercado
-            let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v12')) || {};
+            let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
             let userBet = activeBets[m.id];
 
             if (userBet) {
-                // Sacar cartera del usuario
-                let userBalance = parseFloat(localStorage.getItem('q_bal_v12')) || 1000.00;
-                let userHistory = JSON.parse(localStorage.getItem('q_hist_v12')) || [];
+                let userBalance = parseFloat(localStorage.getItem('q_bal_v13')) || 1000.00;
+                let userHistory = JSON.parse(localStorage.getItem('q_hist_v13')) || [];
                 
                 const won = (userBet.side === winningSide);
-                if (won) userBalance += 200; // Paga la apuesta doble
+                if (won) userBalance += (userBet.amount * 2); // Paga lo invertido x2
 
-                userHistory.unshift({ win: won, amt: won ? 200 : 100, side: userBet.side, asset: m.asset });
+                userHistory.unshift({ win: won, amt: won ? userBet.amount * 2 : userBet.amount, side: userBet.side, asset: m.asset });
                 if(userHistory.length > 5) userHistory.pop();
 
-                // Guardar la nueva cartera del usuario
-                localStorage.setItem('q_bal_v12', userBalance);
-                localStorage.setItem('q_hist_v12', JSON.stringify(userHistory));
+                localStorage.setItem('q_bal_v13', userBalance);
+                localStorage.setItem('q_hist_v13', JSON.stringify(userHistory));
                 
-                // Eliminar la apuesta de la lista de pendientes
                 delete activeBets[m.id];
-                localStorage.setItem('q_active_bets_v12', JSON.stringify(activeBets));
+                localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
             }
 
-            // Borrar el mercado porque ya terminó
             markets.splice(index, 1);
-            localStorage.setItem('q_markets_v12', JSON.stringify(markets));
+            localStorage.setItem('q_markets_v13', JSON.stringify(markets));
             renderAdminMarkets();
-            alert("Liquidación completada y fondos transferidos.");
         }
 
         function deleteMarket(index) {
-            if(confirm("¿Seguro que quieres borrar este mercado SIN resolver apuestas?")) {
+            if(confirm("¿Seguro que quieres borrar este mercado?")) {
                 markets.splice(index, 1);
-                localStorage.setItem('q_markets_v12', JSON.stringify(markets));
+                localStorage.setItem('q_markets_v13', JSON.stringify(markets));
                 renderAdminMarkets();
             }
         }
