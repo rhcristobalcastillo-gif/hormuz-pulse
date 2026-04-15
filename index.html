@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Quetza Forecast v3.6 | Dual Engine</title>
+    <title>Quetza Forecast v4.0 | Serverless Secure Node</title>
     <style>
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
         .tradingview-widget-container { height: 140px !important; width: 100%; }
@@ -26,11 +26,11 @@
     <div id="view-monitor">
         <header class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-lg font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v3.6</h1>
-                <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Jalisco Live AI Node</p>
+                <h1 class="text-lg font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v4.0</h1>
+                <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Jalisco Secure Serverless Node</p>
             </div>
             <div id="status-binance" class="bg-green-900/30 text-green-400 px-3 py-1 rounded-full text-[8px] font-bold border border-green-800 animate-pulse">
-                ORÁCULO ACTIVO
+                SISTEMA SEGURO ACTIVO
             </div>
         </header>
 
@@ -73,7 +73,7 @@
                 
                 <div class="mt-4 w-full text-center h-12 flex items-center justify-center">
                     <p id="taco-news" class="text-[9px] text-slate-400 uppercase font-bold italic px-2 news-ticker leading-tight">
-                        Inicializando enlace con Google AI Studio...
+                        Conectando a servidor seguro...
                     </p>
                 </div>
             </div>
@@ -133,22 +133,18 @@
 
     <script>
         // ==========================================
-        // 1. CONFIGURACIÓN DEL SISTEMA Y API KEY
+        // 1. CONFIGURACIÓN DEL SISTEMA
         // ==========================================
-        let balance = localStorage.getItem('q_bal_v7') ? parseFloat(localStorage.getItem('q_bal_v7')) : 1000.00;
+        let balance = localStorage.getItem('q_bal_v8') ? parseFloat(localStorage.getItem('q_bal_v8')) : 1000.00;
         let activeBet = { side: null, amount: 0 };
-        let history = JSON.parse(localStorage.getItem('q_hist_v7')) || [];
+        let history = JSON.parse(localStorage.getItem('q_hist_v8')) || [];
         let timerStarted = false;
         let currentTacoRisk = 50;
-
-        // 👇👇 AQUÍ PEGARÁS TU API KEY GENERADA EN GOOGLE AI STUDIO 👇👇
-        const GEMINI_API_KEY = 'AIzaSyD09EdL6JKv2monaQvYuX7em-w0hr1lAUY'; 
 
         // ==========================================
         // 2A. MOTOR DEL HORMUZ PULSE (SIMULADOR INDEPENDIENTE)
         // ==========================================
         function updateHormuzPulse() {
-            // Genera volatilidad entre 65% y 95%
             const newPulse = Math.floor(Math.random() * (95 - 65) + 65);
             const pNumber = document.getElementById('pulse-number');
             const pContainer = document.getElementById('pulse-container');
@@ -157,41 +153,42 @@
             pNumber.innerText = `${newPulse}%`;
 
             if (newPulse > 85) {
-                pContainer.style.borderColor = "#dc2626"; // Rojo intenso
+                pContainer.style.borderColor = "#dc2626"; 
                 pContainer.style.boxShadow = "0 0 25px rgba(220, 38, 38, 0.6)";
                 pStatus.innerText = "ALERTA CRÍTICA: ORMUZ";
                 pStatus.className = "mt-4 text-[8px] text-red-500 font-bold uppercase tracking-widest italic text-center animate-pulse";
             } else {
-                pContainer.style.borderColor = "#ea580c"; // Naranja
+                pContainer.style.borderColor = "#ea580c"; 
                 pContainer.style.boxShadow = "0 0 10px rgba(234, 88, 12, 0.3)";
                 pStatus.innerText = "TENSIÓN ELEVADA";
                 pStatus.className = "mt-4 text-[8px] text-orange-500 font-bold uppercase tracking-widest italic text-center";
             }
         }
 
-       // ==========================================
-        // 2B. MOTOR DE INTELIGENCIA ARTIFICIAL (SEGURO)
+        // ==========================================
+        // 2B. MOTOR DE INTELIGENCIA ARTIFICIAL (NUEVO BACKEND SEGURO)
         // ==========================================
         async function updateTrumpAILive() {
             const tacoNewsText = document.getElementById('taco-news');
             tacoNewsText.innerText = "Consultando Servidor Seguro...";
 
             try {
-                // 👇 AQUÍ ESTÁ LA MAGIA: Le pedimos los datos a NUESTRO servidor oculto 👇
+                // AQUÍ OCURRE LA MAGIA: Ya no llamamos a Google directamente, llamamos a nuestra API
                 const response = await fetch('/api/getTacoData');
                 const aiData = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(aiData.error || "Error de servidor");
+                    throw new Error(aiData.error || "Error de comunicación con el backend");
                 }
 
                 applyTacoUI(aiData.risk, aiData.text, aiData.alert);
 
             } catch (error) {
                 console.error("Fallo de Oráculo IA:", error);
-                applyTacoUI(60, `ERROR: ${error.message}`, false);
+                applyTacoUI(60, `ESPERANDO DESPLIEGUE EN VERCEL...`, false);
             }
         }
+
         function applyTacoUI(riskScore, newsText, isAlert) {
             currentTacoRisk = riskScore;
             const tacoNum = document.getElementById('taco-number');
@@ -239,8 +236,8 @@
                 `).join('');
             }
             
-            localStorage.setItem('q_bal_v7', balance);
-            localStorage.setItem('q_hist_v7', JSON.stringify(history));
+            localStorage.setItem('q_bal_v8', balance);
+            localStorage.setItem('q_hist_v8', JSON.stringify(history));
         }
 
         function makeBet(side) {
@@ -316,11 +313,9 @@
             setInterval(getBTC, 5000);
             updateUI();
             
-            // Inicia el simulador de Hormuz (Se actualiza cada 15 segundos)
             updateHormuzPulse();
             setInterval(updateHormuzPulse, 15000);
             
-            // Inicia la Inteligencia Artificial (Se actualiza cada 2 minutos)
             updateTrumpAILive(); 
             setInterval(updateTrumpAILive, 120000); 
             
