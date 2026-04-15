@@ -132,7 +132,7 @@
     </div>
 
     <script>
-        // ==========================================
+       // ==========================================
         // 1. CONFIGURACIÓN DEL SISTEMA Y API KEY
         // ==========================================
         let balance = localStorage.getItem('q_bal_v6') ? parseFloat(localStorage.getItem('q_bal_v6')) : 1000.00;
@@ -141,19 +141,13 @@
         let timerStarted = false;
         let currentTacoRisk = 50;
 
-        // 👇👇 AQUÍ PEgas TU LLAVE NUEVA. MANTÉN LAS COMILLAS SIMPLES 👇👇
-        const GEMINI_API_KEY = 'TU_API_KEY_AQUI'; 
+        // 👇 AQUÍ ESTÁ TU LLAVE INGRESADA EXACTAMENTE COMO DEBE IR 👇
+        const GEMINI_API_KEY = 'AIzaSyDDsQEYLS3gEYg9t3Am-2z02NXVuTi9zqg'; 
 
         // ==========================================
         // 2. MOTOR DE INTELIGENCIA ARTIFICIAL (GEMINI LIVE)
         // ==========================================
         async function updateTrumpAILive() {
-            // Verificación de seguridad para no ejecutar si no hay llave
-            if (GEMINI_API_KEY === 'TU_API_KEY_AQUI') {
-                applyTacoUI(75, "FALTA API KEY DE GEMINI EN EL CÓDIGO", false);
-                return;
-            }
-
             const tacoNewsText = document.getElementById('taco-news');
             tacoNewsText.innerText = "Consultando Oráculo Gemini...";
 
@@ -173,7 +167,11 @@
                 });
 
                 const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+                
+                // Si la API de Google devuelve un error (ej. llave inválida o bloqueada), lo detectamos aquí
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
 
                 let textResponse = data.candidates[0].content.parts[0].text;
                 // Limpieza drástica por si Gemini formatea como código
@@ -184,7 +182,8 @@
 
             } catch (error) {
                 console.error("Fallo de Oráculo IA:", error);
-                applyTacoUI(60, "SISTEMA ESTABLE. ORÁCULO IA RECALCULANDO.", false);
+                // Mostrar el error exacto en pantalla para saber qué está fallando
+                applyTacoUI(60, "ERROR DE COMUNICACIÓN: Abre la consola (F12) para ver detalles.", false);
             }
         }
 
@@ -308,6 +307,16 @@
             document.getElementById('tab-quetza').className = tab === 'quetza' ? 'tab-active py-2' : 'py-2 text-slate-500';
             if (tab === 'quetza' && !timerStarted) startTimer(1); 
         }
+
+        window.onload = () => {
+            getBTC(); setInterval(getBTC, 5000);
+            updateUI();
+            
+            updateTrumpAILive(); 
+            setInterval(updateTrumpAILive, 120000); 
+            
+            switchTab('monitor');
+        };
 
         window.onload = () => {
             getBTC(); setInterval(getBTC, 5000);
