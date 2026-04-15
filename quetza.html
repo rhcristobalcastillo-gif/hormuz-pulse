@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Quetza Forecast | Mercado Descentralizado</title>
+    <style>
+        .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
+        body { transition: background-color 1.5s ease-in-out; }
+    </style>
+</head>
+<body id="app-body" class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-xl mx-auto">
+
+    <nav class="flex justify-center space-x-8 mb-8 border-b border-slate-800 pb-2 text-[10px] uppercase tracking-[0.2em]">
+        <a href="index.html" class="py-2 text-slate-500 hover:text-yellow-500 transition-all">📡 Monitor Global</a>
+        <a href="quetza.html" class="tab-active py-2 transition-all">🦅 Quetza Consensus</a>
+    </nav>
+
+    <div>
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <h2 class="text-2xl font-black text-yellow-500 italic uppercase tracking-tighter">QuetzaPredict MX</h2>
+                <p class="text-[7px] text-slate-500 uppercase font-bold tracking-[0.2em]">Mercado Descentralizado (Simulado)</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-right shadow-xl">
+                <p class="text-[8px] text-slate-500 uppercase tracking-widest">Saldo fUSDT</p>
+                <p id="user-credits" class="text-xl font-black text-green-400">1,000.00</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl border-t-4 border-t-yellow-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full font-bold animate-pulse uppercase">Mercado #042</span>
+                <span class="text-slate-500 text-[10px]">Cierre en: <span id="quetza-timer" class="font-bold text-yellow-500">01:00</span></span>
+            </div>
+            
+            <h3 class="text-xl font-bold mb-8 italic text-center leading-tight">
+                ¿Validarás el <span class="text-yellow-500 underline">Oro (XAUT)</span> sobre <span class="text-white bg-slate-800 px-2">$4,850.00</span>?
+            </h3>
+
+            <div class="mb-8">
+                <div class="flex justify-between text-[9px] uppercase font-bold mb-2">
+                    <span class="text-green-500">SÍ: 64%</span> <span class="text-red-500">NO: 36%</span>
+                </div>
+                <div class="w-full h-3 bg-slate-800 rounded-full flex shadow-inner">
+                    <div class="h-full bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.5)] rounded-l-full" style="width: 64%"></div>
+                    <div class="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] rounded-r-full" style="width: 36%"></div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-3 mb-6">
+                <button id="btn-yes" onclick="makeBet('SÍ')" class="flex-1 bg-green-700 hover:bg-green-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg">Apostar SÍ</button>
+                <button id="btn-no" onclick="makeBet('NO')" class="flex-1 bg-red-700 hover:bg-red-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg">Apostar NO</button>
+            </div>
+
+            <div class="border-t border-slate-800 pt-4 flex justify-between text-[10px] uppercase text-slate-500 font-bold mt-4">
+                <span>Tu Posición: <span id="user-pos" class="text-white italic">PENDIENTE</span></span>
+                <span>Inversión: <span id="user-amt" class="text-white">0.00</span> fUSDT</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. ESTADO DE OPERACIONES ---
+        let balance = localStorage.getItem('q_bal_v8') ? parseFloat(localStorage.getItem('q_bal_v8')) : 1000.00;
+        let activeBet = { side: null, amount: 0 };
+        let history = JSON.parse(localStorage.getItem('q_hist_v8')) || [];
+        let currentTacoRisk = 50; 
+        let timerStarted = false;
+
+        // --- 2. CONEXIÓN CON IA PARA EFECTO INMERSIVO Y BONOS ---
+        // Seguimos consultando la IA para saber si dar el "Bono" si ganan, y para cambiar el fondo
+        async function fetchAIContext() {
+            try {
+                const response = await fetch('/api/getTacoData');
+                const aiData = await response.json();
+                if (response.ok) {
+                    currentTacoRisk = aiData.risk;
+                    // Efecto inmersivo de fondo si hay alerta
+                    document.getElementById('app-body').style.backgroundColor = aiData.alert ? "#2a1508" : "#020617";
+                }
+            } catch (error) {
+                console.log("Esperando conexión a Vercel...");
+            }
+        }
+
+        // --- 3. LÓGICA DE TRANSACCIONES ---
+        function updateUI() {
+            document.getElementById('user-credits').innerText = balance.toFixed(2);
+            document.getElementById('user-pos').innerText = activeBet.side || 'PENDIENTE';
+            document.getElementById('user-amt').innerText = activeBet.amount.toFixed(2);
+            
+            localStorage.setItem('q_bal_v8', balance);
+            localStorage.setItem('q_hist_v8', JSON.stringify(history));
+        }
+
+        function makeBet(side) {
+            if (activeBet.amount > 0) return alert("Ya tienes una posición abierta.");
+            if (balance < 100) return alert("Saldo insuficiente.");
+            balance -= 100;
+            activeBet = { side: side, amount: 100 };
+            updateUI();
+        }
+
+        function settleMarket() {
+            const finalPrice = (4848 + Math.random() * 5).toFixed(2);
+            let won = false;
+
+            if (activeBet.amount > 0) {
+                if (activeBet.side === 'SÍ' && finalPrice >= 4850) won = true;
+                if (activeBet.side === 'NO' && finalPrice < 4850) won = true;
+
+                // El bono depende de la volatilidad actual que extrajimos del servidor
+                const isBonus = won && currentTacoRisk > 80;
+                const multiplier = isBonus ? 2.5 : 2.0;
+                const prize = activeBet.amount * multiplier;
+
+                if (won) balance += prize;
+                history.unshift({ win: won, amt: won ? prize : 100, side: activeBet.side, bonus: isBonus });
+                if (history.length > 5) history.pop();
+            }
+
+            activeBet = { side: null, amount: 0 };
+            updateUI();
+            alert(`LIQUIDACIÓN\nOro Final: $${finalPrice}\nResultado: ${won ? '¡GANASTE!' : 'Perdiste'}`);
+            
+            timerStarted = false;
+            startTimer(1); 
+        }
+
+        // --- 4. CRONÓMETRO ---
+        function startTimer(minutes) {
+            if (timerStarted) return;
+            timerStarted = true;
+            let time = minutes * 60;
+            const display = document.getElementById('quetza-timer');
+            
+            const count = setInterval(() => {
+                let m = Math.floor(time / 60), s = time % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                if (--time < 0) { clearInterval(count); settleMarket(); }
+            }, 1000);
+        }
+
+        // --- ARRANQUE ---
+        window.onload = () => {
+            updateUI();
+            startTimer(1); // Iniciar contador directamente
+            fetchAIContext(); setInterval(fetchAIContext, 120000);
+        };
+    </script>
+</body>
+</html>
