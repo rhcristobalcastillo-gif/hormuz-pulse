@@ -41,13 +41,14 @@
         </div>
     </div>
 
-    <div id="markets-container" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        </div>
+    <div id="markets-container" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
 
     <script>
-        let balance = localStorage.getItem('q_bal_v11') ? parseFloat(localStorage.getItem('q_bal_v11')) : 1000.00;
-        let history = JSON.parse(localStorage.getItem('q_hist_v11')) || [];
-        let activeBets = {};
+        // Variables sincronizadas con v12
+        let balance = localStorage.getItem('q_bal_v12') ? parseFloat(localStorage.getItem('q_bal_v12')) : 1000.00;
+        let history = JSON.parse(localStorage.getItem('q_hist_v12')) || [];
+        let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v12')) || {};
+        let localMarketCount = 0;
 
         function updateDashboard() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -59,11 +60,11 @@
         }
 
         function renderMarkets() {
-            let markets = JSON.parse(localStorage.getItem('q_markets_v11')) || [];
+            let markets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
             const container = document.getElementById('markets-container');
 
             if (markets.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 italic text-sm text-center col-span-2 py-10">Esperando que el Administrador publique nuevos mercados...</p>`;
+                container.innerHTML = `<p class="text-slate-500 italic text-sm text-center col-span-2 py-10">Esperando nuevos contratos inteligentes...</p>`;
                 return;
             }
 
@@ -88,10 +89,10 @@
                         ${chartHTML}
                         
                         <div class="flex space-x-3 mt-4">
-                            <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-700 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest ${btnClass}" ${hasBet ? 'disabled' : ''}>Validar SÍ</button>
-                            <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-700 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest ${btnClass}" ${hasBet ? 'disabled' : ''}>Validar NO</button>
+                            <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-700 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest ${btnClass}" ${hasBet ? 'disabled' : ''}>Comprar SÍ</button>
+                            <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-700 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest ${btnClass}" ${hasBet ? 'disabled' : ''}>Comprar NO</button>
                         </div>
-                        ${hasBet ? `<p class="mt-4 text-center text-yellow-500 text-[10px] font-bold animate-pulse uppercase tracking-widest">Posición Abierta: ${hasBet.side}</p>` : ''}
+                        ${hasBet ? `<p class="mt-4 text-center text-yellow-500 text-[10px] font-bold animate-pulse uppercase tracking-widest">Posición Abierta: ${hasBet.side} (Esperando Oráculo)</p>` : ''}
                     </div>
                 </div>
                 `;
@@ -102,28 +103,42 @@
             if (balance < 100) return alert("Saldo insuficiente.");
             balance -= 100;
             activeBets[marketId] = { side: side, amount: 100, asset: assetName };
+            
+            localStorage.setItem('q_bal_v12', balance);
+            localStorage.setItem('q_active_bets_v12', JSON.stringify(activeBets));
+            
             updateDashboard();
             renderMarkets();
-            setTimeout(() => simulateResolution(marketId), 8000);
         }
 
-        function simulateResolution(marketId) {
-            const bet = activeBets[marketId];
-            if (!bet) return;
-            const won = Math.random() > 0.5;
-            if (won) balance += 200;
-            history.unshift({ win: won, amt: won ? 200 : 100, side: bet.side, asset: bet.asset });
-            delete activeBets[marketId];
-            localStorage.setItem('q_bal_v11', balance);
-            localStorage.setItem('q_hist_v11', JSON.stringify(history));
-            updateDashboard();
-            renderMarkets();
-            alert(`${bet.asset}: ${won ? '¡MERCADO VALIDADO! +100 fUSDT' : 'MERCADO LIQUIDADO'}`);
+        // Sincronización automática con el Admin
+        function syncState() {
+            let newBalance = parseFloat(localStorage.getItem('q_bal_v12')) || 1000.00;
+            let newHistory = JSON.parse(localStorage.getItem('q_hist_v12')) || [];
+            let newBets = JSON.parse(localStorage.getItem('q_active_bets_v12')) || {};
+            let newMarkets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
+
+            let needsUpdate = false;
+
+            if(newBalance !== balance) { balance = newBalance; needsUpdate = true; }
+            if(newHistory.length !== history.length) { history = newHistory; needsUpdate = true; }
+            if(Object.keys(newBets).length !== Object.keys(activeBets).length) { activeBets = newBets; needsUpdate = true; }
+            if(newMarkets.length !== localMarketCount) { localMarketCount = newMarkets.length; needsUpdate = true; }
+
+            if(needsUpdate) {
+                updateDashboard();
+                renderMarkets();
+            }
         }
 
         window.onload = () => {
+            let initialMarkets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
+            localMarketCount = initialMarkets.length;
             updateDashboard();
             renderMarkets();
+            
+            // Revisa cada segundo si el admin pagó o creó un mercado nuevo
+            setInterval(syncState, 1000); 
         };
     </script>
 </body>
