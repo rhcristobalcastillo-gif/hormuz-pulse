@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Quetza Forecast v4.0 | Serverless Secure Node</title>
+    <title>Quetza Forecast | Monitor Global</title>
     <style>
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
         .tradingview-widget-container { height: 140px !important; width: 100%; }
@@ -19,17 +19,17 @@
 <body id="app-body" class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-xl mx-auto">
 
     <nav class="flex justify-center space-x-8 mb-8 border-b border-slate-800 pb-2 text-[10px] uppercase tracking-[0.2em]">
-        <button id="tab-monitor" onclick="switchTab('monitor')" class="tab-active py-2 transition-all">📡 Monitor Global</button>
-        <button id="tab-quetza" onclick="switchTab('quetza')" class="py-2 text-slate-500 hover:text-yellow-500 transition-all">🦅 Quetza Consensus</button>
+        <a href="index.html" class="tab-active py-2 transition-all">📡 Monitor Global</a>
+        <a href="quetza.html" class="py-2 text-slate-500 hover:text-yellow-500 transition-all">🦅 Quetza Consensus</a>
     </nav>
 
-    <div id="view-monitor">
+    <div>
         <header class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-lg font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor v4.0</h1>
+                <h1 class="text-lg font-bold text-yellow-500 tracking-tighter uppercase">Friction Monitor</h1>
                 <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Jalisco Secure Serverless Node</p>
             </div>
-            <div id="status-binance" class="bg-green-900/30 text-green-400 px-3 py-1 rounded-full text-[8px] font-bold border border-green-800 animate-pulse">
+            <div class="bg-green-900/30 text-green-400 px-3 py-1 rounded-full text-[8px] font-bold border border-green-800 animate-pulse">
                 SISTEMA SEGURO ACTIVO
             </div>
         </header>
@@ -70,7 +70,6 @@
                 <div id="taco-container" class="w-24 h-24 rounded-full border-[6px] border-orange-600 flex items-center justify-center transition-all duration-1000 z-10">
                     <span id="taco-number" class="text-2xl font-black">--%</span>
                 </div>
-                
                 <div class="mt-4 w-full text-center h-12 flex items-center justify-center">
                     <p id="taco-news" class="text-[9px] text-slate-400 uppercase font-bold italic px-2 news-ticker leading-tight">
                         Conectando a servidor seguro...
@@ -80,70 +79,30 @@
         </div>
 
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl mt-4">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.4em] mb-4 italic text-center">Registro de Liquidación</h3>
-            <div id="history-list" class="space-y-2 text-[10px]">
-                <p class="text-slate-600 italic text-center">Esperando cierre de mercado...</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-quetza" class="hidden" style="display: none;">
-        <div class="flex justify-between items-start mb-8">
-            <div>
-                <h2 class="text-2xl font-black text-yellow-500 italic uppercase tracking-tighter">QuetzaPredict MX</h2>
-                <p class="text-[7px] text-slate-500 uppercase font-bold tracking-[0.2em]">Mercado Descentralizado</p>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-right shadow-xl">
-                <p class="text-[8px] text-slate-500 uppercase tracking-widest">Saldo fUSDT</p>
-                <p id="user-credits" class="text-xl font-black text-green-400">1,000.00</p>
-            </div>
-        </div>
-
-        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl border-t-4 border-t-yellow-600 shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <span class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full font-bold animate-pulse uppercase">Mercado #042</span>
-                <span class="text-slate-500 text-[10px]">Cierre: <span id="quetza-timer" class="font-bold text-yellow-500">01:00</span></span>
-            </div>
-            
-            <h3 class="text-xl font-bold mb-8 italic text-center leading-tight">
-                ¿Validarás el <span class="text-yellow-500 underline">Oro (XAUT)</span> sobre <span class="text-white bg-slate-800 px-2">$4,850.00</span>?
-            </h3>
-
-            <div class="mb-8">
-                <div class="flex justify-between text-[9px] uppercase font-bold mb-2">
-                    <span class="text-green-500">SÍ: 64%</span> <span class="text-red-500">NO: 36%</span>
-                </div>
-                <div class="w-full h-3 bg-slate-800 rounded-full flex shadow-inner">
-                    <div class="h-full bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.5)] rounded-l-full" style="width: 64%"></div>
-                    <div class="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] rounded-r-full" style="width: 36%"></div>
-                </div>
-            </div>
-            
-            <div class="flex space-x-3 mb-6">
-                <button id="btn-yes" onclick="makeBet('SÍ')" class="flex-1 bg-green-700 hover:bg-green-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg">Apostar SÍ</button>
-                <button id="btn-no" onclick="makeBet('NO')" class="flex-1 bg-red-700 hover:bg-red-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg">Apostar NO</button>
-            </div>
-
-            <div class="border-t border-slate-800 pt-4 flex justify-between text-[10px] uppercase text-slate-500 font-bold mt-4">
-                <span>Tu Posición: <span id="user-pos" class="text-white italic">PENDIENTE</span></span>
-                <span>Inversión: <span id="user-amt" class="text-white">0.00</span> fUSDT</span>
-            </div>
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.4em] mb-4 italic text-center">Registro de Liquidación Reciente</h3>
+            <div id="history-list" class="space-y-2 text-[10px]"></div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. CONFIGURACIÓN DEL SISTEMA
-        // ==========================================
-        let balance = localStorage.getItem('q_bal_v8') ? parseFloat(localStorage.getItem('q_bal_v8')) : 1000.00;
-        let activeBet = { side: null, amount: 0 };
-        let history = JSON.parse(localStorage.getItem('q_hist_v8')) || [];
-        let timerStarted = false;
-        let currentTacoRisk = 50;
+        // --- 1. HISTORIAL DE OTRA PESTAÑA ---
+        function loadHistory() {
+            let history = JSON.parse(localStorage.getItem('q_hist_v8')) || [];
+            const list = document.getElementById('history-list');
+            if (history.length === 0) {
+                list.innerHTML = `<p class="text-slate-600 italic text-center">Aún no hay operaciones en Quetza Consensus...</p>`;
+                return;
+            }
+            list.innerHTML = history.map(h => `
+                <div class="flex justify-between border-b border-slate-800 pb-1 items-center">
+                    <span class="${h.win ? 'text-green-500' : 'text-red-500'} font-bold">${h.win ? 'GANASTE' : 'PERDISTE'}</span>
+                    <span class="text-slate-400">${h.side} ${h.bonus ? '<span class="text-orange-500 animate-pulse text-[8px] border border-orange-500 px-1 rounded ml-1">BONO IA</span>' : ''}</span>
+                    <span class="text-white">${h.win ? '+' : '-'}${h.amt} fUSDT</span>
+                </div>
+            `).join('');
+        }
 
-        // ==========================================
-        // 2A. MOTOR DEL HORMUZ PULSE (SIMULADOR INDEPENDIENTE)
-        // ==========================================
+        // --- 2. MOTORES INDEPENDIENTES ---
         function updateHormuzPulse() {
             const newPulse = Math.floor(Math.random() * (95 - 65) + 65);
             const pNumber = document.getElementById('pulse-number');
@@ -151,7 +110,6 @@
             const pStatus = document.getElementById('pulse-status');
 
             pNumber.innerText = `${newPulse}%`;
-
             if (newPulse > 85) {
                 pContainer.style.borderColor = "#dc2626"; 
                 pContainer.style.boxShadow = "0 0 25px rgba(220, 38, 38, 0.6)";
@@ -165,38 +123,22 @@
             }
         }
 
-        // ==========================================
-        // 2B. MOTOR DE INTELIGENCIA ARTIFICIAL (NUEVO BACKEND SEGURO)
-        // ==========================================
         async function updateTrumpAILive() {
-            const tacoNewsText = document.getElementById('taco-news');
-            tacoNewsText.innerText = "Consultando Servidor Seguro...";
-
             try {
-                // AQUÍ OCURRE LA MAGIA: Ya no llamamos a Google directamente, llamamos a nuestra API
                 const response = await fetch('/api/getTacoData');
                 const aiData = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(aiData.error || "Error de comunicación con el backend");
-                }
-
+                if (!response.ok) throw new Error(aiData.error || "Error backend");
                 applyTacoUI(aiData.risk, aiData.text, aiData.alert);
-
             } catch (error) {
-                console.error("Fallo de Oráculo IA:", error);
                 applyTacoUI(60, `ESPERANDO DESPLIEGUE EN VERCEL...`, false);
             }
         }
 
         function applyTacoUI(riskScore, newsText, isAlert) {
-            currentTacoRisk = riskScore;
-            const tacoNum = document.getElementById('taco-number');
+            document.getElementById('taco-number').innerText = `${riskScore}%`;
             const tacoCont = document.getElementById('taco-container');
             const tacoNewsText = document.getElementById('taco-news');
             const appBody = document.getElementById('app-body');
-
-            tacoNum.innerText = `${currentTacoRisk}%`;
             
             tacoNewsText.classList.remove('news-ticker');
             void tacoNewsText.offsetWidth; 
@@ -217,78 +159,6 @@
             }
         }
 
-        // ==========================================
-        // 3. LÓGICA DE QUETZAPREDICT (BETS & SETTLEMENT)
-        // ==========================================
-        function updateUI() {
-            document.getElementById('user-credits').innerText = balance.toFixed(2);
-            document.getElementById('user-pos').innerText = activeBet.side || 'PENDIENTE';
-            document.getElementById('user-amt').innerText = activeBet.amount.toFixed(2);
-            
-            const list = document.getElementById('history-list');
-            if (history.length > 0) {
-                list.innerHTML = history.map(h => `
-                    <div class="flex justify-between border-b border-slate-800 pb-1 items-center">
-                        <span class="${h.win ? 'text-green-500' : 'text-red-500'} font-bold">${h.win ? 'GANASTE' : 'PERDISTE'}</span>
-                        <span class="text-slate-400">${h.side} ${h.bonus ? '<span class="text-orange-500 animate-pulse text-[8px] border border-orange-500 px-1 rounded ml-1">BONO IA</span>' : ''}</span>
-                        <span class="text-white">${h.win ? '+' : '-'}${h.amt} fUSDT</span>
-                    </div>
-                `).join('');
-            }
-            
-            localStorage.setItem('q_bal_v8', balance);
-            localStorage.setItem('q_hist_v8', JSON.stringify(history));
-        }
-
-        function makeBet(side) {
-            if (activeBet.amount > 0) return alert("Ya tienes una posición abierta.");
-            if (balance < 100) return alert("Saldo insuficiente.");
-            balance -= 100;
-            activeBet = { side: side, amount: 100 };
-            updateUI();
-        }
-
-        function settleMarket() {
-            const finalPrice = (4848 + Math.random() * 5).toFixed(2);
-            let won = false;
-
-            if (activeBet.amount > 0) {
-                if (activeBet.side === 'SÍ' && finalPrice >= 4850) won = true;
-                if (activeBet.side === 'NO' && finalPrice < 4850) won = true;
-
-                const isBonus = won && currentTacoRisk > 80;
-                const multiplier = isBonus ? 2.5 : 2.0;
-                const prize = activeBet.amount * multiplier;
-
-                if (won) balance += prize;
-                history.unshift({ win: won, amt: won ? prize : 100, side: activeBet.side, bonus: isBonus });
-            }
-
-            activeBet = { side: null, amount: 0 };
-            if (history.length > 5) history.pop();
-            updateUI();
-            
-            alert(`LIQUIDACIÓN\nOro Final: $${finalPrice}\nResultado: ${won ? '¡GANASTE!' : 'Perdiste'}`);
-            timerStarted = false;
-            startTimer(1); 
-        }
-
-        function startTimer(minutes) {
-            if (timerStarted) return;
-            timerStarted = true;
-            let time = minutes * 60;
-            const display = document.getElementById('quetza-timer');
-            
-            const count = setInterval(() => {
-                let m = Math.floor(time / 60), s = time % 60;
-                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-                if (--time < 0) { clearInterval(count); settleMarket(); }
-            }, 1000);
-        }
-
-        // ==========================================
-        // 4. MOTOR DE DATOS EN VIVO (BINANCE)
-        // ==========================================
         async function getBTC() {
             try {
                 const r = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
@@ -297,29 +167,12 @@
             } catch(e) {}
         }
 
-        // ==========================================
-        // 5. NAVEGACIÓN Y ARRANQUE
-        // ==========================================
-        function switchTab(tab) {
-            document.getElementById('view-monitor').style.display = tab === 'monitor' ? 'block' : 'none';
-            document.getElementById('view-quetza').style.display = tab === 'quetza' ? 'block' : 'none';
-            document.getElementById('tab-monitor').className = tab === 'monitor' ? 'tab-active py-2' : 'py-2 text-slate-500';
-            document.getElementById('tab-quetza').className = tab === 'quetza' ? 'tab-active py-2' : 'py-2 text-slate-500';
-            if (tab === 'quetza' && !timerStarted) startTimer(1); 
-        }
-
+        // --- ARRANQUE ---
         window.onload = () => {
-            getBTC(); 
-            setInterval(getBTC, 5000);
-            updateUI();
-            
-            updateHormuzPulse();
-            setInterval(updateHormuzPulse, 15000);
-            
-            updateTrumpAILive(); 
-            setInterval(updateTrumpAILive, 120000); 
-            
-            switchTab('monitor');
+            getBTC(); setInterval(getBTC, 5000);
+            loadHistory();
+            updateHormuzPulse(); setInterval(updateHormuzPulse, 15000);
+            updateTrumpAILive(); setInterval(updateTrumpAILive, 120000); 
         };
     </script>
 </body>
