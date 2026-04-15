@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Quetza Forecast | Admin Panel</title>
+</head>
+<body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-md mx-auto">
+
+    <header class="mb-8 border-b border-red-900 pb-4 mt-8">
+        <h1 class="text-2xl font-black text-red-500 uppercase tracking-widest">⚙️ Quetza Admin Core</h1>
+        <p class="text-[10px] text-slate-500 uppercase">Panel de Control de Oráculo</p>
+    </header>
+
+    <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-red-900 mb-8">
+        <h2 class="text-lg font-bold text-white mb-4">Lanzar Nuevo Mercado</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Categoría</label>
+                <select id="m-cat" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-red-500">
+                    <option value="🪙 Cripto">🪙 Cripto</option>
+                    <option value="🏛️ Política">🏛️ Política</option>
+                    <option value="⚽ Deportes">⚽ Deportes</option>
+                    <option value="📈 Finanzas">📈 Finanzas</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Activo / Tema</label>
+                <input id="m-asset" type="text" placeholder="Ej: Elecciones EEUU, Bitcoin..." class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Pregunta Principal</label>
+                <input id="m-question" type="text" placeholder="¿Ganará Donald Trump?" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
+            </div>
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Símbolo TradingView (Opcional)</label>
+                <input id="m-symbol" type="text" placeholder="Ej: BINANCE:BTCUSDT (Dejar vacío si es Política/Deportes)" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
+            </div>
+        </div>
+
+        <button onclick="createMarket()" class="w-full bg-red-900 hover:bg-red-800 text-white font-black py-3 rounded-lg uppercase text-xs tracking-widest transition-colors mt-2">
+            Desplegar Mercado en la Red
+        </button>
+    </div>
+
+    <div>
+        <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Mercados Activos</h2>
+        <div id="admin-markets-list" class="space-y-4">
+            </div>
+    </div>
+
+    <script>
+        // Cargar mercados existentes o poner 3 por defecto si está vacío
+        let markets = JSON.parse(localStorage.getItem('q_markets_v11'));
+        if (!markets || markets.length === 0) {
+            markets = [
+                { id: 1, cat: "🪙 Cripto", asset: "Bitcoin", question: "¿Bitcoin superará los $75,000 este mes?", symbol: "BINANCE:BTCUSDT" },
+                { id: 2, cat: "🏛️ Política", asset: "Elecciones MX", question: "¿Se aprobará la reforma en el senado?", symbol: "" },
+                { id: 3, cat: "⚽ Deportes", asset: "Champions League", question: "¿Real Madrid ganará la final?", symbol: "" }
+            ];
+            localStorage.setItem('q_markets_v11', JSON.stringify(markets));
+        }
+
+        function renderAdminMarkets() {
+            const list = document.getElementById('admin-markets-list');
+            list.innerHTML = markets.map((m, index) => `
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <span class="text-[9px] bg-slate-800 px-2 py-1 rounded text-yellow-500 uppercase tracking-widest">${m.cat}</span>
+                        <p class="font-bold text-white mt-2">${m.question}</p>
+                    </div>
+                    <button onclick="deleteMarket(${index})" class="bg-slate-800 hover:bg-red-900 text-white text-[10px] px-3 py-2 rounded font-bold uppercase">Borrar / Liquidar</button>
+                </div>
+            `).join('');
+        }
+
+        function createMarket() {
+            const cat = document.getElementById('m-cat').value;
+            const asset = document.getElementById('m-asset').value;
+            const question = document.getElementById('m-question').value;
+            const symbol = document.getElementById('m-symbol').value;
+
+            if(!asset || !question) return alert("Faltan datos.");
+
+            markets.unshift({ id: Date.now(), cat, asset, question, symbol });
+            localStorage.setItem('q_markets_v11', JSON.stringify(markets));
+            renderAdminMarkets();
+            alert("Mercado publicado con éxito.");
+        }
+
+        function deleteMarket(index) {
+            if(confirm("¿Estás seguro de cerrar este mercado?")) {
+                markets.splice(index, 1);
+                localStorage.setItem('q_markets_v11', JSON.stringify(markets));
+                renderAdminMarkets();
+            }
+        }
+
+        window.onload = renderAdminMarkets;
+    </script>
+</body>
+</html>
