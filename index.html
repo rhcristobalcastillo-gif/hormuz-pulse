@@ -132,22 +132,28 @@
     </div>
 
     <script>
-       // ==========================================
+        // ==========================================
         // 1. CONFIGURACIÓN DEL SISTEMA Y API KEY
         // ==========================================
-        let balance = localStorage.getItem('q_bal_v6') ? parseFloat(localStorage.getItem('q_bal_v6')) : 1000.00;
+        let balance = localStorage.getItem('q_bal_v7') ? parseFloat(localStorage.getItem('q_bal_v7')) : 1000.00;
         let activeBet = { side: null, amount: 0 };
-        let history = JSON.parse(localStorage.getItem('q_hist_v6')) || [];
+        let history = JSON.parse(localStorage.getItem('q_hist_v7')) || [];
         let timerStarted = false;
         let currentTacoRisk = 50;
 
-        // 👇 AQUÍ ESTÁ TU LLAVE INGRESADA EXACTAMENTE COMO DEBE IR 👇
-        const GEMINI_API_KEY = 'AIzaSyDDsQEYLS3gEYg9t3Am-2z02NXVuTi9zqg'; 
+        // 👇👇 REEMPLAZA TU API KEY AQUÍ. DEBE QUEDAR ENTRE LAS COMILLAS SIMPLES 👇👇
+        const GEMINI_API_KEY = 'TU_NUEVA_API_KEY_AQUI'; 
 
         // ==========================================
         // 2. MOTOR DE INTELIGENCIA ARTIFICIAL (GEMINI LIVE)
         // ==========================================
         async function updateTrumpAILive() {
+            // Validación inicial
+            if (GEMINI_API_KEY === 'AIzaSyBHrQLiibYsnVp1v8r7Tk045tsNSrweWZM' || GEMINI_API_KEY.trim() === '') {
+                applyTacoUI(60, "FALTA CONFIGURAR LA API KEY EN EL CÓDIGO.", false);
+                return;
+            }
+
             const tacoNewsText = document.getElementById('taco-news');
             tacoNewsText.innerText = "Consultando Oráculo Gemini...";
 
@@ -168,13 +174,14 @@
 
                 const data = await response.json();
                 
-                // Si la API de Google devuelve un error (ej. llave inválida o bloqueada), lo detectamos aquí
-                if (data.error) {
-                    throw new Error(data.error.message);
+                // SISTEMA DETECTOR DE ERRORES MEJORADO
+                if (!response.ok) {
+                    console.error("Error de Google:", data);
+                    throw new Error(data.error?.message || "Error HTTP " + response.status);
                 }
 
                 let textResponse = data.candidates[0].content.parts[0].text;
-                // Limpieza drástica por si Gemini formatea como código
+                // Limpieza drástica
                 textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
                 
                 const aiData = JSON.parse(textResponse);
@@ -182,8 +189,8 @@
 
             } catch (error) {
                 console.error("Fallo de Oráculo IA:", error);
-                // Mostrar el error exacto en pantalla para saber qué está fallando
-                applyTacoUI(60, "ERROR DE COMUNICACIÓN: Abre la consola (F12) para ver detalles.", false);
+                // ESTO MOSTRARÁ EL ERROR EXACTO EN LA PANTALLA
+                applyTacoUI(60, `ERROR: ${error.message}`, false);
             }
         }
 
@@ -235,8 +242,8 @@
                 `).join('');
             }
             
-            localStorage.setItem('q_bal_v6', balance);
-            localStorage.setItem('q_hist_v6', JSON.stringify(history));
+            localStorage.setItem('q_bal_v7', balance);
+            localStorage.setItem('q_hist_v7', JSON.stringify(history));
         }
 
         function makeBet(side) {
@@ -307,16 +314,6 @@
             document.getElementById('tab-quetza').className = tab === 'quetza' ? 'tab-active py-2' : 'py-2 text-slate-500';
             if (tab === 'quetza' && !timerStarted) startTimer(1); 
         }
-
-        window.onload = () => {
-            getBTC(); setInterval(getBTC, 5000);
-            updateUI();
-            
-            updateTrumpAILive(); 
-            setInterval(updateTrumpAILive, 120000); 
-            
-            switchTab('monitor');
-        };
 
         window.onload = () => {
             getBTC(); setInterval(getBTC, 5000);
