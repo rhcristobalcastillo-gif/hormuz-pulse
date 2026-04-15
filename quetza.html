@@ -20,20 +20,8 @@
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl mb-8 flex flex-col md:flex-row justify-between items-center border-l-4 border-l-yellow-600">
         <div class="mb-4 md:mb-0">
             <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Nodo Jalisco | Usuario</h2>
-            <div id="user-badge" class="inline-block mt-1 bg-slate-800 text-yellow-500 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-yellow-900 uppercase">
-                🌱 Iniciado
-            </div>
         </div>
-        
         <div class="flex space-x-6 text-center">
-            <div>
-                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Win Rate</p>
-                <p id="stat-winrate" class="text-xl font-black text-blue-400">0%</p>
-            </div>
-            <div>
-                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Operaciones</p>
-                <p id="stat-trades" class="text-xl font-black text-white">0</p>
-            </div>
             <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 shadow-inner">
                 <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Saldo fUSDT</p>
                 <p id="user-credits" class="text-xl font-black text-green-400">1,000.00</p>
@@ -44,55 +32,62 @@
     <div id="markets-container" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
 
     <script>
-        // Variables sincronizadas con v12
-        let balance = localStorage.getItem('q_bal_v12') ? parseFloat(localStorage.getItem('q_bal_v12')) : 1000.00;
-        let history = JSON.parse(localStorage.getItem('q_hist_v12')) || [];
-        let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v12')) || {};
-        let localMarketCount = 0;
+        // Variables v13
+        let balance = localStorage.getItem('q_bal_v13') ? parseFloat(localStorage.getItem('q_bal_v13')) : 1000.00;
+        let history = JSON.parse(localStorage.getItem('q_hist_v13')) || [];
+        let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
 
         function updateDashboard() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
-            const totalTrades = history.length;
-            const wins = history.filter(h => h.win).length;
-            const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
-            document.getElementById('stat-trades').innerText = totalTrades;
-            document.getElementById('stat-winrate').innerText = `${winRate}%`;
         }
 
         function renderMarkets() {
-            let markets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
+            let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
             const container = document.getElementById('markets-container');
 
             if (markets.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 italic text-sm text-center col-span-2 py-10">Esperando nuevos contratos inteligentes...</p>`;
+                container.innerHTML = `<p class="text-slate-500 italic text-sm text-center col-span-2 py-10">Esperando mercados abiertos...</p>`;
                 return;
             }
 
             container.innerHTML = markets.map(m => {
                 const chartHTML = m.symbol ? `
                     <div class="w-full h-48 mb-6 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner">
-                        <iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(m.symbol)}&interval=15&theme=dark&style=1&hidesidetoolbar=1" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+                        <iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(m.symbol)}&interval=1&theme=dark&style=1&hidesidetoolbar=1" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
                     </div>
-                ` : `<div class="w-full h-12 mb-6 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-[8px] text-slate-600 uppercase tracking-widest italic">Análisis de gráfico no disponible para esta categoría</div>`;
+                ` : `<div class="w-full h-12 mb-6 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-[8px] text-slate-600 uppercase tracking-widest italic">Análisis visual no requerido</div>`;
 
                 const hasBet = activeBets[m.id];
-                const btnClass = hasBet ? 'opacity-30 cursor-not-allowed' : 'hover:bg-opacity-80 active:scale-95 transition-all';
+                
+                // Lógica visual del Oráculo
+                let oracleUI = m.resolution === 'AUTO' 
+                    ? `<span id="timer-${m.id}" class="text-yellow-400 font-bold font-mono tracking-widest text-lg">02:00</span>`
+                    : `<span class="text-orange-500 font-bold uppercase tracking-widest text-xs">Esperando Juez Admin</span>`;
 
                 return `
-                <div class="bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-                    <div class="relative z-10">
+                <div class="bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div>
                         <div class="flex justify-between items-center mb-4">
-                            <span class="text-[9px] text-yellow-500 font-bold uppercase tracking-[0.2em] border border-yellow-900/50 px-2 py-1 rounded-md bg-yellow-950/20">${m.cat}</span>
-                            <span class="text-[9px] text-slate-500 font-mono">ID: #${m.id.toString().slice(-4)}</span>
+                            <span class="text-[9px] text-blue-400 font-bold uppercase tracking-[0.2em] border border-blue-900/50 px-2 py-1 rounded-md bg-blue-950/20">${m.cat}</span>
+                            <span class="text-[9px] text-slate-500 font-mono">Volumen: Libre</span>
                         </div>
                         <h3 class="text-xl font-bold text-white mb-6 leading-tight">${m.question}</h3>
                         ${chartHTML}
                         
                         <div class="flex space-x-3 mt-4">
-                            <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-700 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest ${btnClass}" ${hasBet ? 'disabled' : ''}>Comprar SÍ</button>
-                            <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-700 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest ${btnClass}" ${hasBet ? 'disabled' : ''}>Comprar NO</button>
+                            <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-700 hover:bg-green-600 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest transition-transform active:scale-95">Invertir SÍ</button>
+                            <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-700 hover:bg-red-600 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest transition-transform active:scale-95">Invertir NO</button>
                         </div>
-                        ${hasBet ? `<p class="mt-4 text-center text-yellow-500 text-[10px] font-bold animate-pulse uppercase tracking-widest">Posición Abierta: ${hasBet.side} (Esperando Oráculo)</p>` : ''}
+                        
+                        ${hasBet ? `<div class="mt-4 p-2 bg-slate-950 border border-slate-800 rounded-lg text-center">
+                            <p class="text-slate-400 text-[9px] uppercase tracking-widest mb-1">Tu Posición Actual</p>
+                            <p class="text-yellow-500 text-sm font-bold uppercase tracking-widest">${hasBet.side} | ${hasBet.amount} fUSDT</p>
+                        </div>` : ''}
+                    </div>
+
+                    <div class="mt-6 border-t border-slate-800 pt-4 text-center">
+                        <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Cierre de Mercado</p>
+                        ${oracleUI}
                     </div>
                 </div>
                 `;
@@ -101,44 +96,96 @@
 
         function makeBet(marketId, side, assetName) {
             if (balance < 100) return alert("Saldo insuficiente.");
-            balance -= 100;
-            activeBets[marketId] = { side: side, amount: 100, asset: assetName };
             
-            localStorage.setItem('q_bal_v12', balance);
-            localStorage.setItem('q_active_bets_v12', JSON.stringify(activeBets));
+            let bet = activeBets[marketId] || { side: side, amount: 0, asset: assetName };
+            
+            // Si intenta apostar al lado contrario, no lo dejamos por simplicidad del MVP
+            if(bet.amount > 0 && bet.side !== side) return alert("Ya tienes una posición abierta en el lado contrario.");
+
+            balance -= 100;
+            bet.amount += 100; // Sumanos a su posición en lugar de sobreescribir
+            activeBets[marketId] = bet;
+            
+            localStorage.setItem('q_bal_v13', balance);
+            localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
             
             updateDashboard();
             renderMarkets();
         }
 
-        // Sincronización automática con el Admin
-        function syncState() {
-            let newBalance = parseFloat(localStorage.getItem('q_bal_v12')) || 1000.00;
-            let newHistory = JSON.parse(localStorage.getItem('q_hist_v12')) || [];
-            let newBets = JSON.parse(localStorage.getItem('q_active_bets_v12')) || {};
-            let newMarkets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
+        // MOTOR GLOBAL DE TIEMPO Y AUTO-LIQUIDACIÓN
+        function startGlobalClock() {
+            setInterval(() => {
+                let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
+                let needsRender = false;
 
-            let needsUpdate = false;
+                markets.forEach((m, index) => {
+                    if (m.resolution === 'AUTO' && m.endTime) {
+                        let timeLeft = Math.floor((m.endTime - Date.now()) / 1000);
+                        let timerEl = document.getElementById(`timer-${m.id}`);
 
-            if(newBalance !== balance) { balance = newBalance; needsUpdate = true; }
-            if(newHistory.length !== history.length) { history = newHistory; needsUpdate = true; }
-            if(Object.keys(newBets).length !== Object.keys(activeBets).length) { activeBets = newBets; needsUpdate = true; }
-            if(newMarkets.length !== localMarketCount) { localMarketCount = newMarkets.length; needsUpdate = true; }
+                        if (timeLeft <= 0) {
+                            // EL MERCADO CADUCÓ: AUTO LIQUIDAR
+                            autoLiquidate(m, index, markets);
+                            needsRender = true;
+                        } else if (timerEl) {
+                            // ACTUALIZAR RELOJ VISUAL
+                            let min = Math.floor(timeLeft / 60);
+                            let sec = timeLeft % 60;
+                            timerEl.innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+                        }
+                    }
+                });
 
-            if(needsUpdate) {
+                if (needsRender) renderMarkets();
+            }, 1000);
+        }
+
+        function autoLiquidate(market, index, marketsArray) {
+            let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
+            let userBet = activeBets[market.id];
+
+            if (userBet) {
+                // Simula un oráculo automático (50/50 de ganar)
+                const won = Math.random() > 0.5;
+                if (won) balance += (userBet.amount * 2);
+
+                history.unshift({ win: won, amt: won ? userBet.amount * 2 : userBet.amount, side: userBet.side, asset: market.asset });
+                if(history.length > 5) history.pop();
+
+                localStorage.setItem('q_bal_v13', balance);
+                localStorage.setItem('q_hist_v13', JSON.stringify(history));
+                
+                delete activeBets[market.id];
+                localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
+                updateDashboard();
+                alert(`LIQUIDACIÓN AUTOMÁTICA DE ${market.asset}\n¡${won ? 'GANASTE' : 'PERDISTE'} ${userBet.amount} fUSDT!`);
+            }
+
+            // Eliminar mercado
+            marketsArray.splice(index, 1);
+            localStorage.setItem('q_markets_v13', JSON.stringify(marketsArray));
+        }
+
+        // Sincronizador para detectar si el Admin liquidó manualmente
+        setInterval(() => {
+            let newBal = parseFloat(localStorage.getItem('q_bal_v13')) || 1000;
+            let newBets = Object.keys(JSON.parse(localStorage.getItem('q_active_bets_v13')) || {}).length;
+            let newMarkets = (JSON.parse(localStorage.getItem('q_markets_v13')) || []).length;
+            
+            let currentMarkets = (JSON.parse(localStorage.getItem('q_markets_v13')) || []).length;
+
+            if (newBal !== balance || newMarkets !== currentMarkets) {
+                balance = newBal;
                 updateDashboard();
                 renderMarkets();
             }
-        }
+        }, 2000);
 
         window.onload = () => {
-            let initialMarkets = JSON.parse(localStorage.getItem('q_markets_v12')) || [];
-            localMarketCount = initialMarkets.length;
             updateDashboard();
             renderMarkets();
-            
-            // Revisa cada segundo si el admin pagó o creó un mercado nuevo
-            setInterval(syncState, 1000); 
+            startGlobalClock();
         };
     </script>
 </body>
