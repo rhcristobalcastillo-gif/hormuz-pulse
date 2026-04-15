@@ -21,7 +21,7 @@
         <div class="flex justify-between items-start mb-8">
             <div>
                 <h2 class="text-2xl font-black text-yellow-500 italic uppercase tracking-tighter">QuetzaPredict MX</h2>
-                <p class="text-[7px] text-slate-500 uppercase font-bold tracking-[0.2em]">Mercado Descentralizado</p>
+                <p class="text-[7px] text-slate-500 uppercase font-bold tracking-[0.2em]">Mercado en Tiempo Real</p>
             </div>
             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-right shadow-xl">
                 <p class="text-[8px] text-slate-500 uppercase tracking-widest">Saldo fUSDT</p>
@@ -31,24 +31,14 @@
 
         <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl border-t-4 border-t-yellow-600 shadow-2xl mb-8">
             <div class="flex justify-between items-center mb-6">
-                <span class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full font-bold animate-pulse uppercase">Mercado Activo</span>
-                <span class="text-slate-500 text-[10px]">Cierre en: <span id="quetza-timer" class="font-bold text-yellow-500">01:00</span></span>
+                <span id="market-status-tag" class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full font-bold animate-pulse uppercase">Mercado Activo</span>
+                <span class="text-slate-500 text-[10px]">Cierre en: <span id="quetza-timer" class="font-bold text-yellow-500">--:--</span></span>
             </div>
             
             <h3 class="text-xl font-bold mb-8 italic text-center leading-tight">
-                ¿Validarás el <span id="display-asset" class="text-yellow-500 underline">Oro (XAUT)</span> sobre <span id="display-price" class="text-white bg-slate-800 px-2">$4,850.00</span>?
+                ¿Validarás el <span id="display-asset" class="text-yellow-500 underline">Cargando...</span> sobre <span id="display-price" class="text-white bg-slate-800 px-2">...</span>?
             </h3>
 
-            <div class="mb-8">
-                <div class="flex justify-between text-[9px] uppercase font-bold mb-2">
-                    <span class="text-green-500">SÍ: 64%</span> <span class="text-red-500">NO: 36%</span>
-                </div>
-                <div class="w-full h-3 bg-slate-800 rounded-full flex shadow-inner">
-                    <div class="h-full bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.5)] rounded-l-full" style="width: 64%"></div>
-                    <div class="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] rounded-r-full" style="width: 36%"></div>
-                </div>
-            </div>
-            
             <div class="flex space-x-3 mb-6">
                 <button id="btn-yes" onclick="makeBet('SÍ')" class="flex-1 bg-green-700 hover:bg-green-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg transition-transform active:scale-95">Apostar SÍ</button>
                 <button id="btn-no" onclick="makeBet('NO')" class="flex-1 bg-red-700 hover:bg-red-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg transition-transform active:scale-95">Apostar NO</button>
@@ -60,81 +50,91 @@
             </div>
         </div>
 
-        <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-slate-700 mt-4">
-            <h3 class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.4em] mb-4 text-center">⚙️ Panel de Oráculo (Admin)</h3>
+        <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-slate-700 mb-8">
+            <h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.4em] mb-4 text-center">⚙️ Panel de Oráculo (Admin)</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="text-[9px] text-slate-500 uppercase tracking-widest block mb-1">Nombre del Activo</label>
-                    <input id="input-asset" type="text" placeholder="Ej: Ethereum (ETH)" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
+                    <input id="input-asset" type="text" placeholder="Ej: Bitcoin (BTC)" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
                 </div>
                 <div>
                     <label class="text-[9px] text-slate-500 uppercase tracking-widest block mb-1">Precio Objetivo ($)</label>
-                    <input id="input-price" type="number" placeholder="Ej: 3500.50" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
+                    <input id="input-price" type="number" placeholder="Ej: 65000" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
                 </div>
             </div>
-            <button onclick="saveNewMarket()" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-yellow-500 font-bold py-2 rounded uppercase text-[10px] tracking-widest border border-slate-700 transition-colors">
-                Generar Nuevo Mercado
+            <button onclick="saveNewMarket()" class="w-full mt-4 bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-2 rounded uppercase text-[10px] tracking-widest transition-colors">
+                Publicar Nueva Pregunta al Mercado
             </button>
         </div>
     </div>
 
     <script>
-        // --- 1. ESTADO DE OPERACIONES Y MEMORIA DEL MERCADO ---
+        // --- 1. CONFIGURACIÓN Y ESTADO ---
         let balance = localStorage.getItem('q_bal_v9') ? parseFloat(localStorage.getItem('q_bal_v9')) : 1000.00;
         let activeBet = { side: null, amount: 0 };
         let history = JSON.parse(localStorage.getItem('q_hist_v9')) || [];
         let currentTacoRisk = 50; 
-        let timerStarted = false;
+        let timerInterval;
 
-        // Variables del mercado dinámico
-        let marketAsset = localStorage.getItem('q_market_asset') || 'Oro (XAUT)';
-        let marketTargetPrice = parseFloat(localStorage.getItem('q_market_price')) || 4850.00;
-
-        // --- 2. CONFIGURACIÓN DEL MERCADO DINÁMICO ---
+        // --- 2. LÓGICA DEL MERCADO DINÁMICO ---
         function loadMarketConfig() {
-            document.getElementById('display-asset').innerText = marketAsset;
-            document.getElementById('display-price').innerText = `$${marketTargetPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            // Pre-llenar los inputs del admin
-            document.getElementById('input-asset').value = marketAsset;
-            document.getElementById('input-price').value = marketTargetPrice;
+            const asset = localStorage.getItem('q_market_asset') || 'Oro (XAUT)';
+            const price = localStorage.getItem('q_market_price') || '4850.00';
+            document.getElementById('display-asset').innerText = asset;
+            document.getElementById('display-price').innerText = `$${parseFloat(price).toLocaleString()}`;
+            document.getElementById('input-asset').value = asset;
+            document.getElementById('input-price').value = price;
         }
 
         function saveNewMarket() {
-            if(activeBet.amount > 0) return alert("No puedes cambiar el mercado mientras haya apuestas activas.");
+            if(activeBet.amount > 0) return alert("No puedes cambiar la pregunta mientras tienes una apuesta activa.");
             
             const newAsset = document.getElementById('input-asset').value;
-            const newPrice = parseFloat(document.getElementById('input-price').value);
+            const newPrice = document.getElementById('input-price').value;
 
             if(newAsset && newPrice) {
-                marketAsset = newAsset;
-                marketTargetPrice = newPrice;
-                localStorage.setItem('q_market_asset', marketAsset);
-                localStorage.setItem('q_market_price', marketTargetPrice);
-                loadMarketConfig();
-                alert(`Nuevo mercado creado: ${marketAsset} sobre $${marketTargetPrice}`);
-            } else {
-                alert("Por favor ingresa un activo y un precio válidos.");
+                localStorage.setItem('q_market_asset', newAsset);
+                localStorage.setItem('q_market_price', newPrice);
+                // Al cambiar la pregunta, reiniciamos el tiempo para que empiece el nuevo ciclo
+                localStorage.removeItem('q_timer_end');
+                location.reload(); 
             }
         }
 
-        // --- 3. CONEXIÓN CON IA PARA EFECTO INMERSIVO ---
-        async function fetchAIContext() {
-            try {
-                const response = await fetch('/api/getTacoData');
-                const aiData = await response.json();
-                if (response.ok) {
-                    currentTacoRisk = aiData.risk;
-                    document.getElementById('app-body').style.backgroundColor = aiData.alert ? "#2a1508" : "#020617";
+        // --- 3. CRONÓMETRO PERSISTENTE (SOLUCIÓN F5) ---
+        function startPersistentTimer() {
+            // Buscamos si ya existe una hora de cierre en el almacenamiento
+            let endTime = localStorage.getItem('q_timer_end');
+
+            if (!endTime) {
+                // Si no existe, creamos una nueva (Hora actual + 60 segundos)
+                endTime = Date.now() + (60 * 1000);
+                localStorage.setItem('q_timer_end', endTime);
+            }
+
+            const display = document.getElementById('quetza-timer');
+            
+            timerInterval = setInterval(() => {
+                const now = Date.now();
+                const timeLeft = Math.floor((endTime - now) / 1000);
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    display.innerText = "00:00";
+                    localStorage.removeItem('q_timer_end'); // Limpiar para el siguiente ciclo
+                    settleMarket();
+                } else {
+                    let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                    display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
                 }
-            } catch (error) {}
+            }, 1000);
         }
 
-        // --- 4. LÓGICA DE TRANSACCIONES CORREGIDA ---
+        // --- 4. LIQUIDACIÓN Y APUESTAS ---
         function updateUI() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById('user-pos').innerText = activeBet.side || 'PENDIENTE';
             document.getElementById('user-amt').innerText = activeBet.amount.toFixed(2);
-            
             localStorage.setItem('q_bal_v9', balance);
             localStorage.setItem('q_hist_v9', JSON.stringify(history));
         }
@@ -148,60 +148,53 @@
         }
 
         function settleMarket() {
-            // Genera un precio final simulado que oscila un poco arriba o abajo del precio objetivo actual
-            const volatility = marketTargetPrice * 0.005; // 0.5% de volatilidad simulada
-            const finalPrice = (marketTargetPrice + (Math.random() * volatility * 2) - volatility).toFixed(2);
+            const target = parseFloat(localStorage.getItem('q_market_price')) || 4850.00;
+            const asset = localStorage.getItem('q_market_asset') || 'Oro (XAUT)';
+            
+            // Simulación de precio final
+            const finalPrice = (target + (Math.random() * 10) - 5).toFixed(2);
             let won = false;
 
-            // SOLO ALERTAMOS Y CALCULAMOS SI EL USUARIO APOSTÓ
+            // Solo mostramos alerta y calculamos si hubo apuesta
             if (activeBet.amount > 0) {
-                if (activeBet.side === 'SÍ' && finalPrice >= marketTargetPrice) won = true;
-                if (activeBet.side === 'NO' && finalPrice < marketTargetPrice) won = true;
+                if (activeBet.side === 'SÍ' && finalPrice >= target) won = true;
+                if (activeBet.side === 'NO' && finalPrice < target) won = true;
 
-                const isBonus = won && currentTacoRisk > 80;
-                const multiplier = isBonus ? 2.5 : 2.0;
+                const multiplier = (won && currentTacoRisk > 80) ? 2.5 : 2.0;
                 const prize = activeBet.amount * multiplier;
 
                 if (won) balance += prize;
-                history.unshift({ win: won, amt: won ? prize : 100, side: activeBet.side, bonus: isBonus, asset: marketAsset });
+                history.unshift({ win: won, amt: won ? prize : 100, side: activeBet.side, asset: asset });
                 if (history.length > 5) history.pop();
 
                 updateUI();
-                alert(`LIQUIDACIÓN DEL MERCADO\n${marketAsset} Final: $${finalPrice}\nResultado: ${won ? '¡GANASTE!' : 'Perdiste'}`);
-            } else {
-                // Si no apostó, puedes descomentar la siguiente línea si quieres que avise que el mercado cerró,
-                // pero lo ideal para la experiencia es que sea silencioso.
-                // console.log(`Mercado cerrado sin participación. Precio: $${finalPrice}`);
+                alert(`MERCADO CERRADO\n${asset} Final: $${finalPrice}\nResultado: ${won ? '¡GANASTE!' : 'Perdiste'}`);
             }
 
-            // Reiniciar el mercado sin importar si apostó o no
+            // Reiniciar estado para el próximo ciclo
             activeBet = { side: null, amount: 0 };
             updateUI();
-            
-            timerStarted = false;
-            startTimer(1); 
+            startPersistentTimer(); // Reiniciar el cronómetro automáticamente
         }
 
-        // --- 5. CRONÓMETRO ---
-        function startTimer(minutes) {
-            if (timerStarted) return;
-            timerStarted = true;
-            let time = minutes * 60;
-            const display = document.getElementById('quetza-timer');
-            
-            const count = setInterval(() => {
-                let m = Math.floor(time / 60), s = time % 60;
-                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-                if (--time < 0) { clearInterval(count); settleMarket(); }
-            }, 1000);
+        // --- 5. CONEXIÓN CON IA (FONDO DINÁMICO) ---
+        async function fetchAIContext() {
+            try {
+                const response = await fetch('/api/getTacoData');
+                const aiData = await response.json();
+                if (response.ok) {
+                    currentTacoRisk = aiData.risk;
+                    document.getElementById('app-body').style.backgroundColor = aiData.alert ? "#2a1508" : "#020617";
+                }
+            } catch (e) {}
         }
 
-        // --- ARRANQUE ---
         window.onload = () => {
             loadMarketConfig();
             updateUI();
-            startTimer(1); 
-            fetchAIContext(); setInterval(fetchAIContext, 120000);
+            startPersistentTimer();
+            fetchAIContext(); 
+            setInterval(fetchAIContext, 120000);
         };
     </script>
 </body>
