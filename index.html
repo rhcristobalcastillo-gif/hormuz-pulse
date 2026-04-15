@@ -133,7 +133,7 @@
 
     <script>
         // ==========================================
-        // 1. CONFIGURACIÓN DEL SISTEMA
+        // 1. CONFIGURACIÓN DEL SISTEMA Y API KEY
         // ==========================================
         let balance = localStorage.getItem('q_bal_v6') ? parseFloat(localStorage.getItem('q_bal_v6')) : 1000.00;
         let activeBet = { side: null, amount: 0 };
@@ -141,15 +141,16 @@
         let timerStarted = false;
         let currentTacoRisk = 50;
 
-        // ¡IMPORTANTE! PEGA TU API KEY AQUÍ ENTRE LAS COMILLAS
+        // 👇👇 AQUÍ PEgas TU LLAVE NUEVA. MANTÉN LAS COMILLAS SIMPLES 👇👇
         const GEMINI_API_KEY = 'TU_API_KEY_AQUI'; 
 
         // ==========================================
         // 2. MOTOR DE INTELIGENCIA ARTIFICIAL (GEMINI LIVE)
         // ==========================================
         async function updateTrumpAILive() {
-            if (GEMINI_API_KEY === 'AIzaSyDDsQEYLS3gEYg9t3Am-2z02NXVuTi9zqg') {
-                applyTacoUI(75, "AIzaSyDDsQEYLS3gEYg9t3Am-2z02NXVuTi9zqg", false);
+            // Verificación de seguridad para no ejecutar si no hay llave
+            if (GEMINI_API_KEY === 'TU_API_KEY_AQUI') {
+                applyTacoUI(75, "FALTA API KEY DE GEMINI EN EL CÓDIGO", false);
                 return;
             }
 
