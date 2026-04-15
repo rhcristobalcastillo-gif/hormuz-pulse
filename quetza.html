@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Quetza Forecast | Mercado Descentralizado</title>
+    <title>Quetza Forecast | User Console</title>
     <style>
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
         body { transition: background-color 1.5s ease-in-out; }
@@ -17,212 +17,141 @@
         <a href="quetza.html" class="tab-active py-2 transition-all">🦅 Quetza Consensus</a>
     </nav>
 
-    <div>
-        <div class="flex justify-between items-start mb-8">
-            <div>
-                <h2 class="text-2xl font-black text-yellow-500 italic uppercase tracking-tighter">QuetzaPredict MX</h2>
-                <p class="text-[7px] text-slate-500 uppercase font-bold tracking-[0.2em]">Mercado en Tiempo Real</p>
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl mb-8 flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+            <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Tu Perfil</h2>
+            <div id="user-badge" class="inline-block mt-1 bg-slate-800 text-yellow-500 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-yellow-900">
+                🌱 Rango: Iniciado
             </div>
-            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-right shadow-xl">
-                <p class="text-[8px] text-slate-500 uppercase tracking-widest">Saldo fUSDT</p>
+        </div>
+        
+        <div class="flex space-x-6 text-center">
+            <div>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Win Rate</p>
+                <p id="stat-winrate" class="text-xl font-black text-blue-400">0%</p>
+            </div>
+            <div>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Operaciones</p>
+                <p id="stat-trades" class="text-xl font-black text-white">0</p>
+            </div>
+            <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Saldo fUSDT</p>
                 <p id="user-credits" class="text-xl font-black text-green-400">1,000.00</p>
             </div>
         </div>
-
-        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl border-t-4 border-t-yellow-600 shadow-2xl mb-8">
-            <div class="flex justify-between items-center mb-6">
-                <span id="market-status-tag" class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full font-bold animate-pulse uppercase">Mercado Activo</span>
-                <span class="text-slate-500 text-[10px]">Cierre en: <span id="quetza-timer" class="font-bold text-yellow-500">--:--</span></span>
-            </div>
-            
-            <h3 class="text-xl font-bold mb-4 italic text-center leading-tight">
-                ¿Validarás el <span id="display-asset" class="text-yellow-500 underline">Cargando...</span> sobre <span id="display-price" class="text-white bg-slate-800 px-2">...</span>?
-            </h3>
-
-            <div class="w-full h-64 mb-8 rounded-xl overflow-hidden border border-slate-700 shadow-inner bg-slate-950">
-                <iframe id="tv-iframe" src="" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
-            </div>
-
-            <div class="mb-8">
-                <div class="flex justify-between text-[9px] uppercase font-bold mb-2">
-                    <span class="text-green-500">SÍ: 64%</span> <span class="text-red-500">NO: 36%</span>
-                </div>
-                <div class="w-full h-3 bg-slate-800 rounded-full flex shadow-inner">
-                    <div class="h-full bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.5)] rounded-l-full" style="width: 64%"></div>
-                    <div class="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] rounded-r-full" style="width: 36%"></div>
-                </div>
-            </div>
-
-            <div class="flex space-x-3 mb-6">
-                <button id="btn-yes" onclick="makeBet('SÍ')" class="flex-1 bg-green-700 hover:bg-green-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg transition-transform active:scale-95">Apostar SÍ</button>
-                <button id="btn-no" onclick="makeBet('NO')" class="flex-1 bg-red-700 hover:bg-red-600 text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest shadow-lg transition-transform active:scale-95">Apostar NO</button>
-            </div>
-
-            <div class="border-t border-slate-800 pt-4 flex justify-between text-[10px] uppercase text-slate-500 font-bold mt-4">
-                <span>Tu Posición: <span id="user-pos" class="text-white italic">PENDIENTE</span></span>
-                <span>Inversión: <span id="user-amt" class="text-white">0.00</span> fUSDT</span>
-            </div>
-        </div>
-
-        <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-slate-700 mb-8">
-            <h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.4em] mb-4 text-center">⚙️ Panel de Oráculo (Admin)</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label class="text-[9px] text-slate-500 uppercase tracking-widest block mb-1">Activo</label>
-                    <input id="input-asset" type="text" placeholder="Ej: Bitcoin (BTC)" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
-                </div>
-                <div>
-                    <label class="text-[9px] text-slate-500 uppercase tracking-widest block mb-1">Símbolo (TradingView)</label>
-                    <input id="input-symbol" type="text" placeholder="Ej: BINANCE:BTCUSDT" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
-                </div>
-                <div>
-                    <label class="text-[9px] text-slate-500 uppercase tracking-widest block mb-1">Precio Objetivo ($)</label>
-                    <input id="input-price" type="number" placeholder="Ej: 65000" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded focus:outline-none focus:border-yellow-500">
-                </div>
-            </div>
-            <button onclick="saveNewMarket()" class="w-full mt-4 bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-2 rounded uppercase text-[10px] tracking-widest transition-colors">
-                Publicar Nueva Pregunta y Gráfico
-            </button>
-        </div>
     </div>
 
+    <h3 class="text-[12px] text-yellow-500 font-bold uppercase tracking-[0.3em] mb-6 border-b border-slate-800 pb-2">Mercados Abiertos</h3>
+
+    <div id="markets-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        </div>
+
     <script>
-        // --- 1. CONFIGURACIÓN Y ESTADO ---
-        let balance = localStorage.getItem('q_bal_v10') ? parseFloat(localStorage.getItem('q_bal_v10')) : 1000.00;
-        let activeBet = { side: null, amount: 0 };
-        let history = JSON.parse(localStorage.getItem('q_hist_v10')) || [];
-        let currentTacoRisk = 50; 
-        let timerInterval;
+        // --- ESTADO DEL USUARIO ---
+        let balance = localStorage.getItem('q_bal_v11') ? parseFloat(localStorage.getItem('q_bal_v11')) : 1000.00;
+        let history = JSON.parse(localStorage.getItem('q_hist_v11')) || [];
+        let activeBets = {}; // Ahora podemos tener múltiples apuestas a la vez (por ID de mercado)
 
-        // --- 2. LÓGICA DEL MERCADO DINÁMICO Y GRÁFICOS ---
-        function loadMarketConfig() {
-            const asset = localStorage.getItem('q_market_asset') || 'Oro (XAUT)';
-            const price = localStorage.getItem('q_market_price') || '4850.00';
-            const symbol = localStorage.getItem('q_market_symbol') || 'OANDA:XAUUSD'; // Símbolo por defecto para oro
-
-            // Actualizar textos
-            document.getElementById('display-asset').innerText = asset;
-            document.getElementById('display-price').innerText = `$${parseFloat(price).toLocaleString()}`;
-            
-            // Llenar inputs del admin
-            document.getElementById('input-asset').value = asset;
-            document.getElementById('input-price').value = price;
-            document.getElementById('input-symbol').value = symbol;
-
-            // Inyectar el gráfico de TradingView dinámicamente
-            const iframeSrc = `https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol)}&interval=15&theme=dark&style=1&hidesidetoolbar=1&withdateranges=1`;
-            document.getElementById('tv-iframe').src = iframeSrc;
-        }
-
-        function saveNewMarket() {
-            if(activeBet.amount > 0) return alert("No puedes cambiar la pregunta mientras tienes una apuesta activa.");
-            
-            const newAsset = document.getElementById('input-asset').value;
-            const newPrice = document.getElementById('input-price').value;
-            const newSymbol = document.getElementById('input-symbol').value;
-
-            if(newAsset && newPrice && newSymbol) {
-                localStorage.setItem('q_market_asset', newAsset);
-                localStorage.setItem('q_market_price', newPrice);
-                localStorage.setItem('q_market_symbol', newSymbol);
-                
-                // Reiniciamos el cronómetro para el nuevo mercado
-                localStorage.removeItem('q_timer_end');
-                location.reload(); 
-            } else {
-                alert("Por favor completa los 3 campos (Activo, Símbolo y Precio).");
-            }
-        }
-
-        // --- 3. CRONÓMETRO PERSISTENTE ---
-        function startPersistentTimer() {
-            let endTime = localStorage.getItem('q_timer_end');
-
-            if (!endTime) {
-                endTime = Date.now() + (60 * 1000);
-                localStorage.setItem('q_timer_end', endTime);
-            }
-
-            const display = document.getElementById('quetza-timer');
-            
-            timerInterval = setInterval(() => {
-                const now = Date.now();
-                const timeLeft = Math.floor((endTime - now) / 1000);
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    display.innerText = "00:00";
-                    localStorage.removeItem('q_timer_end');
-                    settleMarket();
-                } else {
-                    let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                    display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-                }
-            }, 1000);
-        }
-
-        // --- 4. LIQUIDACIÓN Y APUESTAS ---
-        function updateUI() {
+        // --- RENDERIZAR LOGROS ---
+        function updateDashboard() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('user-pos').innerText = activeBet.side || 'PENDIENTE';
-            document.getElementById('user-amt').innerText = activeBet.amount.toFixed(2);
-            localStorage.setItem('q_bal_v10', balance);
-            localStorage.setItem('q_hist_v10', JSON.stringify(history));
-        }
-
-        function makeBet(side) {
-            if (activeBet.amount > 0) return alert("Ya tienes una posición abierta.");
-            if (balance < 100) return alert("Saldo insuficiente.");
-            balance -= 100;
-            activeBet = { side: side, amount: 100 };
-            updateUI();
-        }
-
-        function settleMarket() {
-            const target = parseFloat(localStorage.getItem('q_market_price')) || 4850.00;
-            const asset = localStorage.getItem('q_market_asset') || 'Oro (XAUT)';
             
-            const finalPrice = (target + (Math.random() * 10) - 5).toFixed(2);
-            let won = false;
+            const totalTrades = history.length;
+            const wins = history.filter(h => h.win).length;
+            const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
 
-            if (activeBet.amount > 0) {
-                if (activeBet.side === 'SÍ' && finalPrice >= target) won = true;
-                if (activeBet.side === 'NO' && finalPrice < target) won = true;
+            document.getElementById('stat-trades').innerText = totalTrades;
+            document.getElementById('stat-winrate').innerText = `${winRate}%`;
 
-                const multiplier = (won && currentTacoRisk > 80) ? 2.5 : 2.0;
-                const prize = activeBet.amount * multiplier;
+            // Lógica de insignias (Gamificación)
+            const badgeEl = document.getElementById('user-badge');
+            if (wins >= 10) { badgeEl.innerHTML = "🏆 Rango: Maestro Oráculo"; badgeEl.className = "inline-block mt-1 bg-yellow-900 text-yellow-300 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-yellow-500"; }
+            else if (wins >= 5) { badgeEl.innerHTML = "🔥 Rango: Analista Experto"; badgeEl.className = "inline-block mt-1 bg-orange-900 text-orange-300 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-orange-500"; }
+            else if (wins >= 1) { badgeEl.innerHTML = "📈 Rango: Trader Activo"; }
+        }
 
-                if (won) balance += prize;
-                history.unshift({ win: won, amt: won ? prize : 100, side: activeBet.side, asset: asset });
-                if (history.length > 5) history.pop();
+        // --- RENDERIZAR MERCADOS ---
+        function renderMarkets() {
+            let markets = JSON.parse(localStorage.getItem('q_markets_v11')) || [];
+            const container = document.getElementById('markets-container');
 
-                updateUI();
-                alert(`MERCADO CERRADO\n${asset} Final: $${finalPrice}\nResultado: ${won ? '¡GANASTE!' : 'Perdiste'}`);
+            if (markets.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic text-sm">No hay mercados activos. Esperando al Administrador...</p>`;
+                return;
             }
 
-            activeBet = { side: null, amount: 0 };
-            updateUI();
-            startPersistentTimer(); 
+            container.innerHTML = markets.map(m => {
+                // Si hay símbolo de TradingView, renderizamos el iframe, si no, lo ocultamos.
+                const chartHTML = m.symbol ? `
+                    <div class="w-full h-32 mb-4 rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                        <iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(m.symbol)}&interval=D&theme=dark&style=3&hidesidetoolbar=1" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+                    </div>
+                ` : `<div class="w-full h-12 mb-4 rounded-xl border border-slate-800 bg-slate-950 flex items-center justify-center text-[9px] text-slate-500 uppercase tracking-widest">Gráfico no disponible para esta categoría</div>`;
+
+                // Verificar si ya apostó en este mercado
+                const hasBet = activeBets[m.id];
+                const btnState = hasBet ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95';
+
+                return `
+                <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <span class="bg-slate-800 text-slate-300 text-[8px] px-2 py-1 rounded-full font-bold uppercase tracking-widest border border-slate-700">${m.cat}</span>
+                        <h3 class="text-lg font-bold text-white mt-4 mb-4 leading-tight">${m.question}</h3>
+                        ${chartHTML}
+                    </div>
+                    
+                    <div>
+                        ${hasBet ? `<p class="text-[10px] text-yellow-500 uppercase tracking-widest text-center mb-2 font-bold animate-pulse">Tu apuesta: ${hasBet.side} (100 fUSDT)</p>` : ''}
+                        <div class="flex space-x-2">
+                            <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-800 text-white font-black py-3 rounded-xl uppercase text-[10px] tracking-widest transition-transform ${btnState}" ${hasBet ? 'disabled' : ''}>SÍ</button>
+                            <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-800 text-white font-black py-3 rounded-xl uppercase text-[10px] tracking-widest transition-transform ${btnState}" ${hasBet ? 'disabled' : ''}>NO</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
         }
 
-        // --- 5. CONEXIÓN CON IA ---
-        async function fetchAIContext() {
-            try {
-                const response = await fetch('/api/getTacoData');
-                const aiData = await response.json();
-                if (response.ok) {
-                    currentTacoRisk = aiData.risk;
-                    document.getElementById('app-body').style.backgroundColor = aiData.alert ? "#2a1508" : "#020617";
-                }
-            } catch (e) {}
+        // --- LÓGICA DE APUESTAS ---
+        function makeBet(marketId, side, assetName) {
+            if (balance < 100) return alert("Saldo insuficiente.");
+            
+            balance -= 100;
+            activeBets[marketId] = { side: side, amount: 100, asset: assetName };
+            
+            localStorage.setItem('q_bal_v11', balance);
+            updateDashboard();
+            renderMarkets(); // Re-renderizar para deshabilitar botones
+            
+            alert(`Apuesta registrada: ${side} a ${assetName}`);
+            
+            // Simular resolución de mercado después de 10 segundos
+            setTimeout(() => simulateResolution(marketId), 10000);
+        }
+
+        // Para este MVP, el mercado se autoliquida a los 10 segundos de apostar para darle feedback rápido al usuario
+        function simulateResolution(marketId) {
+            const bet = activeBets[marketId];
+            if (!bet) return;
+
+            const won = Math.random() > 0.5; // 50/50 probabilidad
+            if (won) balance += (bet.amount * 2);
+
+            history.unshift({ win: won, amt: won ? bet.amount * 2 : bet.amount, side: bet.side, asset: bet.asset });
+            
+            delete activeBets[marketId]; // Limpiar apuesta activa
+            
+            localStorage.setItem('q_bal_v11', balance);
+            localStorage.setItem('q_hist_v11', JSON.stringify(history));
+            
+            updateDashboard();
+            renderMarkets();
+            alert(`RESULTADO DE ${bet.asset}:\n¡${won ? 'GANASTE' : 'PERDISTE'}!`);
         }
 
         window.onload = () => {
-            loadMarketConfig();
-            updateUI();
-            startPersistentTimer();
-            fetchAIContext(); 
-            setInterval(fetchAIContext, 120000);
+            updateDashboard();
+            renderMarkets();
         };
     </script>
 </body>
