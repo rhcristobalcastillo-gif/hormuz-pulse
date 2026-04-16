@@ -8,30 +8,29 @@
     <style>
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
         body { transition: background-color 1.5s ease-in-out; }
-        /* Scrollbar personalizado */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body id="app-body" class="bg-slate-950 text-slate-200 font-mono p-4 max-w-[1600px] mx-auto h-screen flex flex-col overflow-hidden">
+<body id="app-body" class="bg-slate-950 text-slate-200 font-mono p-3 lg:p-4 max-w-[1600px] mx-auto min-h-screen lg:h-screen flex flex-col lg:overflow-hidden">
 
-    <nav class="flex justify-center space-x-8 mb-6 border-b border-slate-800 pb-2 text-[10px] uppercase tracking-[0.2em] flex-shrink-0">
+    <nav class="flex justify-center space-x-6 lg:space-x-8 mb-6 border-b border-slate-800 pb-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] flex-shrink-0">
         <a href="index.html" class="py-2 text-slate-500 hover:text-yellow-500 transition-all">📡 Monitor Global</a>
         <a href="quetza.html" class="tab-active py-2 transition-all">🦅 Quetza Consensus</a>
     </nav>
 
-    <div class="flex flex-col lg:flex-row gap-6 flex-grow overflow-hidden pb-4">
+    <div class="flex flex-col lg:flex-row gap-6 flex-grow lg:overflow-hidden pb-4">
         
-        <div class="lg:w-2/3 flex flex-col overflow-hidden">
+        <div class="lg:w-2/3 flex flex-col lg:overflow-hidden">
             <h2 class="text-xl font-black text-yellow-500 uppercase tracking-tighter mb-4 flex-shrink-0">🌎 Mercados de Liquidez Continua</h2>
             
-            <div id="markets-container" class="overflow-y-auto pr-2 pb-10 space-y-6 flex-grow">
+            <div id="markets-container" class="lg:overflow-y-auto pr-0 lg:pr-2 pb-6 lg:pb-10 space-y-6 flex-grow">
                 </div>
         </div>
 
-        <div class="lg:w-1/3 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xl relative">
-            <div class="p-6 border-b border-slate-800 bg-slate-900 z-10 flex-shrink-0">
+        <div class="lg:w-1/3 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col lg:overflow-hidden shadow-2xl relative mb-10 lg:mb-0">
+            <div class="p-5 lg:p-6 border-b border-slate-800 bg-slate-900 z-10 flex-shrink-0">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-black text-white uppercase tracking-widest">Tu Portafolio</h2>
                     <span class="bg-slate-800 text-yellow-500 px-2 py-1 rounded text-[9px] font-bold tracking-widest uppercase">Nodo Jalisco</span>
@@ -54,9 +53,9 @@
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto p-6 space-y-8 bg-slate-900/50">
+            <div class="flex-grow lg:overflow-y-auto p-5 lg:p-6 space-y-8 bg-slate-900/50">
                 <div>
-                    <h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em] mb-3 border-b border-slate-800 pb-1">⚡ Posiciones del Ciclo Actual</h3>
+                    <h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em] mb-3 border-b border-slate-800 pb-1">⚡ Posiciones del Ciclo</h3>
                     <div id="open-positions-list" class="space-y-2"></div>
                 </div>
                 <div>
@@ -89,14 +88,15 @@
             } else {
                 posList.innerHTML = betKeys.map(key => {
                     const bet = activeBets[key];
+                    // CORRECCIÓN DE CAJA: Usamos flex-1 y min-w-0 para que el texto se adapte sin romper la caja
                     return `
-                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex justify-between items-center animate-pulse">
-                        <div>
-                            <p class="text-[10px] text-slate-400 truncate w-32 uppercase">${bet.asset}</p>
+                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg flex flex-row justify-between items-center animate-pulse gap-3">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] text-slate-400 truncate uppercase" title="${bet.asset}">${bet.asset}</p>
                             <p class="text-xs font-bold ${bet.side === 'SÍ' ? 'text-green-500' : 'text-red-500'} uppercase tracking-widest">${bet.side}</p>
                         </div>
-                        <div class="text-right">
-                            <p class="text-sm font-black text-white">${bet.amount} fUSDT</p>
+                        <div class="text-right whitespace-nowrap pl-2 border-l border-slate-800">
+                            <p class="text-sm font-black text-white">${bet.amount} <span class="text-[9px] text-slate-500">fUSDT</span></p>
                         </div>
                     </div>`;
                 }).join('');
@@ -107,18 +107,19 @@
                 histList.innerHTML = `<p class="text-[10px] text-slate-500 italic">No hay historial.</p>`;
             } else {
                 histList.innerHTML = history.map(h => `
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
-                        <div>
+                    <div class="flex flex-row justify-between items-center border-b border-slate-800 pb-2 mb-2 gap-2">
+                        <div class="flex-1 min-w-0">
                             <p class="text-[9px] font-bold ${h.win ? 'text-green-500' : 'text-slate-500'} uppercase">${h.win ? 'GANASTE' : 'PERDISTE'} (${h.side})</p>
-                            <p class="text-[10px] text-slate-400 truncate w-32 uppercase">${h.asset}</p>
+                            <p class="text-[10px] text-slate-400 truncate uppercase">${h.asset}</p>
                             ${h.details ? `<p class="text-[8px] text-slate-500 font-mono mt-1">${h.details}</p>` : ''}
                         </div>
-                        <p class="text-[11px] font-mono text-white">${h.win ? '+' : '-'}${h.amt} fUSDT</p>
+                        <div class="text-right whitespace-nowrap">
+                            <p class="text-[11px] font-mono text-white">${h.win ? '+' : '-'}${h.amt} <span class="text-[8px] text-slate-500">fUSDT</span></p>
+                        </div>
                     </div>`).join('');
             }
         }
 
-        // FUNCIÓN CORREGIDA
         function renderMarkets() {
             let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
             currentMarketsCount = markets.length;
@@ -134,13 +135,13 @@
             }
 
             container.innerHTML = markets.map(m => {
+                // CORRECCIÓN DE GRÁFICO: h-64 (más alto) para móviles y md:h-72 para tablets/escritorio
                 const chartHTML = m.symbol ? `
-                    <div class="w-full h-48 mb-6 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner pointer-events-auto">
+                    <div class="w-full h-64 md:h-72 mb-6 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner pointer-events-auto">
                         <iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(m.symbol)}&interval=1&theme=dark&style=1&hidesidetoolbar=1" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
                     </div>
                 ` : ``;
 
-                // Aquí calculamos el tiempo inicial para que al dar F5 se vea perfecto
                 let oracleUI = "";
                 if (m.resolution === 'AUTO' && m.endTime) {
                     let timeLeft = Math.floor((m.endTime - Date.now()) / 1000);
@@ -151,33 +152,33 @@
                     
                     oracleUI = `<span id="timer-${m.id}" class="text-blue-400 font-bold font-mono tracking-widest text-sm bg-blue-950/30 px-3 py-1 rounded border border-blue-900">${timeStr}</span>`;
                 } else {
-                    oracleUI = `<span class="text-orange-500 font-bold uppercase tracking-widest text-[10px] bg-orange-950/30 px-3 py-1 rounded border border-orange-900">Esperando Juez Admin</span>`;
+                    oracleUI = `<span class="text-orange-500 font-bold uppercase tracking-widest text-[10px] bg-orange-950/30 px-3 py-1 rounded border border-orange-900">Juez Admin</span>`;
                 }
 
                 return `
-                <div class="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div class="bg-slate-900/40 border border-slate-800 p-4 lg:p-6 rounded-2xl shadow-xl">
                     <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] border border-slate-700 px-2 py-1 rounded bg-slate-950">${m.cat}</span>
-                            <span class="text-[10px] text-white font-bold uppercase truncate max-w-[150px]">${m.asset}</span>
+                        <div class="flex items-center space-x-2 flex-1 min-w-0 pr-2">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] border border-slate-700 px-2 py-1 rounded bg-slate-950 flex-shrink-0">${m.cat}</span>
+                            <span class="text-[10px] text-white font-bold uppercase truncate">${m.asset}</span>
                         </div>
-                        <div class="flex flex-col items-end">
-                            <span class="text-[7px] text-slate-500 uppercase tracking-widest mb-1">Cierre de Ciclo</span>
+                        <div class="flex flex-col items-end flex-shrink-0">
+                            <span class="text-[7px] text-slate-500 uppercase tracking-widest mb-1">Cierre</span>
                             ${oracleUI}
                         </div>
                     </div>
                     
-                    <h3 class="text-lg font-bold text-white mb-2 leading-tight">${m.question}</h3>
+                    <h3 class="text-base lg:text-lg font-bold text-white mb-2 leading-tight">${m.question}</h3>
                     
                     <p id="price-tag-${m.id}" class="text-[10px] text-blue-400 font-mono mb-4 border border-blue-900/50 bg-blue-950/30 inline-block px-2 py-1 rounded">
-                        ${m.startPrice ? `Precio de Entrada: $${m.startPrice}` : 'Calculando nueva entrada...'}
+                        ${m.startPrice ? `Entrada: $${m.startPrice}` : 'Calculando...'}
                     </p>
                     
                     ${chartHTML}
                     
-                    <div class="flex space-x-3 mt-4">
-                        <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-900/80 hover:bg-green-600 text-green-100 border border-green-800 font-black py-3 rounded-xl uppercase text-[10px] tracking-widest transition-all active:scale-95">Invierte SÍ (Sube)</button>
-                        <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-900/80 hover:bg-red-600 text-red-100 border border-red-800 font-black py-3 rounded-xl uppercase text-[10px] tracking-widest transition-all active:scale-95">Invierte NO (Baja)</button>
+                    <div class="flex space-x-2 lg:space-x-3 mt-4">
+                        <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-green-900/80 hover:bg-green-600 text-green-100 border border-green-800 font-black py-3 lg:py-4 rounded-xl uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-lg">SÍ (Sube)</button>
+                        <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-900/80 hover:bg-red-600 text-red-100 border border-red-800 font-black py-3 lg:py-4 rounded-xl uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-lg">NO (Baja)</button>
                     </div>
                 </div>
                 `;
@@ -226,12 +227,12 @@
                         if (!m.startPrice && m.symbol && m.symbol.includes("BINANCE")) {
                             m.startPrice = await fetchRealPrice(m.symbol);
                             marketsUpdated = true;
-                            if (priceTag) priceTag.innerText = `Precio de Entrada: $${m.startPrice}`;
+                            if (priceTag) priceTag.innerText = `Entrada: $${m.startPrice}`;
                         }
 
                         if (timeLeft <= 0) {
                             await autoLiquidateAndRestart(m, markets);
-                            if (priceTag) priceTag.innerText = `Calculando nueva entrada...`;
+                            if (priceTag) priceTag.innerText = `Calculando...`;
                         } else if (timerEl) {
                             let min = Math.floor(timeLeft / 60);
                             let sec = timeLeft % 60;
@@ -244,7 +245,7 @@
                 if (marketsUpdated) localStorage.setItem('q_markets_v13', JSON.stringify(markets));
             };
 
-            tick(); // Evita el retraso inicial al recargar
+            tick(); 
             setInterval(tick, 1000);
         }
 
@@ -259,12 +260,12 @@
 
             if (userBet) {
                 let won = false;
-                let resolutionDetails = "Liquidación Aleatoria (Sin Símbolo)";
+                let resolutionDetails = "Liquidación Aleatoria";
 
                 if (market.startPrice && finalPrice) {
                     if (userBet.side === 'SÍ' && finalPrice > market.startPrice) won = true;
                     if (userBet.side === 'NO' && finalPrice < market.startPrice) won = true;
-                    resolutionDetails = `Entrada: $${market.startPrice} | Salida: $${finalPrice}`;
+                    resolutionDetails = `In: $${market.startPrice} | Out: $${finalPrice}`;
                 } else {
                     won = Math.random() > 0.5; 
                 }
