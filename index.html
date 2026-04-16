@@ -12,7 +12,7 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         .glow-text { text-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
         
-        /* Animación de Latido de Corazón (Hormuz Pulse) */
+        /* Animaciones del Corazón y Radares */
         @keyframes heartbeat-slow {
             0%, 100% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
@@ -25,25 +25,31 @@
         }
         .pulse-normal { animation: heartbeat-slow 2s infinite ease-in-out; background-color: #3b82f6; }
         .pulse-danger { animation: heartbeat-fast 1s infinite ease-in-out; background-color: #ef4444; }
+
+        /* Fondo de radar táctico (cuadrícula) */
+        .tactical-grid {
+            background-image: linear-gradient(rgba(51, 65, 85, 0.2) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(51, 65, 85, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
     </style>
 </head>
 <body id="monitor-body" class="bg-slate-950 text-slate-200 font-mono p-3 lg:p-4 max-w-[1200px] mx-auto min-h-screen flex flex-col transition-colors duration-1000">
 
-    <nav class="flex justify-center space-x-6 lg:space-x-8 mb-8 lg:mb-12 border-b border-slate-800 pb-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] flex-shrink-0 pt-4">
+    <nav class="flex justify-center space-x-6 lg:space-x-8 mb-8 lg:mb-10 border-b border-slate-800 pb-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] flex-shrink-0 pt-4">
         <a href="index.html" class="tab-active py-2 transition-all">📡 Monitor Global</a>
         <a href="quetza.html" class="py-2 text-slate-500 hover:text-yellow-500 transition-all">🦅 Quetza Consensus</a>
     </nav>
 
-    <header class="text-center mb-10">
+    <header class="text-center mb-8">
         <h1 class="text-4xl lg:text-5xl font-black text-white uppercase tracking-tighter mb-2">Hormuz <span class="text-yellow-500 glow-text">Pulse</span></h1>
         <p class="text-slate-400 text-xs lg:text-sm uppercase tracking-[0.3em] max-w-2xl mx-auto leading-relaxed">
             Motor de Inteligencia Geopolítica y Análisis de Riesgo
         </p>
     </header>
 
-    <section class="mb-12">
+    <section class="mb-10">
         <div id="taco-container" class="bg-slate-900 border border-slate-800 p-6 lg:p-8 rounded-3xl shadow-2xl relative overflow-hidden transition-all duration-700">
-            
             <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6">
                 <div class="flex items-center space-x-4">
                     <div class="relative flex items-center justify-center w-16 h-16 bg-slate-950 rounded-full border border-slate-800 shadow-inner">
@@ -54,22 +60,110 @@
                         <p id="taco-status-text" class="text-[10px] text-blue-400 font-bold uppercase tracking-widest mt-1">Nivel de Riesgo: Estable</p>
                     </div>
                 </div>
-
                 <div class="w-full md:w-1/3 bg-slate-950 rounded-full h-4 border border-slate-800 p-0.5 overflow-hidden shadow-inner">
                     <div id="risk-bar" class="bg-gradient-to-r from-blue-500 to-green-500 h-full rounded-full transition-all duration-1000" style="width: 35%"></div>
                 </div>
             </div>
             
             <p id="taco-message" class="text-sm lg:text-base text-slate-300 font-medium leading-relaxed italic border-l-4 border-blue-500 pl-4 bg-slate-950/50 p-4 rounded-r-lg">
-                Sincronizando con satélites y fuentes de noticias globales... Esperando análisis de la IA Gemini.
+                Sincronizando con satélites y fuentes de noticias globales...
             </p>
         </div>
     </section>
 
-    <section class="mb-12">
+    <section class="mb-10">
         <div class="flex justify-between items-end mb-6">
-            <h2 class="text-sm text-slate-400 font-bold uppercase tracking-[0.2em]">🔥 Impacto en Mercados</h2>
-            <span class="text-[9px] text-slate-600 uppercase tracking-widest bg-slate-900 px-2 py-1 rounded">Blockchain en Vivo</span>
+            <h2 class="text-sm text-slate-400 font-bold uppercase tracking-[0.2em]">🗺️ Mapas de Calor Tácticos</h2>
+            <span class="text-[9px] text-red-500 font-bold uppercase tracking-widest bg-red-950/30 border border-red-900 px-2 py-1 rounded animate-pulse">Clasificado</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl relative">
+                <div class="absolute inset-0 tactical-grid opacity-30 z-0"></div>
+                
+                <div class="relative z-10 p-6 flex flex-col h-full justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-black text-white uppercase tracking-wider">Frente Medio Oriente</h3>
+                            <span class="bg-red-600 text-white text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(220,38,38,0.8)]">Nivel 4: Tensión Alta</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-6">Irán vs EE.UU. e Israel</p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
+                                    <span>Estrecho de Ormuz (Tránsito)</span>
+                                    <span class="text-orange-400 font-bold">Riesgo Bloqueo 65%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-orange-500 to-red-600 animate-pulse w-[65%]"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
+                                    <span>Intercambio Balístico</span>
+                                    <span class="text-red-500 font-bold">Crítico 85%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div class="h-full bg-red-600 animate-pulse w-[85%] shadow-[0_0_8px_rgba(220,38,38,1)]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[9px] text-slate-500 mt-6 pt-3 border-t border-slate-800 uppercase tracking-widest italic">
+                        🔥 Impacto Financiero: Presión al alza en Petróleo (WTI) y Oro (XAU).
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl relative">
+                <div class="absolute inset-0 tactical-grid opacity-30 z-0"></div>
+                
+                <div class="relative z-10 p-6 flex flex-col h-full justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-black text-white uppercase tracking-wider">Frente Europa Oriental</h3>
+                            <span class="bg-orange-600 text-white text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(234,88,12,0.8)]">Nivel 3: Desgaste</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-6">Ucrania vs Rusia (OTAN)</p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
+                                    <span>Infraestructura Energética</span>
+                                    <span class="text-red-400 font-bold">Daño Severo 78%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-yellow-500 to-red-500 w-[78%]"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
+                                    <span>Riesgo Nuclear Táctico</span>
+                                    <span class="text-yellow-500 font-bold">Moderado 30%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                    <div class="h-full bg-yellow-500 w-[30%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[9px] text-slate-500 mt-6 pt-3 border-t border-slate-800 uppercase tracking-widest italic">
+                        🔥 Impacto Financiero: Volatilidad en Trigo y Gas Natural Europeo.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="mb-10">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="text-sm text-slate-400 font-bold uppercase tracking-[0.2em]">📊 Radar de Activos Impactados</h2>
+            <span class="text-[9px] text-slate-600 uppercase tracking-widest bg-slate-900 px-2 py-1 rounded">Binance Live API</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="live-tickers">
@@ -81,7 +175,7 @@
 
     <section class="text-center mt-auto pb-12">
         <div class="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 inline-block w-full lg:w-2/3 mx-auto shadow-xl">
-            <p class="text-slate-400 text-[10px] mb-6 uppercase tracking-[0.3em]">El conocimiento es poder. Ejecuta tu estrategia.</p>
+            <p class="text-slate-400 text-[10px] mb-6 uppercase tracking-[0.3em]">Convierte la inteligencia en rentabilidad.</p>
             <a href="quetza.html" class="inline-block bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-4 px-10 rounded-xl uppercase text-xs tracking-[0.2em] transition-all hover:scale-105 shadow-[0_0_20px_rgba(202,138,4,0.2)]">
                 Abrir Terminal Quetza ⚡
             </a>
@@ -89,7 +183,7 @@
     </section>
 
     <script>
-        // --- 1. LÓGICA DEL MOTOR GEOPOLÍTICO (TACO TRADE / HORMUZ PULSE) ---
+        // LÓGICA DEL MOTOR TACO TRADE (LATIDO)
         async function fetchTacoOracle() {
             const heart = document.getElementById('heart-indicator');
             const messageEl = document.getElementById('taco-message');
@@ -98,23 +192,17 @@
             const container = document.getElementById('taco-container');
 
             try {
-                // Intenta conectarse al backend de Vercel/Gemini que creamos antes
                 const response = await fetch('/api/getTacoData');
-                
                 if (response.ok) {
                     const aiData = await response.json();
                     applyTacoState(aiData.risk, aiData.message, aiData.alert);
-                } else {
-                    throw new Error("Backend offline, usando simulación");
-                }
+                } else throw new Error("Backend offline");
             } catch (error) {
-                // FALLBACK: Si estás en GitHub Pages sin el backend conectado, simulamos el pulso para no perder el diseño.
-                // Simula un riesgo aleatorio entre 30 y 90
                 const simulatedRisk = Math.floor(Math.random() * 60) + 30;
                 const isAlert = simulatedRisk > 75;
                 const msgs = isAlert 
-                    ? "ALERTA GEOPOLÍTICA: Tensión detectada en corredores comerciales clave. Volatilidad inminente en mercados de energía (Petróleo/XAU). Precaución en posiciones cortas."
-                    : "Macroeconomía estable. El análisis de sentimiento muestra absorción institucional. Flujos de capital migrando hacia ecosistemas Web3 y refugios de oro.";
+                    ? "ALERTA: Ataque con drones detectado cerca del Estrecho de Ormuz. Posible disrupción en cadenas de suministro de crudo. Riesgo de contagio a mercados bursátiles."
+                    : "Actualización de Frente: Líneas estáticas en Europa Oriental. El mercado ha descontado el riesgo geopolítico actual. Enfoque en datos macroeconómicos de la FED.";
                 
                 applyTacoState(simulatedRisk, msgs, isAlert);
             }
@@ -126,14 +214,11 @@
             const riskBar = document.getElementById('risk-bar');
             const statusText = document.getElementById('taco-status-text');
             const container = document.getElementById('taco-container');
-            const body = document.getElementById('monitor-body');
 
-            // Actualizar textos y barra
             messageEl.innerText = `"${message}"`;
             riskBar.style.width = `${riskLevel}%`;
 
             if (isAlert) {
-                // MODO TENSIÓN (Pánico en el mercado)
                 heart.className = "w-6 h-6 rounded-full pulse-danger";
                 statusText.innerText = `Nivel de Riesgo: CRÍTICO (${riskLevel}%)`;
                 statusText.className = "text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1 animate-pulse";
@@ -141,7 +226,6 @@
                 container.classList.add('border-red-900', 'bg-red-950/20');
                 messageEl.className = "text-sm lg:text-base text-white font-bold leading-relaxed italic border-l-4 border-red-500 pl-4 bg-red-950/30 p-4 rounded-r-lg";
             } else {
-                // MODO ESTABLE
                 heart.className = "w-6 h-6 rounded-full pulse-normal";
                 statusText.innerText = `Nivel de Riesgo: ESTABLE (${riskLevel}%)`;
                 statusText.className = "text-[10px] text-blue-400 font-bold uppercase tracking-widest mt-1";
@@ -151,11 +235,11 @@
             }
         }
 
-        // --- 2. LÓGICA DEL RADAR FINANCIERO (BINANCE) ---
+        // LÓGICA DEL RADAR FINANCIERO
         const watchList = [
             { symbol: 'BTCUSDT', name: 'Bitcoin', ticker: 'BTC', cat: 'Cripto Rey' },
-            { symbol: 'ETHUSDT', name: 'Ethereum', ticker: 'ETH', cat: 'Infraestructura Web3' },
-            { symbol: 'PAXGUSDT', name: 'Oro (PAXG)', ticker: 'PAXG', cat: 'Refugio Seguro' }
+            { symbol: 'ETHUSDT', name: 'Ethereum', ticker: 'ETH', cat: 'Infra Web3' },
+            { symbol: 'PAXGUSDT', name: 'Oro (PAXG)', ticker: 'PAXG', cat: 'Metales' }
         ];
 
         async function fetchMarketData() {
@@ -166,53 +250,39 @@
                 for (let asset of watchList) {
                     const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${asset.symbol}`);
                     const data = await response.json();
-                    
                     const price = parseFloat(data.lastPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     const change = parseFloat(data.priceChangePercent);
                     const isPositive = change >= 0;
-                    
                     const colorClass = isPositive ? 'text-green-400' : 'text-red-400';
-                    const sign = isPositive ? '+' : '';
-                    const trendIcon = isPositive ? '📈' : '📉';
-
+                    
                     htmlContent += `
-                    <div class="bg-slate-900 border border-slate-800 p-5 lg:p-6 rounded-2xl shadow-lg hover:border-slate-700 transition-colors group cursor-pointer" onclick="window.location.href='quetza.html'">
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg hover:border-slate-700 transition-colors group cursor-pointer" onclick="window.location.href='quetza.html'">
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <span class="text-[8px] bg-slate-950 text-slate-400 px-2 py-1 rounded uppercase tracking-widest border border-slate-800">${asset.cat}</span>
-                                <h3 class="text-lg lg:text-xl font-black text-white mt-2">${asset.name}</h3>
+                                <h3 class="text-lg font-black text-white mt-2">${asset.name}</h3>
                             </div>
-                            <span class="text-xl lg:text-2xl opacity-50 group-hover:opacity-100 transition-opacity">${trendIcon}</span>
                         </div>
-                        
                         <div class="flex justify-between items-end border-t border-slate-800 pt-3">
                             <div>
-                                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Precio Actual</p>
-                                <p class="text-xl lg:text-2xl font-mono font-bold text-white">$${price}</p>
+                                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Spot Price</p>
+                                <p class="text-xl font-mono font-bold text-white">$${price}</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">24h Vol</p>
-                                <p class="text-xs lg:text-sm font-black ${colorClass}">${sign}${change.toFixed(2)}%</p>
+                                <p class="text-xs font-black ${colorClass}">${isPositive?'+':''}${change.toFixed(2)}%</p>
                             </div>
                         </div>
-                    </div>
-                    `;
+                    </div>`;
                 }
                 container.innerHTML = htmlContent;
-            } catch (error) {
-                console.error("Error cargando el radar:", error);
-            }
+            } catch (error) { console.error("Error radar:", error); }
         }
 
-        // --- INICIALIZADOR ---
         window.onload = () => {
-            fetchTacoOracle();   // Consulta la IA / Geopolítica una vez al cargar
-            fetchMarketData();   // Consulta los precios
-            
-            // Refresca los precios cada 10 segundos
+            fetchTacoOracle();   
+            fetchMarketData();   
             setInterval(fetchMarketData, 10000);
-            
-            // Refresca el Oráculo Geopolítico cada 15 segundos (para ver la animación cambiar en el simulador)
             setInterval(fetchTacoOracle, 15000); 
         };
     </script>
