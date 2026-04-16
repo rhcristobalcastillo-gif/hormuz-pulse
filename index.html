@@ -93,3 +93,153 @@
                                 <div class="w-full h-2 bg-[#121212] rounded-full overflow-hidden border border-white/5">
                                     <div class="h-full bg-gradient-to-r from-orange-500 to-red-600 animate-pulse w-[65%]"></div>
                                 </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-white mb-1">
+                                    <span>Intercambio Balístico</span>
+                                    <span class="text-red-500 font-bold">Crítico 85%</span>
+                                </div>
+                                <div class="w-full h-2 bg-[#121212] rounded-full overflow-hidden border border-white/5">
+                                    <div class="h-full bg-red-600 animate-pulse w-[85%] shadow-[0_0_8px_rgba(220,38,38,1)]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-[#b3b3b3] mt-6 pt-3 border-t border-white/10 uppercase tracking-widest italic">🔥 Impacto: Presión al alza en XAU y Crudo.</p>
+                </div>
+            </div>
+            <div class="bg-[#181818] border border-white/5 rounded-2xl overflow-hidden shadow-xl relative hover:bg-[#282828] transition-colors">
+                <div class="absolute inset-0 tactical-grid opacity-50 z-0"></div>
+                <div class="relative z-10 p-6 flex flex-col h-full justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-black text-white uppercase tracking-wider">Europa Oriental</h3>
+                            <span class="bg-orange-600 text-white text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest">Frente Activo</span>
+                        </div>
+                        <p class="text-[10px] text-[#b3b3b3] uppercase tracking-widest mb-6">Ucrania vs Rusia</p>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-white mb-1">
+                                    <span>Infraestructura Energética</span>
+                                    <span class="text-red-400 font-bold">Daño 78%</span>
+                                </div>
+                                <div class="w-full h-2 bg-[#121212] rounded-full overflow-hidden border border-white/5">
+                                    <div class="h-full bg-gradient-to-r from-yellow-500 to-red-500 w-[78%]"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-white mb-1">
+                                    <span>Riesgo Nuclear Táctico</span>
+                                    <span class="text-yellow-500 font-bold">Bajo 30%</span>
+                                </div>
+                                <div class="w-full h-2 bg-[#121212] rounded-full overflow-hidden border border-white/5">
+                                    <div class="h-full bg-yellow-500 w-[30%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-[#b3b3b3] mt-6 pt-3 border-t border-white/10 uppercase tracking-widest italic">🔥 Impacto: Volatilidad en Gas Natural.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-10">
+        <div class="flex justify-between items-end mb-6 border-b border-white/10 pb-2">
+            <h2 class="text-sm text-white font-bold uppercase tracking-[0.2em]">📊 Radar de Activos</h2>
+            <span class="text-[9px] text-[#b3b3b3] uppercase tracking-widest bg-[#181818] border border-white/10 px-2 py-1 rounded-full">Binance Live</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="live-tickers">
+            <div class="bg-[#181818] border border-white/5 p-6 rounded-2xl animate-pulse h-32"></div>
+            <div class="bg-[#181818] border border-white/5 p-6 rounded-2xl animate-pulse h-32"></div>
+            <div class="bg-[#181818] border border-white/5 p-6 rounded-2xl animate-pulse h-32"></div>
+        </div>
+    </section>
+
+    <section class="text-center mt-auto pb-12 pt-8">
+        <a href="quetza.html" class="inline-block bg-white hover:bg-gray-200 text-black font-black py-4 px-12 rounded-full uppercase text-xs tracking-[0.2em] transition-all hover:scale-105 shadow-lg">
+            Abrir Terminal Quetza ⚡
+        </a>
+    </section>
+
+    <script>
+        async function fetchTacoOracle() {
+            try {
+                const response = await fetch('/api/getTacoData');
+                if (response.ok) {
+                    const aiData = await response.json();
+                    applyTacoState(aiData.risk, aiData.message, aiData.alert);
+                } else throw new Error("Offline");
+            } catch (error) {
+                const simulatedRisk = Math.floor(Math.random() * 60) + 30;
+                const isAlert = simulatedRisk > 75;
+                const msgs = isAlert 
+                    ? "ALERTA: Ataque con drones detectado. Volatilidad inminente en Petróleo/XAU."
+                    : "Macroeconomía estable. El análisis muestra acumulación institucional.";
+                applyTacoState(simulatedRisk, msgs, isAlert);
+            }
+        }
+
+        function applyTacoState(riskLevel, message, isAlert) {
+            const heart = document.getElementById('heart-indicator');
+            const messageEl = document.getElementById('taco-message');
+            const riskBar = document.getElementById('risk-bar');
+            const statusText = document.getElementById('taco-status-text');
+            const container = document.getElementById('taco-container');
+
+            messageEl.innerText = `"${message}"`;
+            riskBar.style.width = `${riskLevel}%`;
+
+            if (isAlert) {
+                heart.className = "w-6 h-6 rounded-full pulse-danger";
+                statusText.innerText = `Riesgo: CRÍTICO (${riskLevel}%)`;
+                statusText.className = "text-[10px] text-red-500 font-bold uppercase mt-1 animate-pulse";
+                riskBar.className = "bg-red-600 h-full rounded-full transition-all duration-1000";
+                container.classList.add('border-red-900/50');
+            } else {
+                heart.className = "w-6 h-6 rounded-full pulse-normal";
+                statusText.innerText = `Riesgo: ESTABLE (${riskLevel}%)`;
+                statusText.className = "text-[10px] text-white/70 font-bold uppercase mt-1";
+                riskBar.className = "bg-white h-full rounded-full transition-all duration-1000";
+                container.classList.remove('border-red-900/50');
+            }
+        }
+
+        const watchList = [
+            { symbol: 'BTCUSDT', name: 'Bitcoin', cat: 'Cripto' },
+            { symbol: 'ETHUSDT', name: 'Ethereum', cat: 'Web3' },
+            { symbol: 'PAXGUSDT', name: 'Oro (PAXG)', cat: 'Metales' }
+        ];
+
+        async function fetchMarketData() {
+            try {
+                const container = document.getElementById('live-tickers');
+                let htmlContent = '';
+                for (let asset of watchList) {
+                    const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${asset.symbol}`);
+                    const data = await response.json();
+                    const price = parseFloat(data.lastPrice).toLocaleString('en-US', {minimumFractionDigits: 2});
+                    const change = parseFloat(data.priceChangePercent);
+                    htmlContent += `
+                    <div class="bg-[#181818] border border-white/5 p-5 rounded-2xl shadow-lg hover:bg-[#282828] cursor-pointer" onclick="window.location.href='quetza.html'">
+                        <span class="text-[8px] bg-[#121212] text-[#b3b3b3] px-2 py-1 rounded-full uppercase border border-white/10">${asset.cat}</span>
+                        <h3 class="text-lg font-black text-white mt-3">${asset.name}</h3>
+                        <div class="flex justify-between items-end border-t border-white/10 pt-3 mt-3">
+                            <p class="text-xl font-mono font-bold text-white">$${price}</p>
+                            <p class="text-xs font-black ${change >= 0 ? 'text-green-500' : 'text-red-500'}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</p>
+                        </div>
+                    </div>`;
+                }
+                container.innerHTML = htmlContent;
+            } catch (error) {}
+        }
+
+        window.onload = () => {
+            fetchTacoOracle();   
+            fetchMarketData();   
+            setInterval(fetchMarketData, 10000);
+            setInterval(fetchTacoOracle, 15000); 
+        };
+    </script>
+</body>
+</html>
