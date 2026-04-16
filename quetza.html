@@ -72,7 +72,7 @@
         let balance = localStorage.getItem('q_bal_v13') ? parseFloat(localStorage.getItem('q_bal_v13')) : 1000.00;
         let history = JSON.parse(localStorage.getItem('q_hist_v13')) || [];
         let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
-        let currentMarketsCount = 0; // Para saber cuándo dibujar toda la pantalla
+        let currentMarketsCount = 0; 
 
         function updatePortfolio() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -118,21 +118,20 @@
             }
         }
 
-        // Esta función ahora SOLO se llama cuando el Admin crea o borra un mercado
+        // FUNCIÓN CORREGIDA
         function renderMarkets() {
-            let oracleUI = "";
-if (m.resolution === 'AUTO' && m.endTime) {
-    // Calculamos el tiempo real justo antes de dibujar
-    let timeLeft = Math.floor((m.endTime - Date.now()) / 1000);
-    if (timeLeft < 0) timeLeft = 0;
-    let min = Math.floor(timeLeft / 60);
-    let sec = timeLeft % 60;
-    let timeStr = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
-    
-    oracleUI = `<span id="timer-${m.id}" class="text-blue-400 font-bold font-mono tracking-widest text-sm bg-blue-950/30 px-3 py-1 rounded border border-blue-900">${timeStr}</span>`;
-} else {
-    oracleUI = `<span class="text-orange-500 font-bold uppercase tracking-widest text-[10px] bg-orange-950/30 px-3 py-1 rounded border border-orange-900">Esperando Juez Admin</span>`;
-}
+            let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
+            currentMarketsCount = markets.length;
+            const container = document.getElementById('markets-container');
+
+            if (markets.length === 0) {
+                container.innerHTML = `
+                <div class="bg-slate-900/50 border border-slate-800 rounded-3xl p-10 flex flex-col items-center justify-center h-64">
+                    <span class="text-4xl mb-4 opacity-50">🦅</span>
+                    <p class="text-slate-500 uppercase tracking-widest text-sm text-center">No hay mercados abiertos.</p>
+                </div>`;
+                return;
+            }
 
             container.innerHTML = markets.map(m => {
                 const chartHTML = m.symbol ? `
@@ -141,11 +140,20 @@ if (m.resolution === 'AUTO' && m.endTime) {
                     </div>
                 ` : ``;
 
-                let oracleUI = m.resolution === 'AUTO' 
-                    ? `<span id="timer-${m.id}" class="text-blue-400 font-bold font-mono tracking-widest text-sm bg-blue-950/30 px-3 py-1 rounded border border-blue-900">02:00</span>`
-                    : `<span class="text-orange-500 font-bold uppercase tracking-widest text-[10px] bg-orange-950/30 px-3 py-1 rounded border border-orange-900">Esperando Juez Admin</span>`;
+                // Aquí calculamos el tiempo inicial para que al dar F5 se vea perfecto
+                let oracleUI = "";
+                if (m.resolution === 'AUTO' && m.endTime) {
+                    let timeLeft = Math.floor((m.endTime - Date.now()) / 1000);
+                    if (timeLeft < 0) timeLeft = 0;
+                    let min = Math.floor(timeLeft / 60);
+                    let sec = timeLeft % 60;
+                    let timeStr = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+                    
+                    oracleUI = `<span id="timer-${m.id}" class="text-blue-400 font-bold font-mono tracking-widest text-sm bg-blue-950/30 px-3 py-1 rounded border border-blue-900">${timeStr}</span>`;
+                } else {
+                    oracleUI = `<span class="text-orange-500 font-bold uppercase tracking-widest text-[10px] bg-orange-950/30 px-3 py-1 rounded border border-orange-900">Esperando Juez Admin</span>`;
+                }
 
-                // Agregamos IDs específicos al texto para actualizarlos con "bisturí"
                 return `
                 <div class="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl shadow-xl">
                     <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
@@ -188,8 +196,6 @@ if (m.resolution === 'AUTO' && m.endTime) {
             
             localStorage.setItem('q_bal_v13', balance);
             localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
-            
-            // Solo actualizamos el panel derecho. ¡El gráfico ni se entera!
             updatePortfolio(); 
         }
 
@@ -205,39 +211,42 @@ if (m.resolution === 'AUTO' && m.endTime) {
             }
         }
 
-       function startGlobalClock() {
-    const tick = async () => {
-        let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
-        let marketsUpdated = false;
+        function startGlobalClock() {
+            const tick = async () => {
+                let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
+                let marketsUpdated = false;
 
-        for (let i = 0; i < markets.length; i++) {
-            let m = markets[i];
-            if (m.resolution === 'AUTO' && m.endTime) {
-                let timeLeft = Math.floor((m.endTime - Date.now()) / 1000);
-                let timerEl = document.getElementById(`timer-${m.id}`);
-                let priceTag = document.getElementById(`price-tag-${m.id}`);
+                for (let i = 0; i < markets.length; i++) {
+                    let m = markets[i];
+                    if (m.resolution === 'AUTO' && m.endTime) {
+                        let timeLeft = Math.floor((m.endTime - Date.now()) / 1000);
+                        let timerEl = document.getElementById(`timer-${m.id}`);
+                        let priceTag = document.getElementById(`price-tag-${m.id}`);
 
-                if (!m.startPrice && m.symbol && m.symbol.includes("BINANCE")) {
-                    m.startPrice = await fetchRealPrice(m.symbol);
-                    marketsUpdated = true;
-                    if (priceTag) priceTag.innerText = `Precio de Entrada: $${m.startPrice}`;
+                        if (!m.startPrice && m.symbol && m.symbol.includes("BINANCE")) {
+                            m.startPrice = await fetchRealPrice(m.symbol);
+                            marketsUpdated = true;
+                            if (priceTag) priceTag.innerText = `Precio de Entrada: $${m.startPrice}`;
+                        }
+
+                        if (timeLeft <= 0) {
+                            await autoLiquidateAndRestart(m, markets);
+                            if (priceTag) priceTag.innerText = `Calculando nueva entrada...`;
+                        } else if (timerEl) {
+                            let min = Math.floor(timeLeft / 60);
+                            let sec = timeLeft % 60;
+                            timerEl.innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+                            if(timeLeft <= 10) timerEl.className = "text-red-500 font-bold font-mono tracking-widest text-sm bg-red-950/30 px-3 py-1 rounded border border-red-900 animate-pulse";
+                            else timerEl.className = "text-blue-400 font-bold font-mono tracking-widest text-sm bg-blue-950/30 px-3 py-1 rounded border border-blue-900";
+                        }
+                    }
                 }
+                if (marketsUpdated) localStorage.setItem('q_markets_v13', JSON.stringify(markets));
+            };
 
-                if (timeLeft <= 0) {
-                    await autoLiquidateAndRestart(m, markets);
-                } else if (timerEl) {
-                    let min = Math.floor(timeLeft / 60);
-                    let sec = timeLeft % 60;
-                    timerEl.innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
-                }
-            }
+            tick(); // Evita el retraso inicial al recargar
+            setInterval(tick, 1000);
         }
-        if (marketsUpdated) localStorage.setItem('q_markets_v13', JSON.stringify(markets));
-    };
-
-    tick(); // Ejecutar una vez al instante para evitar el lag inicial
-    setInterval(tick, 1000); // Luego seguir cada segundo
-}
 
         async function autoLiquidateAndRestart(market, marketsArray) {
             let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
@@ -283,7 +292,6 @@ if (m.resolution === 'AUTO' && m.endTime) {
             localStorage.setItem('q_markets_v13', JSON.stringify(marketsArray));
         }
 
-        // Sincronizador ultra-ligero
         setInterval(() => {
             let newBal = parseFloat(localStorage.getItem('q_bal_v13')) || 1000;
             let newBetsStr = localStorage.getItem('q_active_bets_v13');
@@ -291,14 +299,12 @@ if (m.resolution === 'AUTO' && m.endTime) {
             
             let currentBetsStr = JSON.stringify(activeBets);
 
-            // Si cambiaron las apuestas o el saldo, solo actualiza el lado derecho
             if (newBal !== balance || newBetsStr !== currentBetsStr) {
                 balance = newBal;
                 activeBets = JSON.parse(newBetsStr) || {};
                 updatePortfolio();
             }
 
-            // Si el ADMIN borró o agregó un mercado, entonces sí recarga toda la pantalla izquierda
             if (newMarkets.length !== currentMarketsCount) {
                 renderMarkets();
             }
