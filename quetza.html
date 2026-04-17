@@ -248,12 +248,27 @@
         }
 
         setInterval(() => {
-            let nB = parseFloat(localStorage.getItem('q_bal_v13')) || 1000, nA = localStorage.getItem('q_active_bets_v13'), nM = (JSON.parse(localStorage.getItem('q_markets_v13')) || []).length;
-            if (nB !== balance || nA !== JSON.stringify(activeBets)) { balance = nB; activeBets = JSON.parse(nA) || {}; updatePortfolio(); }
-            if (nM !== currentMarketsCount) renderMarkets();
+            let storedBal = localStorage.getItem('q_bal_v13');
+            // Aquí le decimos explícitamente: ¡Si es 0, respeta el 0!
+            let nB = storedBal !== null ? parseFloat(storedBal) : 1000;
+            let nA = localStorage.getItem('q_active_bets_v13');
+            let nM = (JSON.parse(localStorage.getItem('q_markets_v13')) || []).length;
+
+            if (nB !== balance || nA !== JSON.stringify(activeBets)) { 
+                balance = nB; 
+                activeBets = JSON.parse(nA) || {}; 
+                updatePortfolio(); 
+            }
+            if (nM !== currentMarketsCount) { renderMarkets(); }
         }, 1500);
 
-        window.onload = () => { updatePortfolio(); renderMarkets(); startGlobalClock(); };
+        window.onload = () => {
+            let initialBal = localStorage.getItem('q_bal_v13');
+            balance = initialBal !== null ? parseFloat(initialBal) : 1000;
+            updatePortfolio();
+            renderMarkets();
+            startGlobalClock();
+        };
     </script>
 </body>
 </html>
