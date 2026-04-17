@@ -6,13 +6,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Quetza MX | Monitor Global</title>
     <style>
+        /* Estilo de pestaña activa (Amarillo Quetza) */
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #333333; }
         ::-webkit-scrollbar-thumb { background: #425465; border-radius: 10px; }
         
-        @keyframes heartbeat-slow { 0%, 100% { transform: scale(1); opacity: 0.8; } 50%   { transform: scale(1.1); opacity: 1; box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); } }
-        @keyframes heartbeat-fast { 0%, 100% { transform: scale(1); opacity: 0.9; } 25% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); } 50% { transform: scale(1); opacity: 0.9; } 75% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); } }
+        /* Animaciones del Corazón y Radares */
+        @keyframes heartbeat-slow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
+        }
+        @keyframes heartbeat-fast {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            25% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); }
+            50% { transform: scale(1); opacity: 0.9; }
+            75% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); }
+        }
         .pulse-normal { animation: heartbeat-slow 2s infinite ease-in-out; background-color: #eab308; }
         .pulse-danger { animation: heartbeat-fast 1s infinite ease-in-out; background-color: #ef4444; }
 
@@ -23,18 +33,18 @@
         }
     </style>
 </head>
-<body id="monitor-body" class="bg-gradient-to-br from-[#333333] to-[#2a3642] text-slate-200 font-sans p-3 lg:p-4 max-w-[1200px] mx-auto min-h-screen flex flex-col transition-colors duration-1000 relative z-0">
+<body id="monitor-body" class="bg-gradient-to-br from-[#333333] to-[#2a3642] text-slate-200 font-sans p-3 lg:p-4 max-w-[1400px] mx-auto min-h-screen flex flex-col transition-colors duration-1000 relative z-0">
 
-<nav class="relative h-20 flex justify-between items-center mb-8 border-b border-white/10 flex-shrink-0 pt-4">
+    <nav class="relative h-20 flex justify-between items-center mb-8 border-b border-white/10 flex-shrink-0 pt-4">
         
-        <a href="index.html" class="absolute left-0 z-20 flex items-center hover:opacity-80 transition-opacity">
-            <img src="(COPY) Logotipo 500x500 px.png" alt="Logo" class="w-24 h-24 lg:w-32 lg:h-32 object-contain drop-shadow-xl">
-            <span class="ml-3 text-white font-black tracking-tighter text-xl hidden md:block uppercase">Quetza MX</span>
+        <a href="index.html" class="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex items-center hover:opacity-80 transition-opacity mt-2">
+            <img src="(COPY) Logotipo 500x500 px.png" alt="Logo" class="w-16 h-16 lg:w-24 lg:h-24 object-contain drop-shadow-xl">
+            <span class="ml-3 text-white font-black tracking-tighter text-lg lg:text-xl hidden md:block uppercase mt-1">Quetza MX</span>
         </a>
 
-        <div class="ml-auto flex space-x-4 lg:space-x-8 text-[10px] uppercase tracking-[0.2em]">
+        <div class="ml-auto flex space-x-4 lg:space-x-8 text-[10px] lg:text-[11px] uppercase tracking-[0.2em] items-center">
             <a href="index.html" class="tab-active py-2">Monitor</a>
-            <a href="quetza.html" class="py-2 text-slate-400 hover:text-white transition-all">Quetza Predicciones</a>
+            <a href="quetza.html" class="py-2 text-slate-400 hover:text-white transition-all">Quetza Consensus</a>
         </div>
     </nav>
 
