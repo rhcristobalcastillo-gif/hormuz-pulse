@@ -10,6 +10,9 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #333333; }
         ::-webkit-scrollbar-thumb { background: #425465; border-radius: 10px; }
+        /* Ocultar barra de scroll en los filtros */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body id="app-body" class="bg-gradient-to-br from-[#333333] to-[#2a3642] text-slate-200 font-sans p-3 lg:p-4 max-w-[1400px] mx-auto min-h-screen lg:h-screen flex flex-col lg:overflow-hidden relative z-0">
@@ -31,6 +34,13 @@
         <div class="lg:w-2/3 flex flex-col lg:overflow-hidden">
             <h2 class="text-xl font-black text-white uppercase tracking-tighter mb-4 flex-shrink-0">🌎 Mercados de Liquidez</h2>
             
+            <div class="flex space-x-2 mb-4 overflow-x-auto pb-2 flex-shrink-0 hide-scroll">
+                <button id="filter-ALL" onclick="setMarketFilter('ALL')" class="bg-yellow-500 text-black px-4 py-2 rounded-[5px] text-[10px] uppercase font-black tracking-widest transition-colors whitespace-nowrap shadow-lg">Todos</button>
+                <button id="filter-CRIPTO" onclick="setMarketFilter('CRIPTO')" class="bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap">Finanzas & Cripto</button>
+                <button id="filter-DEPORTES" onclick="setMarketFilter('DEPORTES')" class="bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap">Deportes</button>
+                <button id="filter-POLITICA" onclick="setMarketFilter('POLITICA')" class="bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap">Política</button>
+            </div>
+
             <div id="markets-container" class="lg:overflow-y-auto pr-0 lg:pr-2 pb-6 lg:pb-10 space-y-6 flex-grow">
                 </div>
         </div>
@@ -77,6 +87,28 @@
         let history = JSON.parse(localStorage.getItem('q_hist_v13')) || [];
         let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
         let currentMarketsCount = 0; 
+        
+        // Variable para controlar qué categoría estamos viendo
+        let currentMarketFilter = 'ALL';
+
+        function setMarketFilter(filterType) {
+            currentMarketFilter = filterType;
+            
+            // Actualizar diseño de botones
+            const tabs = ['ALL', 'CRIPTO', 'DEPORTES', 'POLITICA'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('filter-' + t);
+                if(btn) {
+                    if(t === filterType) {
+                        btn.className = "bg-yellow-500 text-black px-4 py-2 rounded-[5px] text-[10px] uppercase font-black tracking-widest transition-colors whitespace-nowrap shadow-lg";
+                    } else {
+                        btn.className = "bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap";
+                    }
+                }
+            });
+
+            renderMarkets(); // Recargar los mercados con el filtro nuevo
+        }
 
         function updatePortfolio() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -115,7 +147,6 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-[9px] font-bold ${h.win ? 'text-green-400' : 'text-slate-500'} uppercase">${h.win ? 'GANASTE' : 'PERDISTE'} (${h.side})</p>
                             <p class="text-[10px] text-slate-300 truncate uppercase">${h.asset}</p>
-                            ${h.details ? `<p class="text-[8px] text-slate-500 font-mono mt-1">${h.details}</p>` : ''}
                         </div>
                         <div class="text-right whitespace-nowrap">
                             <p class="text-[11px] font-mono text-white">${h.win ? '+' : '-'}${h.amt} <span class="text-[8px] text-slate-400 font-sans">fUSDT</span></p>
@@ -125,15 +156,27 @@
         }
 
         function renderMarkets() {
-            let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
-            currentMarketsCount = markets.length;
+            let allMarkets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
+            currentMarketsCount = allMarkets.length;
             const container = document.getElementById('markets-container');
+
+            // Filtrar mercados
+            let markets = allMarkets;
+            if(currentMarketFilter !== 'ALL') {
+                markets = allMarkets.filter(m => {
+                    let c = (m.cat || '').toUpperCase();
+                    if(currentMarketFilter === 'CRIPTO' && (c.includes('CRIPTO') || c.includes('FINANZA') || c.includes('WEB3') || c.includes('METAL') || c.includes('ORO') || c.includes('ACCION'))) return true;
+                    if(currentMarketFilter === 'DEPORTES' && (c.includes('DEPORT') || c.includes('FUTBOL') || c.includes('NFL') || c.includes('BOX') || c.includes('UFC') || c.includes('LIGA'))) return true;
+                    if(currentMarketFilter === 'POLITICA' && (c.includes('POLITIC') || c.includes('ELECCION') || c.includes('GEOPOLITICA') || c.includes('PRESIDENT'))) return true;
+                    return false;
+                });
+            }
 
             if (markets.length === 0) {
                 container.innerHTML = `
                 <div class="bg-[#1e272e] border border-[#425465] rounded-[10px] shadow-[5px_5px_20px_0_rgba(0,0,0,0.4)] p-10 flex flex-col items-center justify-center h-64">
                     <span class="text-4xl mb-4 opacity-50">🦅</span>
-                    <p class="text-slate-400 uppercase tracking-widest text-sm text-center">No hay mercados abiertos.</p>
+                    <p class="text-slate-400 uppercase tracking-widest text-sm text-center">No hay mercados en esta categoría.</p>
                 </div>`;
                 return;
             }
@@ -180,8 +223,8 @@
                     ${chartHTML}
                     
                     <div class="flex space-x-2 lg:space-x-3 mt-4">
-                        <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-[#1f6838] hover:bg-[#164b28] text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-[0_4px_15px_rgba(31,104,56,0.3)]">SÍ (Sube)</button>
-                        <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-[0_4px_15px_rgba(185,28,28,0.3)]">NO (Baja)</button>
+                        <button onclick="makeBet(${m.id}, 'SÍ', '${m.asset}')" class="flex-1 bg-[#1f6838] hover:bg-[#164b28] text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-[0_4px_15px_rgba(31,104,56,0.3)]">SÍ</button>
+                        <button onclick="makeBet(${m.id}, 'NO', '${m.asset}')" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-[0_4px_15px_rgba(185,28,28,0.3)]">NO</button>
                     </div>
                 </div>
                 `;
@@ -210,9 +253,7 @@
                 const data = await response.json();
                 if(data.price) return parseFloat(data.price);
                 return null;
-            } catch (error) {
-                return null;
-            }
+            } catch (error) { return null; }
         }
 
         function startGlobalClock() {
@@ -255,11 +296,8 @@
         async function autoLiquidateAndRestart(market, marketsArray) {
             let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
             let userBet = activeBets[market.id];
-
             let finalPrice = null;
-            if (market.symbol && market.symbol.includes("BINANCE")) {
-                finalPrice = await fetchRealPrice(market.symbol);
-            }
+            if (market.symbol && market.symbol.includes("BINANCE")) { finalPrice = await fetchRealPrice(market.symbol); }
 
             if (userBet) {
                 let won = false;
@@ -274,7 +312,6 @@
                 }
 
                 if (won) balance += (userBet.amount * 2);
-
                 history.unshift({ win: won, amt: won ? userBet.amount * 2 : userBet.amount, side: userBet.side, asset: market.asset, details: resolutionDetails });
                 if(history.length > 8) history.pop();
 
@@ -300,7 +337,6 @@
             let newBal = parseFloat(localStorage.getItem('q_bal_v13')) || 1000;
             let newBetsStr = localStorage.getItem('q_active_bets_v13');
             let newMarkets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
-            
             let currentBetsStr = JSON.stringify(activeBets);
 
             if (newBal !== balance || newBetsStr !== currentBetsStr) {
@@ -309,9 +345,7 @@
                 updatePortfolio();
             }
 
-            if (newMarkets.length !== currentMarketsCount) {
-                renderMarkets();
-            }
+            if (newMarkets.length !== currentMarketsCount) { renderMarkets(); }
         }, 1500);
 
         window.onload = () => {
