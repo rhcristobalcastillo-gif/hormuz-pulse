@@ -129,8 +129,10 @@
 
             // Lógica botón recarga
             const rechargeBtn = document.getElementById('recharge-container');
-            if (balance < 100) rechargeBtn.classList.remove('hidden');
-            else rechargeBtn.classList.add('hidden');
+            if (rechargeBtn) {
+                if (balance < 100) rechargeBtn.classList.remove('hidden');
+                else rechargeBtn.classList.add('hidden');
+            }
 
             const posList = document.getElementById('open-positions-list');
             const betKeys = Object.keys(activeBets);
@@ -144,9 +146,20 @@
 
             const histList = document.getElementById('history-list');
             histList.innerHTML = history.length === 0 ? `<p class="text-[10px] text-slate-500 italic">No hay historial.</p>` : history.map(h => `
-                <div class="flex justify-between items-center border-b border-[#425465] pb-2 mb-2 gap-2 hover:bg-[#2a3642] p-1 rounded-[5px] transition-colors">
-                    <div class="flex-1 min-w-0"><p class="text-[9px] font-bold ${h.win ? 'text-green-400' : 'text-slate-500'} uppercase">${h.win ? 'GANASTE' : 'PERDISTE'}</p><p class="text-[10px] text-slate-300 truncate uppercase">${h.asset}</p></div>
-                    <p class="text-[11px] font-mono font-bold text-white">${h.win ? '+' : '-'}${h.amt}</p>
+                <div class="flex flex-col border-b border-[#425465] pb-3 mb-3 gap-2 hover:bg-[#2a3642] p-2 rounded-[5px] transition-colors">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[9px] font-bold ${h.win ? 'text-green-400' : 'text-red-500'} uppercase">${h.win ? 'GANASTE' : 'PERDISTE'} (${h.side})</p>
+                            <p class="text-[10px] text-slate-300 truncate uppercase">${h.asset}</p>
+                        </div>
+                        <div class="text-right whitespace-nowrap">
+                            <p class="text-[11px] font-mono font-bold ${h.win ? 'text-green-400' : 'text-red-500'}">${h.win ? '+' : '-'}${h.amt} fUSDT</p>
+                        </div>
+                    </div>
+                    ${h.details ? `
+                    <div class="mt-1 bg-[#121212] p-1.5 rounded-[5px] border border-white/5 text-center">
+                        <p class="text-[8px] text-slate-400 font-mono tracking-widest uppercase">${h.details}</p>
+                    </div>` : ''}
                 </div>`).join('');
         }
 
@@ -234,22 +247,46 @@
         async function autoLiquidate(market, mkArr) {
             let ab = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
             let ub = ab[market.id], fP = market.symbol ? await fetchRealPrice(market.symbol) : null;
+            
             if (ub) {
-                let won = (market.startPrice && fP) ? (ub.side==='SÍ' ? fP > market.startPrice : fP < market.startPrice) : Math.random() > 0.5;
+                let won = false;
+                let resolutionDetails = "Resolución por Juez Administrativo";
+
+                // Si hay símbolo de Binance, calcula con precios reales
+                if (market.startPrice && fP) {
+                    won = (ub.side === 'SÍ') ? (fP > market.startPrice) : (fP < market.startPrice);
+                    resolutionDetails = `ENTRADA: $${market.startPrice} | SALIDA: $${fP}`;
+                } else {
+                    // Si no hay símbolo (Ej. Deportes/Política), es aleatorio para el demo
+                    won = Math.random() > 0.5;
+                    resolutionDetails = "Liquidación Aleatoria (Modo Demo)";
+                }
+
                 if (won) balance += (ub.amount * 2);
-                history.unshift({ win: won, amt: won ? ub.amount * 2 : ub.amount, side: ub.side, asset: market.asset });
-                if(history.length > 8) history.pop();
-                localStorage.setItem('q_bal_v13', balance); localStorage.setItem('q_hist_v13', JSON.stringify(history));
-                delete ab[market.id]; localStorage.setItem('q_active_bets_v13', JSON.stringify(ab));
+                
+                history.unshift({ 
+                    win: won, 
+                    amt: won ? ub.amount * 2 : ub.amount, 
+                    side: ub.side, 
+                    asset: market.asset,
+                    details: resolutionDetails // <-- Aquí guardamos el recibo
+                });
+                
+                if(history.length > 10) history.pop();
+                
+                localStorage.setItem('q_bal_v13', balance); 
+                localStorage.setItem('q_hist_v13', JSON.stringify(history));
+                delete ab[market.id]; 
+                localStorage.setItem('q_active_bets_v13', JSON.stringify(ab));
                 updatePortfolio();
             }
-            market.endTime = Date.now() + 120000; market.startPrice = null;
+            market.endTime = Date.now() + 120000; 
+            market.startPrice = null;
             localStorage.setItem('q_markets_v13', JSON.stringify(mkArr));
         }
 
         setInterval(() => {
             let storedBal = localStorage.getItem('q_bal_v13');
-            // Aquí le decimos explícitamente: ¡Si es 0, respeta el 0!
             let nB = storedBal !== null ? parseFloat(storedBal) : 1000;
             let nA = localStorage.getItem('q_active_bets_v13');
             let nM = (JSON.parse(localStorage.getItem('q_markets_v13')) || []).length;
@@ -259,15 +296,15 @@
                 activeBets = JSON.parse(nA) || {}; 
                 updatePortfolio(); 
             }
-            if (nM !== currentMarketsCount) { renderMarkets(); }
+            if (nM !== currentMarketsCount) renderMarkets();
         }, 1500);
 
-        window.onload = () => {
+        window.onload = () => { 
             let initialBal = localStorage.getItem('q_bal_v13');
             balance = initialBal !== null ? parseFloat(initialBal) : 1000;
-            updatePortfolio();
-            renderMarkets();
-            startGlobalClock();
+            updatePortfolio(); 
+            renderMarkets(); 
+            startGlobalClock(); 
         };
     </script>
 </body>
