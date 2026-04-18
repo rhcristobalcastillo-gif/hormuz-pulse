@@ -8,83 +8,59 @@
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 
-    <title>Quetza MX | Terminal</title>
-    <style>
-        .tab-active { border-bottom: 3px solid #eab308; color: #eab308; font-weight: 900; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #333333; }
-        ::-webkit-scrollbar-thumb { background: #425465; border-radius: 10px; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <title>Quetza Forecast | Admin Panel</title>
 </head>
-<body id="app-body" class="bg-gradient-to-br from-[#333333] to-[#2a3642] text-slate-200 font-sans p-3 lg:p-4 max-w-[1400px] mx-auto min-h-screen lg:h-screen flex flex-col lg:overflow-hidden relative z-0">
+<body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-md mx-auto">
 
-    <nav class="relative h-20 flex justify-between items-center mb-6 border-b border-white/10 flex-shrink-0 pt-4">
-        <a href="index.html" class="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex items-center hover:opacity-80 transition-opacity mt-2">
-            <img src="(COPY) Logotipo 500x500 px.png" alt="Logo" class="w-16 h-16 lg:w-24 lg:h-24 object-contain drop-shadow-xl">
-            <span class="ml-3 text-white font-black tracking-tighter text-lg lg:text-xl hidden md:block uppercase mt-1">Quetza MX</span>
-        </a>
-
-        <div class="ml-auto flex space-x-4 lg:space-x-8 text-[10px] lg:text-[11px] uppercase tracking-[0.2em] items-center">
-            <a href="index.html" class="py-2 text-slate-400 hover:text-white transition-all">Monitor</a>
-            <a href="quetza.html" class="tab-active py-2">Quetza Consensus</a>
+    <header class="mb-8 border-b border-red-900 pb-4 mt-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-black text-red-500 uppercase tracking-widest">⚙️ Quetza Admin</h1>
+            <p class="text-[10px] text-slate-500 uppercase">Control Central (Nube)</p>
         </div>
-    </nav>
+        <span class="text-[9px] bg-green-900/30 text-green-500 border border-green-800 px-3 py-1 rounded-full animate-pulse">Online</span>
+    </header>
 
-    <div class="flex flex-col lg:flex-row gap-6 flex-grow lg:overflow-hidden pb-4">
-        
-        <div class="lg:w-2/3 flex flex-col lg:overflow-hidden">
-            <div class="flex justify-between items-center mb-4 px-1">
-                <h2 class="text-xl font-black text-white uppercase tracking-tighter flex-shrink-0">🌎 Mercados de Liquidez</h2>
-                <span id="cloud-status" class="text-[8px] bg-green-900/50 text-green-400 border border-green-500 px-2 py-1 rounded-[5px] uppercase tracking-widest animate-pulse">🔴 Nube Conectada</span>
+    <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-red-900 mb-8">
+        <h2 class="text-lg font-bold text-white mb-4">Lanzar Nuevo Mercado Global</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Categoría</label>
+                <select id="m-cat" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
+                    <option value="🪙 Cripto">🪙 Cripto (Auto 2 Min)</option>
+                    <option value="📈 Finanzas">📈 Finanzas (Auto 2 Min)</option>
+                    <option value="🏛️ Política">🏛️ Política (Manual)</option>
+                    <option value="⚽ Deportes">⚽ Deportes (Manual)</option>
+                </select>
             </div>
-            
-            <div class="flex space-x-2 mb-4 overflow-x-auto pb-2 flex-shrink-0 hide-scroll px-1">
-                <button id="filter-ALL" onclick="setMarketFilter('ALL')" class="bg-yellow-500 text-black px-4 py-2 rounded-[5px] text-[10px] uppercase font-black tracking-widest transition-colors whitespace-nowrap shadow-lg">Todos</button>
-                <button id="filter-CRIPTO" onclick="setMarketFilter('CRIPTO')" class="bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap">Finanzas & Cripto</button>
-                <button id="filter-DEPORTES" onclick="setMarketFilter('DEPORTES')" class="bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap">Deportes</button>
-                <button id="filter-POLITICA" onclick="setMarketFilter('POLITICA')" class="bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap">Política</button>
-            </div>
-
-            <div id="markets-container" class="lg:overflow-y-auto pr-0 lg:pr-2 pb-6 lg:pb-10 space-y-6 flex-grow">
-                <p class="text-slate-500 text-center py-20 uppercase tracking-widest text-sm animate-pulse">Sincronizando con Firebase...</p>
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Activo / Tema</label>
+                <input id="m-asset" type="text" placeholder="Ej: Bitcoin, LA Galaxy..." class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
         </div>
-
-        <div class="lg:w-1/3 bg-[#1e272e] border border-[#425465] rounded-[10px] flex flex-col lg:overflow-hidden shadow-2xl relative mb-10 lg:mb-0">
-            <div class="p-5 lg:p-6 border-b border-[#425465] bg-[#1e272e] z-10 flex-shrink-0">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-black text-white uppercase tracking-widest">Tu Portafolio</h2>
-                    <span class="bg-[#2a3642] text-yellow-500 border border-[#425465] px-2 py-1 rounded-[5px] text-[9px] font-bold tracking-widest uppercase">Nodo Local</span>
-                </div>
-                
-                <div class="bg-[#2a3642] px-4 py-3 rounded-[10px] border border-[#425465] shadow-inner text-center mb-4 transition-all duration-500" id="balance-box">
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Saldo Disponible</p>
-                    <p class="text-3xl font-black text-[#10b981] font-mono"><span class="text-sm text-slate-400 mr-1">fUSDT</span><span id="user-credits">1,000.00</span></p>
-                    
-                    <div id="recharge-container" class="hidden mt-3">
-                        <button onclick="rechargeDemo()" class="w-full bg-gradient-to-r from-[#1f6838] to-[#10b981] hover:from-[#164b28] hover:to-[#059669] text-white font-black py-2 rounded-[5px] uppercase text-[10px] tracking-widest shadow-lg transition-all animate-bounce border border-[#10b981]">
-                            + Recargar Demo (1,000)
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex justify-between text-center px-4">
-                    <div><p class="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Win Rate</p><p id="stat-winrate" class="text-lg font-black text-yellow-500 font-mono">0%</p></div>
-                    <div><p class="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Operaciones</p><p id="stat-trades" class="text-lg font-black text-white font-mono">0</p></div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Pregunta Principal</label>
+                <input id="m-question" type="text" placeholder="¿Logrará el objetivo?" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
-
-            <div class="flex-grow lg:overflow-y-auto p-5 lg:p-6 space-y-8 bg-[#1e272e]">
-                <div><h3 class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em] mb-3 border-b border-[#425465] pb-1">⚡ Posiciones del Ciclo</h3><div id="open-positions-list" class="space-y-2"></div></div>
-                <div><h3 class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-3 border-b border-[#425465] pb-1">📜 Historial</h3><div id="history-list" class="space-y-2 opacity-80"></div></div>
+            <div>
+                <label class="text-[10px] text-slate-400 uppercase tracking-widest block mb-1">Símbolo TradingView</label>
+                <input id="m-symbol" type="text" placeholder="Ej: BINANCE:BTCUSDT" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
+        </div>
+        <button onclick="createMarket()" class="w-full bg-red-900 hover:bg-red-800 text-white font-black py-3 rounded-lg uppercase text-xs tracking-widest transition-colors mt-2 shadow-[0_0_15px_rgba(153,27,27,0.5)]">
+            🚀 Desplegar Mercado a todos los jugadores
+        </button>
+    </div>
+
+    <div>
+        <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Panel de Liquidación en Vivo</h2>
+        <div id="admin-markets-list" class="space-y-4">
+            <p class="text-slate-500 italic text-sm animate-pulse">Conectando a Firebase...</p>
         </div>
     </div>
 
     <script>
-        // 1. INICIALIZAR FIREBASE TERMINAL
+        // 1. INICIALIZAR FIREBASE ADMIN
         const firebaseConfig = {
             apiKey: "AIzaSyAQcptmRYAKQdjGzkUiRjI2xmgB2dgnyIw",
             authDomain: "quetza-mx.firebaseapp.com",
@@ -96,243 +72,86 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Variables Globales
-        let allMarkets = []; 
-        let currentMarketFilter = 'ALL';
-        
-        // Variables Locales (Billetera del usuario)
-        let balance = 1000.00;
-        let history = [];
-        let activeBets = {};
-
-        // 2. ESCUCHAR A LA NUBE EN TIEMPO REAL
-        db.collection("markets").onSnapshot((querySnapshot) => {
-            allMarkets = [];
-            querySnapshot.forEach((doc) => {
-                let data = doc.data();
-                data.id = doc.id; 
-                
-                // Si el Admin envió la señal de resolución manual...
-                if (data.status === 'RESOLVED') {
-                    processManualWin(data);
-                } else {
-                    allMarkets.push(data); // Si sigue activo, lo mostramos
-                }
-            });
-            renderMarkets();
-        });
-
-        // 3. PAGAR AL USUARIO CUANDO EL ADMIN DECIDE EL GANADOR
-        function processManualWin(market) {
-            let ub = activeBets[market.id];
-            if (!ub) return; 
-
-            let won = (ub.side === market.winningSide);
-            if (won) balance += (ub.amount * 2);
+        // 2. ESCUCHAR LOS MERCADOS ACTIVOS EN LA NUBE
+        db.collection("markets").onSnapshot((snapshot) => {
+            const list = document.getElementById('admin-markets-list');
+            let html = '';
             
-            history.unshift({ 
-                win: won, 
-                amt: won ? ub.amount * 2 : ub.amount, 
-                side: ub.side, 
-                asset: market.asset, 
-                details: `Juez Admin: GANA ${market.winningSide}` 
-            });
-            
-            if(history.length > 10) history.pop();
-            
-            localStorage.setItem('q_bal_v13', balance); 
-            localStorage.setItem('q_hist_v13', JSON.stringify(history));
-            delete activeBets[market.id]; 
-            localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
-            
-            const box = document.getElementById('balance-box');
-            box.classList.add(won ? 'bg-green-900/50' : 'bg-red-900/50');
-            setTimeout(() => box.classList.remove('bg-green-900/50', 'bg-red-900/50'), 1000);
-            
-            updatePortfolio();
-        }
-
-        // FUNCIONES DE INTERFAZ Y LOCALES
-        function setMarketFilter(filterType) {
-            currentMarketFilter = filterType;
-            const tabs = ['ALL', 'CRIPTO', 'DEPORTES', 'POLITICA'];
-            tabs.forEach(t => {
-                const btn = document.getElementById('filter-' + t);
-                if(btn) {
-                    btn.className = (t === filterType) 
-                        ? "bg-yellow-500 text-black px-4 py-2 rounded-[5px] text-[10px] uppercase font-black tracking-widest transition-colors whitespace-nowrap shadow-lg"
-                        : "bg-[#2a3642] text-slate-400 hover:text-white px-4 py-2 rounded-[5px] text-[10px] uppercase font-bold tracking-widest border border-[#425465] transition-colors whitespace-nowrap";
-                }
-            });
-            renderMarkets();
-        }
-
-        function rechargeDemo() {
-            balance += 1000;
-            localStorage.setItem('q_bal_v13', balance);
-            updatePortfolio();
-            const box = document.getElementById('balance-box');
-            box.classList.add('bg-green-900/50');
-            setTimeout(() => box.classList.remove('bg-green-900/50'), 1000);
-        }
-
-        function updatePortfolio() {
-            document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
-            const totalTrades = history.length;
-            const wins = history.filter(h => h.win).length;
-            document.getElementById('stat-trades').innerText = totalTrades;
-            document.getElementById('stat-winrate').innerText = totalTrades > 0 ? `${Math.round((wins / totalTrades) * 100)}%` : `0%`;
-
-            const rechargeBtn = document.getElementById('recharge-container');
-            if (rechargeBtn) {
-                if (balance < 100) rechargeBtn.classList.remove('hidden');
-                else rechargeBtn.classList.add('hidden');
-            }
-
-            const posList = document.getElementById('open-positions-list');
-            const betKeys = Object.keys(activeBets);
-            posList.innerHTML = betKeys.length === 0 ? `<p class="text-[10px] text-slate-500 italic">Esperando tu inversión...</p>` : betKeys.map(key => {
-                const bet = activeBets[key];
-                return `<div class="bg-[#2a3642] border border-[#425465] p-3 rounded-[10px] flex justify-between items-center animate-pulse gap-3">
-                    <div class="flex-1 min-w-0"><p class="text-[10px] text-slate-300 truncate uppercase">${bet.asset}</p><p class="text-xs font-bold ${bet.side === 'SÍ' ? 'text-green-400' : 'text-red-400'} uppercase">${bet.side}</p></div>
-                    <div class="text-right pl-2 border-l border-[#425465]"><p class="text-sm font-black text-white font-mono">${bet.amount}</p></div>
-                </div>`;
-            }).join('');
-
-            const histList = document.getElementById('history-list');
-            histList.innerHTML = history.length === 0 ? `<p class="text-[10px] text-slate-500 italic">No hay historial.</p>` : history.map(h => `
-                <div class="flex flex-col border-b border-[#425465] pb-3 mb-3 gap-2 hover:bg-[#2a3642] p-2 rounded-[5px] transition-colors">
-                    <div class="flex justify-between items-center">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[9px] font-bold ${h.win ? 'text-green-400' : 'text-red-500'} uppercase">${h.win ? 'GANASTE' : 'PERDISTE'} (${h.side})</p>
-                            <p class="text-[10px] text-slate-300 truncate uppercase">${h.asset}</p>
-                        </div>
-                        <div class="text-right whitespace-nowrap">
-                            <p class="text-[11px] font-mono font-bold ${h.win ? 'text-green-400' : 'text-red-500'}">${h.win ? '+' : '-'}${h.amt} fUSDT</p>
-                        </div>
-                    </div>
-                    ${h.details ? `<div class="mt-1 bg-[#121212] p-1.5 rounded-[5px] border border-white/5 text-center"><p class="text-[8px] text-slate-400 font-mono tracking-widest uppercase">${h.details}</p></div>` : ''}
-                </div>`).join('');
-        }
-
-        function renderMarkets() {
-            const container = document.getElementById('markets-container');
-            let markets = allMarkets;
-
-            if(currentMarketFilter !== 'ALL') {
-                markets = allMarkets.filter(m => {
-                    let c = (m.cat || '').toUpperCase();
-                    if(currentMarketFilter === 'CRIPTO' && (c.includes('CRIPTO') || c.includes('FINANZA') || c.includes('WEB3') || c.includes('ORO') || c.includes('METAL'))) return true;
-                    if(currentMarketFilter === 'DEPORTES' && (c.includes('DEPORT') || c.includes('FUTBOL') || c.includes('LIGA') || c.includes('BOX') || c.includes('UFC'))) return true;
-                    if(currentMarketFilter === 'POLITICA' && (c.includes('POLITIC') || c.includes('ELECCION') || c.includes('PRESIDENT'))) return true;
-                    return false;
-                });
-            }
-
-            if (markets.length === 0) {
-                container.innerHTML = `<div class="bg-[#1e272e] border border-[#425465] rounded-[10px] p-10 flex flex-col items-center justify-center h-64"><span class="text-4xl mb-4 opacity-50">🦅</span><p class="text-slate-400 uppercase tracking-widest text-sm text-center">No hay mercados activos en la nube.</p></div>`;
+            if (snapshot.empty) {
+                list.innerHTML = `<p class="text-slate-500 italic text-sm">No hay mercados activos en la nube.</p>`;
                 return;
             }
 
-            container.innerHTML = markets.map(m => {
-                const chart = m.symbol ? `<div class="w-full h-64 md:h-72 mb-6 rounded-[10px] overflow-hidden border border-[#425465] bg-[#121212] shadow-inner"><iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(m.symbol)}&interval=1&theme=dark&style=1&hidesidetoolbar=1" width="100%" height="100%" frameborder="0"></iframe></div>` : ``;
-                let oracleUI = "";
-                if (m.resolution === 'AUTO' && m.endTime) {
-                    let t = Math.max(0, Math.floor((m.endTime - Date.now()) / 1000));
-                    oracleUI = `<span id="timer-${m.id}" class="text-yellow-500 font-bold font-mono tracking-widest text-sm bg-yellow-500/10 px-3 py-1 rounded-[5px] border border-yellow-500/30">${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}</span>`;
-                } else { oracleUI = `<span class="text-orange-400 font-bold uppercase tracking-widest text-[10px] bg-orange-900/30 px-3 py-1 rounded-[5px] border border-orange-500/30">Juez Admin</span>`; }
+            snapshot.forEach((doc) => {
+                const m = doc.data();
+                if (m.status === 'RESOLVED') return; 
 
-                return `<div class="bg-[#1e272e] border border-[#425465] p-4 lg:p-6 rounded-[10px] shadow-xl hover:bg-[#222d36] transition-colors">
-                    <div class="flex justify-between items-center mb-4 border-b border-[#425465] pb-3">
-                        <div class="flex-1 min-w-0 pr-2"><span class="text-[9px] text-slate-300 font-bold uppercase tracking-[0.2em] border border-[#425465] px-2 py-1 rounded-[5px] bg-[#2a3642]">${m.cat || 'General'}</span><h3 class="text-[10px] text-white font-bold uppercase truncate mt-2">${m.asset}</h3></div>
-                        <div class="flex flex-col items-end">${oracleUI}</div>
+                html += `
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
+                    <div class="flex-1">
+                        <span class="text-[9px] bg-slate-800 px-2 py-1 rounded ${m.resolution === 'AUTO' ? 'text-blue-400' : 'text-yellow-500'} uppercase tracking-widest">
+                            ${m.cat} [${m.resolution}]
+                        </span>
+                        <p class="font-bold text-white mt-2 leading-tight">${m.question}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">ID: ${doc.id}</p>
                     </div>
-                    <h3 class="text-base lg:text-lg font-black text-white mb-2 leading-tight">${m.question}</h3>
-                    <p id="price-tag-${m.id}" class="text-[10px] text-yellow-500 font-mono mb-4 border border-[#425465] bg-[#2a3642] px-3 py-1 rounded-[5px] inline-block">${m.startPrice ? `Entrada: $${m.startPrice}` : 'Calculando...'}</p>
-                    ${chart}
-                    <div class="flex space-x-2 lg:space-x-3 mt-4">
-                        <button onclick="makeBet('${m.id}', 'SÍ', '${m.asset}')" class="flex-1 bg-[#1f6838] hover:bg-[#164b28] text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">SÍ</button>
-                        <button onclick="makeBet('${m.id}', 'NO', '${m.asset}')" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">NO</button>
+                    <div class="flex space-x-2 w-full md:w-auto">
+                        <button onclick="resolveMarket('${doc.id}', 'SÍ')" class="flex-1 bg-green-800 hover:bg-green-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana SÍ</button>
+                        <button onclick="resolveMarket('${doc.id}', 'NO')" class="flex-1 bg-red-800 hover:bg-red-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana NO</button>
+                        <button onclick="deleteMarket('${doc.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] px-3 py-3 rounded-lg font-bold uppercase">🗑️</button>
                     </div>
                 </div>`;
-            }).join('');
+            });
+            list.innerHTML = html || `<p class="text-slate-500 italic text-sm">Procesando liquidaciones...</p>`;
+        });
+
+        // 3. ENVIAR NUEVO MERCADO A FIREBASE
+        function createMarket() {
+            const cat = document.getElementById('m-cat').value;
+            const asset = document.getElementById('m-asset').value;
+            const question = document.getElementById('m-question').value;
+            const symbol = document.getElementById('m-symbol').value;
+
+            if(!asset || !question) return alert("Faltan datos.");
+
+            const isAuto = cat.includes("Cripto") || cat.includes("Finanzas");
+            const endTime = isAuto ? Date.now() + 120000 : null;
+
+            db.collection("markets").add({ 
+                cat: cat.split(' ')[1] + " " + (cat.split(' ')[2] || ""), 
+                asset: asset, 
+                question: question, 
+                symbol: symbol,
+                resolution: isAuto ? 'AUTO' : 'MANUAL',
+                endTime: endTime,
+                status: 'ACTIVE'
+            }).then(() => {
+                document.getElementById('m-asset').value = '';
+                document.getElementById('m-question').value = '';
+                document.getElementById('m-symbol').value = '';
+            });
         }
 
-        function makeBet(marketId, side, assetName) {
-            if (balance < 100) return alert("Saldo insuficiente.");
-            let bet = activeBets[marketId] || { side: side, amount: 0, asset: assetName };
-            if(bet.amount > 0 && bet.side !== side) return alert("Ya tienes una posición contraria.");
-            balance -= 100; bet.amount += 100; activeBets[marketId] = bet;
-            localStorage.setItem('q_bal_v13', balance);
-            localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
-            updatePortfolio(); 
+        // 4. RESOLVER MERCADO MANUALMENTE
+        function resolveMarket(marketId, winningSide) {
+            if(!confirm(`¿Lanzar señal a todos los jugadores de que GANA ${winningSide}?`)) return;
+
+            db.collection("markets").doc(marketId).update({
+                status: 'RESOLVED',
+                winningSide: winningSide
+            });
+
+            setTimeout(() => {
+                db.collection("markets").doc(marketId).delete();
+            }, 5000);
         }
 
-        async function fetchRealPrice(symbol) {
-            try {
-                let s = symbol.replace('BINANCE:', '').replace('CRYPTO:', '');
-                const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${s}`);
-                const d = await r.json(); return d.price ? parseFloat(d.price) : null;
-            } catch (e) { return null; }
-        }
-
-        function startGlobalClock() {
-            const tick = async () => {
-                for (let m of allMarkets) {
-                    if (m.resolution === 'AUTO' && m.endTime) {
-                        let t = Math.max(0, Math.floor((m.endTime - Date.now()) / 1000));
-                        let tEl = document.getElementById(`timer-${m.id}`);
-                        
-                        if (t <= 0) {
-                            await autoLiquidateLocal(m);
-                            if(tEl) tEl.innerText = "00:00";
-                        } else if (tEl) {
-                            tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
-                        }
-                    }
-                }
-            };
-            tick(); setInterval(tick, 1000);
-        }
-
-        async function autoLiquidateLocal(market) {
-            let ub = activeBets[market.id];
-            if (!ub) return; 
-
-            let fP = market.symbol ? await fetchRealPrice(market.symbol) : null;
-            let won = false;
-            let resolutionDetails = "Liquidación Aleatoria (Modo Demo)";
-
-            if (market.startPrice && fP) {
-                won = (ub.side === 'SÍ') ? (fP > market.startPrice) : (fP < market.startPrice);
-                resolutionDetails = `ENTRADA: $${market.startPrice} | SALIDA: $${fP}`;
-            } else {
-                won = Math.random() > 0.5;
+        // 5. BORRAR MERCADO (Si te equivocaste al crearlo)
+        function deleteMarket(marketId) {
+            if(confirm("¿Cancelar y borrar mercado? (No reembolsa a los usuarios)")) {
+                db.collection("markets").doc(marketId).delete();
             }
-
-            if (won) balance += (ub.amount * 2);
-            
-            history.unshift({ win: won, amt: won ? ub.amount * 2 : ub.amount, side: ub.side, asset: market.asset, details: resolutionDetails });
-            if(history.length > 10) history.pop();
-            
-            localStorage.setItem('q_bal_v13', balance); 
-            localStorage.setItem('q_hist_v13', JSON.stringify(history));
-            delete activeBets[market.id]; 
-            localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
-            updatePortfolio();
         }
-
-        window.onload = () => { 
-            let storedBal = localStorage.getItem('q_bal_v13');
-            balance = storedBal !== null ? parseFloat(storedBal) : 1000;
-            let storedHist = localStorage.getItem('q_hist_v13');
-            history = storedHist ? JSON.parse(storedHist) : [];
-            let storedBets = localStorage.getItem('q_active_bets_v13');
-            activeBets = storedBets ? JSON.parse(storedBets) : {};
-            
-            updatePortfolio(); 
-            startGlobalClock(); 
-        };
     </script>
 </body>
 </html>
