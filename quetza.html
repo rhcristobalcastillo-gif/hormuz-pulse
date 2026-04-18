@@ -259,7 +259,7 @@
             }).join('');
         }
 
-        function renderMarkets() {
+function renderMarkets() {
             const container = document.getElementById('markets-container');
             let markets = allMarkets;
 
@@ -295,8 +295,8 @@
                     <p id="price-tag-${m.id}" class="text-[10px] text-yellow-500 font-mono mb-4 border border-[#425465] bg-[#2a3642] px-3 py-1 rounded-[5px] inline-block">${m.startPrice ? `Entrada: $${m.startPrice}` : 'Calculando...'}</p>
                     ${chart}
                     <div class="flex space-x-2 lg:space-x-3 mt-4">
-                        <button onclick="makeBet('${m.id}', 'SÍ', '${m.asset}')" class="flex-1 bg-[#1f6838] hover:bg-[#164b28] text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">SÍ</button>
-                        <button onclick="makeBet('${m.id}', 'NO', '${m.asset}')" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">NO</button>
+                        <button onclick="makeBet('${m.id}', 'SÍ', '${m.asset}')" class="flex-1 bg-[#1f6838] hover:bg-[#164b28] text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">SÍ (SUBE)</button>
+                        <button onclick="makeBet('${m.id}', 'NO', '${m.asset}')" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-black py-3 lg:py-4 rounded-[10px] uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">NO (BAJA)</button>
                     </div>
                 </div>`;
             }).join('');
