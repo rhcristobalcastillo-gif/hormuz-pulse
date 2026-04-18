@@ -119,9 +119,7 @@
                 }
             });
             
-            // Llama al sistema que busca apuestas en el Limbo
             cleanOrphanBets();
-            
             renderMarkets();
         });
 
@@ -131,11 +129,9 @@
             let updated = false;
 
             betKeys.forEach(betId => {
-                // Buscamos si el ID de la apuesta sigue existiendo en Firebase
                 let marketExists = allMarkets.find(m => m.id === betId);
                 
                 if (!marketExists) {
-                    // Si no existe, es un mercado borrado o viejo. ¡REEMBOLSAR!
                     let orphanedBet = activeBets[betId];
                     balance += orphanedBet.amount; 
                     
@@ -218,7 +214,6 @@
         function updatePortfolio() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
             
-            // Calculamos WinRate ignorando los reembolsos (win: null)
             const resolvedTrades = history.filter(h => h.win !== null);
             const totalTrades = resolvedTrades.length;
             const wins = resolvedTrades.filter(h => h.win === true).length;
@@ -244,7 +239,6 @@
 
             const histList = document.getElementById('history-list');
             histList.innerHTML = history.length === 0 ? `<p class="text-[10px] text-slate-500 italic">No hay historial.</p>` : history.map(h => {
-                // Estilos dependiendo si ganó, perdió o fue reembolso
                 let statusText = h.win === true ? 'GANASTE' : (h.win === false ? 'PERDISTE' : 'REEMBOLSO');
                 let colorClass = h.win === true ? 'text-green-400' : (h.win === false ? 'text-red-500' : 'text-slate-400');
                 let sign = h.win === true || h.win === null ? '+' : '-';
@@ -318,12 +312,10 @@
             updatePortfolio(); 
         }
 
-       async function fetchRealPrice(symbol) {
+        // LIMPIEZA DE SÍMBOLO PARA BINANCE
+        async function fetchRealPrice(symbol) {
             try {
-                // Hacemos una limpieza radical del símbolo. 
-                // Si escribes "BINANCE:BTCUSDT", nos quedamos solo con "BTCUSDT"
                 let cleanSymbol = symbol.includes(':') ? symbol.split(':')[1] : symbol;
-                
                 const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${cleanSymbol}`);
                 const d = await r.json(); 
                 return d.price ? parseFloat(d.price) : null;
@@ -338,16 +330,14 @@
                         let tEl = document.getElementById(`timer-${m.id}`);
                         let pEl = document.getElementById(`price-tag-${m.id}`);
                         
-                        // Si está calculando, buscamos el precio en Binance
                         if (!m.startPrice && m.symbol && pEl && pEl.innerText.includes('Calculando')) {
-                            m.startPrice = "buscando"; // Evita que llame a Binance 100 veces por segundo
+                            m.startPrice = "buscando"; 
                             fetchRealPrice(m.symbol).then(price => {
                                 if (price) {
                                     m.startPrice = price; 
                                     if (pEl) pEl.innerText = `Entrada: $${price}`;
                                 } else {
                                     m.startPrice = null; 
-                                    // Si Binance no lo reconoce, avisamos en pantalla
                                     if (pEl) pEl.innerText = `API: Símbolo Inválido`; 
                                 }
                             });
@@ -371,24 +361,6 @@
             tick(); setInterval(tick, 1000);
         }
 
-                        // 2. SOLUCIÓN AL RELOJ CONGELADO EN 00:00
-                        if (t <= 0) {
-                            if (!m.liquidatedLocal) {
-                                m.liquidatedLocal = true; // Evita que te pague doble
-                                await autoLiquidateLocal(m);
-                            }
-                            if (tEl) tEl.innerText = "00:00";
-                            if (pEl) pEl.innerText = "Esperando nuevo ciclo...";
-                        } else {
-                            if (tEl) {
-                                tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
-                            }
-                        }
-                    }
-                }
-            };
-            tick(); setInterval(tick, 1000);
-        }
         async function autoLiquidateLocal(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
