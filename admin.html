@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
     <title>Quetza Forecast | Admin Panel</title>
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono p-4 max-w-screen-md mx-auto">
 
-    <header class="mb-8 border-b border-red-900 pb-4 mt-8">
-        <h1 class="text-2xl font-black text-red-500 uppercase tracking-widest">⚙️ Quetza Admin Core</h1>
-        <p class="text-[10px] text-slate-500 uppercase">Panel de Resolución del Oráculo</p>
+    <header class="mb-8 border-b border-red-900 pb-4 mt-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-black text-red-500 uppercase tracking-widest">⚙️ Quetza Admin</h1>
+            <p class="text-[10px] text-slate-500 uppercase">Control Central (Nube)</p>
+        </div>
+        <span class="text-[9px] bg-green-900/30 text-green-500 border border-green-800 px-3 py-1 rounded-full animate-pulse">Online</span>
     </header>
 
     <div class="bg-slate-900 p-6 rounded-2xl border border-dashed border-red-900 mb-8">
@@ -40,43 +47,66 @@
                 <input id="m-symbol" type="text" placeholder="Ej: BINANCE:BTCUSDT" class="w-full bg-slate-950 border border-slate-800 text-white text-sm p-2 rounded">
             </div>
         </div>
-        <button onclick="createMarket()" class="w-full bg-red-900 hover:bg-red-800 text-white font-black py-3 rounded-lg uppercase text-xs tracking-widest transition-colors mt-2">
-            Desplegar Mercado Global
+        <button onclick="createMarket()" class="w-full bg-red-900 hover:bg-red-800 text-white font-black py-3 rounded-lg uppercase text-xs tracking-widest transition-colors mt-2 shadow-[0_0_15px_rgba(153,27,27,0.5)]">
+            🚀 Desplegar Mercado a todos los jugadores
         </button>
     </div>
 
     <div>
-        <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Panel de Liquidación</h2>
-        <div id="admin-markets-list" class="space-y-4"></div>
+        <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Panel de Liquidación en Vivo</h2>
+        <div id="admin-markets-list" class="space-y-4">
+            <p class="text-slate-500 italic text-sm animate-pulse">Conectando a Firebase...</p>
+        </div>
     </div>
 
     <script>
-        let markets = JSON.parse(localStorage.getItem('q_markets_v13')) || [];
+        // 1. INICIALIZAR FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQcptmRYAKQdjGzkUiRjI2xmgB2dgnyIw",
+            authDomain: "quetza-mx.firebaseapp.com",
+            projectId: "quetza-mx",
+            storageBucket: "quetza-mx.firebasestorage.app",
+            messagingSenderId: "543605206347",
+            appId: "1:543605206347:web:cbe986ea33b0b37acf0cce"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        function renderAdminMarkets() {
+        // 2. ESCUCHAR LOS MERCADOS ACTIVOS EN LA NUBE
+        db.collection("markets").onSnapshot((snapshot) => {
             const list = document.getElementById('admin-markets-list');
-            if (markets.length === 0) {
-                list.innerHTML = `<p class="text-slate-500 italic">No hay mercados activos.</p>`;
+            let html = '';
+            
+            if (snapshot.empty) {
+                list.innerHTML = `<p class="text-slate-500 italic text-sm">No hay mercados activos en la nube.</p>`;
                 return;
             }
 
-            list.innerHTML = markets.map((m, index) => `
-                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4">
+            snapshot.forEach((doc) => {
+                const m = doc.data();
+                // Ocultar del panel los que ya mandamos a resolver
+                if (m.status === 'RESOLVED') return; 
+
+                html += `
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
                     <div class="flex-1">
                         <span class="text-[9px] bg-slate-800 px-2 py-1 rounded ${m.resolution === 'AUTO' ? 'text-blue-400' : 'text-yellow-500'} uppercase tracking-widest">
                             ${m.cat} [${m.resolution}]
                         </span>
                         <p class="font-bold text-white mt-2 leading-tight">${m.question}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">ID: ${doc.id}</p>
                     </div>
                     <div class="flex space-x-2 w-full md:w-auto">
-                        <button onclick="resolveMarket(${index}, 'SÍ')" class="flex-1 bg-green-800 hover:bg-green-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana SÍ</button>
-                        <button onclick="resolveMarket(${index}, 'NO')" class="flex-1 bg-red-800 hover:bg-red-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana NO</button>
-                        <button onclick="deleteMarket(${index})" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] px-3 py-3 rounded-lg font-bold uppercase">🗑️</button>
+                        <button onclick="resolveMarket('${doc.id}', 'SÍ')" class="flex-1 bg-green-800 hover:bg-green-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana SÍ</button>
+                        <button onclick="resolveMarket('${doc.id}', 'NO')" class="flex-1 bg-red-800 hover:bg-red-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana NO</button>
+                        <button onclick="deleteMarket('${doc.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] px-3 py-3 rounded-lg font-bold uppercase">🗑️</button>
                     </div>
-                </div>
-            `).join('');
-        }
+                </div>`;
+            });
+            list.innerHTML = html || `<p class="text-slate-500 italic text-sm">Procesando liquidaciones...</p>`;
+        });
 
+        // 3. ENVIAR NUEVO MERCADO A FIREBASE
         function createMarket() {
             const cat = document.getElementById('m-cat').value;
             const asset = document.getElementById('m-asset').value;
@@ -85,63 +115,48 @@
 
             if(!asset || !question) return alert("Faltan datos.");
 
-            // Determinar si es automático y asignarle fecha de caducidad (2 minutos = 120,000 ms)
             const isAuto = cat.includes("Cripto") || cat.includes("Finanzas");
             const endTime = isAuto ? Date.now() + 120000 : null;
 
-            markets.unshift({ 
-                id: Date.now(), 
-                cat: cat.split(' ')[1] + " " + cat.split(' ')[2], // Limpiar nombre
-                asset, 
-                question, 
-                symbol,
+            db.collection("markets").add({ 
+                cat: cat.split(' ')[1] + " " + (cat.split(' ')[2] || ""), 
+                asset: asset, 
+                question: question, 
+                symbol: symbol,
                 resolution: isAuto ? 'AUTO' : 'MANUAL',
-                endTime: endTime
+                endTime: endTime,
+                status: 'ACTIVE' // <- Clave para saber que está en juego
+            }).then(() => {
+                document.getElementById('m-asset').value = '';
+                document.getElementById('m-question').value = '';
+                document.getElementById('m-symbol').value = '';
+            });
+        }
+
+        // 4. RESOLVER MERCADO MANUALMENTE
+        function resolveMarket(marketId, winningSide) {
+            if(!confirm(`¿Lanzar señal a todos los jugadores de que GANA ${winningSide}?`)) return;
+
+            // En lugar de borrarlo, le cambiamos el estatus a "RESUELTO"
+            // Esto dispara una señal en todos los celulares conectados
+            db.collection("markets").doc(marketId).update({
+                status: 'RESOLVED',
+                winningSide: winningSide
             });
 
-            localStorage.setItem('q_markets_v13', JSON.stringify(markets));
-            renderAdminMarkets();
-            alert("Mercado publicado con éxito.");
+            // Borramos la basura de Firebase después de 5 segundos 
+            // (tiempo suficiente para que todos los celulares hayan leído la señal)
+            setTimeout(() => {
+                db.collection("markets").doc(marketId).delete();
+            }, 5000);
         }
 
-        function resolveMarket(index, winningSide) {
-            if(!confirm(`¿Liquidar mercado como GANA ${winningSide}?`)) return;
-
-            const m = markets[index];
-            let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
-            let userBet = activeBets[m.id];
-
-            if (userBet) {
-                let userBalance = parseFloat(localStorage.getItem('q_bal_v13')) || 1000.00;
-                let userHistory = JSON.parse(localStorage.getItem('q_hist_v13')) || [];
-                
-                const won = (userBet.side === winningSide);
-                if (won) userBalance += (userBet.amount * 2); // Paga lo invertido x2
-
-                userHistory.unshift({ win: won, amt: won ? userBet.amount * 2 : userBet.amount, side: userBet.side, asset: m.asset });
-                if(userHistory.length > 5) userHistory.pop();
-
-                localStorage.setItem('q_bal_v13', userBalance);
-                localStorage.setItem('q_hist_v13', JSON.stringify(userHistory));
-                
-                delete activeBets[m.id];
-                localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
-            }
-
-            markets.splice(index, 1);
-            localStorage.setItem('q_markets_v13', JSON.stringify(markets));
-            renderAdminMarkets();
-        }
-
-        function deleteMarket(index) {
-            if(confirm("¿Seguro que quieres borrar este mercado?")) {
-                markets.splice(index, 1);
-                localStorage.setItem('q_markets_v13', JSON.stringify(markets));
-                renderAdminMarkets();
+        // 5. BORRAR MERCADO (Si te equivocaste al crearlo)
+        function deleteMarket(marketId) {
+            if(confirm("¿Cancelar y borrar mercado? (No reembolsa a los usuarios)")) {
+                db.collection("markets").doc(marketId).delete();
             }
         }
-
-        window.onload = renderAdminMarkets;
     </script>
 </body>
 </html>
