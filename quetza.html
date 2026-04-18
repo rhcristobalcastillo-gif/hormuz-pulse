@@ -112,17 +112,56 @@
                 let data = doc.data();
                 data.id = doc.id; 
                 
-                // Si el Admin envió la señal de resolución manual...
                 if (data.status === 'RESOLVED') {
                     processManualWin(data);
                 } else {
-                    allMarkets.push(data); // Si sigue activo, lo mostramos
+                    allMarkets.push(data);
                 }
             });
+            
+            // Llama al sistema que busca apuestas en el Limbo
+            cleanOrphanBets();
+            
             renderMarkets();
         });
 
-        // 3. PAGAR AL USUARIO CUANDO EL ADMIN DECIDE EL GANADOR
+        // 3. SISTEMA ANTI-LIMBO (Reembolsa si el mercado ya no existe)
+        function cleanOrphanBets() {
+            let betKeys = Object.keys(activeBets);
+            let updated = false;
+
+            betKeys.forEach(betId => {
+                // Buscamos si el ID de la apuesta sigue existiendo en Firebase
+                let marketExists = allMarkets.find(m => m.id === betId);
+                
+                if (!marketExists) {
+                    // Si no existe, es un mercado borrado o viejo. ¡REEMBOLSAR!
+                    let orphanedBet = activeBets[betId];
+                    balance += orphanedBet.amount; 
+                    
+                    history.unshift({ 
+                        win: null, 
+                        amt: orphanedBet.amount, 
+                        side: orphanedBet.side, 
+                        asset: orphanedBet.asset, 
+                        details: "Mercado Cancelado - Reembolso" 
+                    });
+                    
+                    if(history.length > 10) history.pop();
+                    delete activeBets[betId];
+                    updated = true;
+                }
+            });
+
+            if (updated) {
+                localStorage.setItem('q_bal_v13', balance); 
+                localStorage.setItem('q_hist_v13', JSON.stringify(history));
+                localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
+                updatePortfolio();
+            }
+        }
+
+        // 4. PAGAR AL USUARIO CUANDO EL ADMIN DECIDE EL GANADOR
         function processManualWin(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
@@ -178,9 +217,13 @@
 
         function updatePortfolio() {
             document.getElementById('user-credits').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
-            const totalTrades = history.length;
-            const wins = history.filter(h => h.win).length;
-            document.getElementById('stat-trades').innerText = totalTrades;
+            
+            // Calculamos WinRate ignorando los reembolsos (win: null)
+            const resolvedTrades = history.filter(h => h.win !== null);
+            const totalTrades = resolvedTrades.length;
+            const wins = resolvedTrades.filter(h => h.win === true).length;
+            
+            document.getElementById('stat-trades').innerText = history.length;
             document.getElementById('stat-winrate').innerText = totalTrades > 0 ? `${Math.round((wins / totalTrades) * 100)}%` : `0%`;
 
             const rechargeBtn = document.getElementById('recharge-container');
@@ -200,19 +243,26 @@
             }).join('');
 
             const histList = document.getElementById('history-list');
-            histList.innerHTML = history.length === 0 ? `<p class="text-[10px] text-slate-500 italic">No hay historial.</p>` : history.map(h => `
+            histList.innerHTML = history.length === 0 ? `<p class="text-[10px] text-slate-500 italic">No hay historial.</p>` : history.map(h => {
+                // Estilos dependiendo si ganó, perdió o fue reembolso
+                let statusText = h.win === true ? 'GANASTE' : (h.win === false ? 'PERDISTE' : 'REEMBOLSO');
+                let colorClass = h.win === true ? 'text-green-400' : (h.win === false ? 'text-red-500' : 'text-slate-400');
+                let sign = h.win === true || h.win === null ? '+' : '-';
+
+                return `
                 <div class="flex flex-col border-b border-[#425465] pb-3 mb-3 gap-2 hover:bg-[#2a3642] p-2 rounded-[5px] transition-colors">
                     <div class="flex justify-between items-center">
                         <div class="flex-1 min-w-0">
-                            <p class="text-[9px] font-bold ${h.win ? 'text-green-400' : 'text-red-500'} uppercase">${h.win ? 'GANASTE' : 'PERDISTE'} (${h.side})</p>
+                            <p class="text-[9px] font-bold ${colorClass} uppercase">${statusText} ${h.win !== null ? `(${h.side})` : ''}</p>
                             <p class="text-[10px] text-slate-300 truncate uppercase">${h.asset}</p>
                         </div>
                         <div class="text-right whitespace-nowrap">
-                            <p class="text-[11px] font-mono font-bold ${h.win ? 'text-green-400' : 'text-red-500'}">${h.win ? '+' : '-'}${h.amt} fUSDT</p>
+                            <p class="text-[11px] font-mono font-bold ${colorClass}">${sign}${h.amt} fUSDT</p>
                         </div>
                     </div>
                     ${h.details ? `<div class="mt-1 bg-[#121212] p-1.5 rounded-[5px] border border-white/5 text-center"><p class="text-[8px] text-slate-400 font-mono tracking-widest uppercase">${h.details}</p></div>` : ''}
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
 
         function renderMarkets() {
