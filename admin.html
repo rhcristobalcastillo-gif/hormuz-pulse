@@ -105,7 +105,52 @@
             });
             list.innerHTML = html || `<p class="text-slate-500 italic text-sm">Procesando liquidaciones...</p>`;
         });
+// 2. ESCUCHAR A LA NUBE EN TIEMPO REAL
+        db.collection("markets").onSnapshot((querySnapshot) => {
+            allMarkets = [];
+            querySnapshot.forEach((doc) => {
+                let data = doc.data();
+                data.id = doc.id;
+                
+                // Si el Admin envió la señal de resolución manual...
+                if (data.status === 'RESOLVED') {
+                    processManualWin(data);
+                } else {
+                    allMarkets.push(data); // Si sigue activo, lo mostramos
+                }
+            });
+            renderMarkets();
+        });
 
+        // FUNCIÓN NUEVA: Para pagarle al usuario cuando el Admin decide el ganador
+        function processManualWin(market) {
+            let ub = activeBets[market.id];
+            if (!ub) return; // Si el usuario no jugó en este mercado, ignorar.
+
+            let won = (ub.side === market.winningSide);
+            if (won) balance += (ub.amount * 2);
+            
+            history.unshift({ 
+                win: won, 
+                amt: won ? ub.amount * 2 : ub.amount, 
+                side: ub.side, 
+                asset: market.asset, 
+                details: `Juez Admin: GANA ${market.winningSide}` 
+            });
+            
+            if(history.length > 10) history.pop();
+            
+            localStorage.setItem('q_bal_v13', balance); 
+            localStorage.setItem('q_hist_v13', JSON.stringify(history));
+            delete activeBets[market.id]; 
+            localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
+            
+            const box = document.getElementById('balance-box');
+            box.classList.add(won ? 'bg-green-900/50' : 'bg-red-900/50');
+            setTimeout(() => box.classList.remove('bg-green-900/50', 'bg-red-900/50'), 1000);
+            
+            updatePortfolio();
+        }
         // 3. ENVIAR NUEVO MERCADO A FIREBASE
         function createMarket() {
             const cat = document.getElementById('m-cat').value;
