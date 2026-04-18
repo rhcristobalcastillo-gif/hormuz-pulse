@@ -84,7 +84,7 @@
     </div>
 
     <script>
-        // 1. INICIALIZAR FIREBASE TERMINAL
+// 1. INICIALIZAR FIREBASE TERMINAL
         const firebaseConfig = {
             apiKey: "AIzaSyAQcptmRYAKQdjGzkUiRjI2xmgB2dgnyIw",
             authDomain: "quetza-mx.firebaseapp.com",
@@ -105,9 +105,11 @@
         let history = [];
         let activeBets = {};
 
-        // 2. ESCUCHAR A LA NUBE EN TIEMPO REAL
+        // 2. ESCUCHAR A LA NUBE EN TIEMPO REAL (AHORA OPTIMIZADO)
         db.collection("markets").onSnapshot((querySnapshot) => {
-            allMarkets = [];
+            let newMarkets = [];
+            let needsRender = false;
+
             querySnapshot.forEach((doc) => {
                 let data = doc.data();
                 data.id = doc.id; 
@@ -115,15 +117,30 @@
                 if (data.status === 'RESOLVED') {
                     processManualWin(data);
                 } else {
-                    allMarkets.push(data);
+                    newMarkets.push(data);
+                    // Verificamos si es un mercado NUEVO que no estaba en pantalla
+                    if (!allMarkets.find(m => m.id === data.id)) {
+                        needsRender = true; 
+                    }
                 }
             });
             
+            // Verificamos si algún mercado fue borrado
+            if (newMarkets.length !== allMarkets.length) {
+                needsRender = true;
+            }
+
+            allMarkets = newMarkets; // Actualizamos la memoria
             cleanOrphanBets();
-            renderMarkets();
+            
+            // ¡EL SECRETO! Solo redibujamos la pantalla si hay mercados nuevos o borrados.
+            // Si el Admin solo actualizó el reloj, NO redibujamos la gráfica (Adiós brincos).
+            if (needsRender) {
+                renderMarkets();
+            }
         });
 
-        // 3. SISTEMA ANTI-LIMBO (Reembolsa si el mercado ya no existe)
+        // 3. SISTEMA ANTI-LIMBO
         function cleanOrphanBets() {
             let betKeys = Object.keys(activeBets);
             let updated = false;
@@ -157,7 +174,7 @@
             }
         }
 
-        // 4. PAGAR AL USUARIO CUANDO EL ADMIN DECIDE EL GANADOR
+        // 4. RESOLUCIÓN MANUAL
         function processManualWin(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
@@ -259,7 +276,7 @@
             }).join('');
         }
 
-function renderMarkets() {
+        function renderMarkets() {
             const container = document.getElementById('markets-container');
             let markets = allMarkets;
 
@@ -312,7 +329,6 @@ function renderMarkets() {
             updatePortfolio(); 
         }
 
-        // LIMPIEZA DE SÍMBOLO PARA BINANCE
         async function fetchRealPrice(symbol) {
             try {
                 let cleanSymbol = symbol.includes(':') ? symbol.split(':')[1] : symbol;
@@ -330,30 +346,29 @@ function renderMarkets() {
                         let tEl = document.getElementById(`timer-${m.id}`);
                         let pEl = document.getElementById(`price-tag-${m.id}`);
                         
-                        if (!m.startPrice && m.symbol && pEl && pEl.innerText.includes('Calculando')) {
-                            m.startPrice = "buscando"; 
-                            fetchRealPrice(m.symbol).then(price => {
-                                if (price) {
-                                    m.startPrice = price; 
-                                    if (pEl) pEl.innerText = `Entrada: $${price}`;
-                                } else {
-                                    m.startPrice = null; 
-                                    if (pEl) pEl.innerText = `API: Símbolo Inválido`; 
-                                }
-                            });
-                        }
-
-                        if (t <= 0) {
+                        if (t > 0) {
+                            if (tEl) tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
+                            
+                            // Si acaba de iniciar un ciclo nuevo, busca el precio sin redibujar la gráfica
+                            if (!m.startPrice && m.symbol && pEl && (pEl.innerText.includes('Calculando') || pEl.innerText.includes('Esperando'))) {
+                                m.startPrice = "buscando"; 
+                                fetchRealPrice(m.symbol).then(price => {
+                                    if (price) {
+                                        m.startPrice = price; 
+                                        if (pEl) pEl.innerText = `Entrada: $${price}`;
+                                    } else {
+                                        m.startPrice = null; 
+                                        if (pEl) pEl.innerText = `API: Símbolo Inválido`; 
+                                    }
+                                });
+                            }
+                        } else {
                             if (!m.liquidatedLocal) {
                                 m.liquidatedLocal = true; 
                                 await autoLiquidateLocal(m);
                             }
                             if (tEl) tEl.innerText = "00:00";
                             if (pEl) pEl.innerText = "Esperando nuevo ciclo...";
-                        } else {
-                            if (tEl) {
-                                tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
-                            }
                         }
                     }
                 }
