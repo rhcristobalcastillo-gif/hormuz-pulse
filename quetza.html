@@ -332,19 +332,40 @@
                     if (m.resolution === 'AUTO' && m.endTime) {
                         let t = Math.max(0, Math.floor((m.endTime - Date.now()) / 1000));
                         let tEl = document.getElementById(`timer-${m.id}`);
+                        let pEl = document.getElementById(`price-tag-${m.id}`);
                         
+                        // 1. SOLUCIÓN AL "CALCULANDO..."
+                        // Si no hay precio y dice calculando, lo vamos a buscar a Binance
+                        if (!m.startPrice && m.symbol && pEl && pEl.innerText.includes('Calculando')) {
+                            m.startPrice = "buscando"; // Bloqueo para no saturar la red
+                            fetchRealPrice(m.symbol).then(price => {
+                                if (price) {
+                                    m.startPrice = price; // Guardamos en memoria local
+                                    if (pEl) pEl.innerText = `Entrada: $${price}`;
+                                } else {
+                                    m.startPrice = null; // Si falló, lo intentará de nuevo
+                                }
+                            });
+                        }
+
+                        // 2. SOLUCIÓN AL RELOJ CONGELADO EN 00:00
                         if (t <= 0) {
-                            await autoLiquidateLocal(m);
-                            if(tEl) tEl.innerText = "00:00";
-                        } else if (tEl) {
-                            tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
+                            if (!m.liquidatedLocal) {
+                                m.liquidatedLocal = true; // Evita que te pague doble
+                                await autoLiquidateLocal(m);
+                            }
+                            if (tEl) tEl.innerText = "00:00";
+                            if (pEl) pEl.innerText = "Esperando nuevo ciclo...";
+                        } else {
+                            if (tEl) {
+                                tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
+                            }
                         }
                     }
                 }
             };
             tick(); setInterval(tick, 1000);
         }
-
         async function autoLiquidateLocal(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
