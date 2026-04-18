@@ -152,6 +152,22 @@
                 db.collection("markets").doc(marketId).delete();
             }
         }
+        // 6. MOTOR DE AUTO-RENOVACIÓN (Exclusivo del Admin)
+        // Revisa cada 2 segundos si algún mercado automático ya caducó para reiniciarlo
+        setInterval(() => {
+            db.collection("markets").get().then(snapshot => {
+                snapshot.forEach(doc => {
+                    let m = doc.data();
+                    // Si es automático, está activo, y el tiempo ya se agotó...
+                    if (m.resolution === 'AUTO' && m.status === 'ACTIVE' && m.endTime && Date.now() > m.endTime) {
+                        // Reiniciamos el reloj dándole 2 minutos nuevos a todos los jugadores
+                        db.collection("markets").doc(doc.id).update({
+                            endTime: Date.now() + 120000
+                        });
+                    }
+                });
+            });
+        }, 2000);
     </script>
 </body>
 </html>
