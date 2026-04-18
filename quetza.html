@@ -84,7 +84,7 @@
     </div>
 
     <script>
-        // 1. INICIALIZAR FIREBASE CON TU LLAVE
+        // 1. INICIALIZAR FIREBASE TERMINAL
         const firebaseConfig = {
             apiKey: "AIzaSyAQcptmRYAKQdjGzkUiRjI2xmgB2dgnyIw",
             authDomain: "quetza-mx.firebaseapp.com",
@@ -97,25 +97,62 @@
         const db = firebase.firestore();
 
         // Variables Globales
-        let allMarkets = []; // ¡Ahora se llenará desde Firebase!
+        let allMarkets = []; 
         let currentMarketFilter = 'ALL';
         
         // Variables Locales (Billetera del usuario)
-        let balance = localStorage.getItem('q_bal_v13') ? parseFloat(localStorage.getItem('q_bal_v13')) : 1000.00;
-        let history = JSON.parse(localStorage.getItem('q_hist_v13')) || [];
-        let activeBets = JSON.parse(localStorage.getItem('q_active_bets_v13')) || {};
+        let balance = 1000.00;
+        let history = [];
+        let activeBets = {};
 
         // 2. ESCUCHAR A LA NUBE EN TIEMPO REAL
         db.collection("markets").onSnapshot((querySnapshot) => {
             allMarkets = [];
             querySnapshot.forEach((doc) => {
                 let data = doc.data();
-                data.id = doc.id; // Usamos el ID real de Firebase
-                allMarkets.push(data);
+                data.id = doc.id; 
+                
+                // Si el Admin envió la señal de resolución manual...
+                if (data.status === 'RESOLVED') {
+                    processManualWin(data);
+                } else {
+                    allMarkets.push(data); // Si sigue activo, lo mostramos
+                }
             });
             renderMarkets();
         });
 
+        // 3. PAGAR AL USUARIO CUANDO EL ADMIN DECIDE EL GANADOR
+        function processManualWin(market) {
+            let ub = activeBets[market.id];
+            if (!ub) return; 
+
+            let won = (ub.side === market.winningSide);
+            if (won) balance += (ub.amount * 2);
+            
+            history.unshift({ 
+                win: won, 
+                amt: won ? ub.amount * 2 : ub.amount, 
+                side: ub.side, 
+                asset: market.asset, 
+                details: `Juez Admin: GANA ${market.winningSide}` 
+            });
+            
+            if(history.length > 10) history.pop();
+            
+            localStorage.setItem('q_bal_v13', balance); 
+            localStorage.setItem('q_hist_v13', JSON.stringify(history));
+            delete activeBets[market.id]; 
+            localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
+            
+            const box = document.getElementById('balance-box');
+            box.classList.add(won ? 'bg-green-900/50' : 'bg-red-900/50');
+            setTimeout(() => box.classList.remove('bg-green-900/50', 'bg-red-900/50'), 1000);
+            
+            updatePortfolio();
+        }
+
+        // FUNCIONES DE INTERFAZ Y LOCALES
         function setMarketFilter(filterType) {
             currentMarketFilter = filterType;
             const tabs = ['ALL', 'CRIPTO', 'DEPORTES', 'POLITICA'];
@@ -260,7 +297,7 @@
 
         async function autoLiquidateLocal(market) {
             let ub = activeBets[market.id];
-            if (!ub) return; // Si el usuario no apostó, ignoramos.
+            if (!ub) return; 
 
             let fP = market.symbol ? await fetchRealPrice(market.symbol) : null;
             let won = false;
@@ -288,6 +325,11 @@
         window.onload = () => { 
             let storedBal = localStorage.getItem('q_bal_v13');
             balance = storedBal !== null ? parseFloat(storedBal) : 1000;
+            let storedHist = localStorage.getItem('q_hist_v13');
+            history = storedHist ? JSON.parse(storedHist) : [];
+            let storedBets = localStorage.getItem('q_active_bets_v13');
+            activeBets = storedBets ? JSON.parse(storedBets) : {};
+            
             updatePortfolio(); 
             startGlobalClock(); 
         };
