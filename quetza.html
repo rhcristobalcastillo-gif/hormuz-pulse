@@ -318,11 +318,15 @@
             updatePortfolio(); 
         }
 
-        async function fetchRealPrice(symbol) {
+       async function fetchRealPrice(symbol) {
             try {
-                let s = symbol.replace('BINANCE:', '').replace('CRYPTO:', '');
-                const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${s}`);
-                const d = await r.json(); return d.price ? parseFloat(d.price) : null;
+                // Hacemos una limpieza radical del símbolo. 
+                // Si escribes "BINANCE:BTCUSDT", nos quedamos solo con "BTCUSDT"
+                let cleanSymbol = symbol.includes(':') ? symbol.split(':')[1] : symbol;
+                
+                const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${cleanSymbol}`);
+                const d = await r.json(); 
+                return d.price ? parseFloat(d.price) : null;
             } catch (e) { return null; }
         }
 
@@ -334,19 +338,38 @@
                         let tEl = document.getElementById(`timer-${m.id}`);
                         let pEl = document.getElementById(`price-tag-${m.id}`);
                         
-                        // 1. SOLUCIÓN AL "CALCULANDO..."
-                        // Si no hay precio y dice calculando, lo vamos a buscar a Binance
+                        // Si está calculando, buscamos el precio en Binance
                         if (!m.startPrice && m.symbol && pEl && pEl.innerText.includes('Calculando')) {
-                            m.startPrice = "buscando"; // Bloqueo para no saturar la red
+                            m.startPrice = "buscando"; // Evita que llame a Binance 100 veces por segundo
                             fetchRealPrice(m.symbol).then(price => {
                                 if (price) {
-                                    m.startPrice = price; // Guardamos en memoria local
+                                    m.startPrice = price; 
                                     if (pEl) pEl.innerText = `Entrada: $${price}`;
                                 } else {
-                                    m.startPrice = null; // Si falló, lo intentará de nuevo
+                                    m.startPrice = null; 
+                                    // Si Binance no lo reconoce, avisamos en pantalla
+                                    if (pEl) pEl.innerText = `API: Símbolo Inválido`; 
                                 }
                             });
                         }
+
+                        if (t <= 0) {
+                            if (!m.liquidatedLocal) {
+                                m.liquidatedLocal = true; 
+                                await autoLiquidateLocal(m);
+                            }
+                            if (tEl) tEl.innerText = "00:00";
+                            if (pEl) pEl.innerText = "Esperando nuevo ciclo...";
+                        } else {
+                            if (tEl) {
+                                tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
+                            }
+                        }
+                    }
+                }
+            };
+            tick(); setInterval(tick, 1000);
+        }
 
                         // 2. SOLUCIÓN AL RELOJ CONGELADO EN 00:00
                         if (t <= 0) {
