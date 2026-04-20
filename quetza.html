@@ -341,7 +341,16 @@
             }).join('');
         }
 
-      function makeBet(marketId, side, assetName) {
+     function makeBet(marketId, side, assetName) {
+            // ¡NUEVO! Candado de tiempo
+            let market = allMarkets.find(m => m.id === marketId);
+            if (market && market.resolution === 'AUTO' && market.endTime) {
+                let timeLeft = (market.endTime - Date.now()) / 1000;
+                if (timeLeft <= 15 && timeLeft > 0) {
+                    return alert("⏱️ MERCADO CERRADO: No se aceptan apuestas en los últimos 15 segundos.");
+                }
+            }
+
             if (balance < 100) return alert("Saldo insuficiente.");
             let bet = activeBets[marketId] || { side: side, amount: 0, asset: assetName };
             if(bet.amount > 0 && bet.side !== side) return alert("Ya tienes una posición en el lado contrario.");
@@ -354,18 +363,25 @@
             localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
             updatePortfolio(); 
 
-            // 1. Preparar incrementos
+            // Actualizar la nube
             const incPool = firebase.firestore.FieldValue.increment(100);
             const incCount = firebase.firestore.FieldValue.increment(1);
-            const today = new Date().toISOString().split('T')[0]; // Genera "YYYY-MM-DD"
+            const today = new Date().toISOString().split('T')[0];
 
-            // 2. Actualizar el Mercado específico (Lo que ya hacíamos)
             const marketRef = db.collection("markets").doc(marketId);
             if (side === 'SÍ') {
                 marketRef.update({ poolYes: incPool, betsYes: incCount });
             } else {
                 marketRef.update({ poolNo: incPool, betsNo: incCount });
             }
+
+            // Actualizar la Caja Global
+            db.collection("stats").doc(today).set({
+                totalVol: incPool,
+                totalBets: incCount,
+                lastUpdate: Date.now()
+            }, { merge: true });
+        }
 
             // 3. ¡NUEVO! Actualizar la Estadística Global del Día
             db.collection("stats").doc(today).set({
@@ -383,7 +399,7 @@
             } catch (e) { return null; }
         }
 
-        function startGlobalClock() {
+function startGlobalClock() {
             const tick = async () => {
                 for (let m of allMarkets) {
                     if (m.resolution === 'AUTO' && m.endTime) {
@@ -392,7 +408,19 @@
                         let pEl = document.getElementById(`price-tag-${m.id}`);
                         
                         if (t > 0) {
-                            if (tEl) tEl.innerText = `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
+                            if (tEl) {
+                                let mins = Math.floor(t/60).toString().padStart(2,'0');
+                                let secs = (t%60).toString().padStart(2,'0');
+                                
+                                // ¡NUEVO! Efecto visual de cierre en los últimos 15 segundos
+                                if (t <= 15) {
+                                    tEl.className = "text-white font-bold font-mono tracking-widest text-sm bg-red-600 px-3 py-1 rounded-[5px] border border-red-500 animate-pulse";
+                                    tEl.innerText = `🔒 ${mins}:${secs}`;
+                                } else {
+                                    tEl.className = "text-yellow-500 font-bold font-mono tracking-widest text-sm bg-yellow-500/10 px-3 py-1 rounded-[5px] border border-yellow-500/30";
+                                    tEl.innerText = `${mins}:${secs}`;
+                                }
+                            }
                             
                             // Si acaba de iniciar un ciclo nuevo, busca el precio sin redibujar la gráfica
                             if (!m.startPrice && m.symbol && pEl && (pEl.innerText.includes('Calculando') || pEl.innerText.includes('Esperando'))) {
@@ -412,7 +440,10 @@
                                 m.liquidatedLocal = true; 
                                 await autoLiquidateLocal(m);
                             }
-                            if (tEl) tEl.innerText = "00:00";
+                            if (tEl) {
+                                tEl.className = "text-slate-500 font-bold font-mono tracking-widest text-sm bg-slate-800 px-3 py-1 rounded-[5px] border border-slate-700";
+                                tEl.innerText = "00:00";
+                            }
                             if (pEl) pEl.innerText = "Esperando nuevo ciclo...";
                         }
                     }
