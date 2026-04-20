@@ -84,7 +84,7 @@
     </div>
 
     <script>
-// 1. INICIALIZAR FIREBASE TERMINAL
+        // 1. INICIALIZAR FIREBASE TERMINAL
         const firebaseConfig = {
             apiKey: "AIzaSyAQcptmRYAKQdjGzkUiRjI2xmgB2dgnyIw",
             authDomain: "quetza-mx.firebaseapp.com",
@@ -100,12 +100,12 @@
         let allMarkets = []; 
         let currentMarketFilter = 'ALL';
         
-        // Variables Locales (Billetera del usuario)
+        // Variables Locales
         let balance = 1000.00;
         let history = [];
         let activeBets = {};
 
-        // 2. ESCUCHAR A LA NUBE EN TIEMPO REAL (AHORA OPTIMIZADO)
+        // 2. ESCUCHAR A LA NUBE EN TIEMPO REAL
         db.collection("markets").onSnapshot((querySnapshot) => {
             let newMarkets = [];
             let needsRender = false;
@@ -118,26 +118,15 @@
                     processManualWin(data);
                 } else {
                     newMarkets.push(data);
-                    // Verificamos si es un mercado NUEVO que no estaba en pantalla
-                    if (!allMarkets.find(m => m.id === data.id)) {
-                        needsRender = true; 
-                    }
+                    if (!allMarkets.find(m => m.id === data.id)) needsRender = true; 
                 }
             });
             
-            // Verificamos si algún mercado fue borrado
-            if (newMarkets.length !== allMarkets.length) {
-                needsRender = true;
-            }
+            if (newMarkets.length !== allMarkets.length) needsRender = true;
 
-            allMarkets = newMarkets; // Actualizamos la memoria
+            allMarkets = newMarkets; 
             cleanOrphanBets();
-            
-            // ¡EL SECRETO! Solo redibujamos la pantalla si hay mercados nuevos o borrados.
-            // Si el Admin solo actualizó el reloj, NO redibujamos la gráfica (Adiós brincos).
-            if (needsRender) {
-                renderMarkets();
-            }
+            if (needsRender) renderMarkets();
         });
 
         // 3. SISTEMA ANTI-LIMBO
@@ -147,19 +136,10 @@
 
             betKeys.forEach(betId => {
                 let marketExists = allMarkets.find(m => m.id === betId);
-                
                 if (!marketExists) {
                     let orphanedBet = activeBets[betId];
                     balance += orphanedBet.amount; 
-                    
-                    history.unshift({ 
-                        win: null, 
-                        amt: orphanedBet.amount, 
-                        side: orphanedBet.side, 
-                        asset: orphanedBet.asset, 
-                        details: "Mercado Cancelado - Reembolso" 
-                    });
-                    
+                    history.unshift({ win: null, amt: orphanedBet.amount, side: orphanedBet.side, asset: orphanedBet.asset, details: "Mercado Cancelado - Reembolso" });
                     if(history.length > 10) history.pop();
                     delete activeBets[betId];
                     updated = true;
@@ -187,32 +167,21 @@
                 let poolN = market.poolNo || 0;
                 let totalPool = poolS + poolN;
 
-                // Solo cobramos comisión y multiplicamos si hubo apuestas en ambos lados
                 if (poolS > 0 && poolN > 0) {
                     let commission = totalPool * 0.05;
                     let distributablePool = totalPool - commission;
                     let winningPool = (ub.side === 'SÍ') ? poolS : poolN;
-                    
                     let multiplier = distributablePool / winningPool;
                     finalPayout = ub.amount * multiplier;
                 } else {
-                    // Si todos apostaron al SÍ y nadie al NO (o viceversa), 
-                    // simplemente se les devuelve su dinero original por ser justos
                     finalPayout = ub.amount; 
                 }
                 
-                finalPayout = Math.round(finalPayout * 100) / 100; // Redondear a 2 decimales
+                finalPayout = Math.round(finalPayout * 100) / 100; 
                 balance += finalPayout;
             }
             
-            history.unshift({ 
-                win: won, 
-                amt: won ? finalPayout : ub.amount, 
-                side: ub.side, 
-                asset: market.asset, 
-                details: `Juez Admin: GANA ${market.winningSide}` 
-            });
-            
+            history.unshift({ win: won, amt: won ? finalPayout : ub.amount, side: ub.side, asset: market.asset, details: `Juez Admin: GANA ${market.winningSide}` });
             if(history.length > 10) history.pop();
             
             localStorage.setItem('q_bal_v13', balance); 
@@ -223,9 +192,9 @@
             const box = document.getElementById('balance-box');
             box.classList.add(won ? 'bg-green-900/50' : 'bg-red-900/50');
             setTimeout(() => box.classList.remove('bg-green-900/50', 'bg-red-900/50'), 1000);
-            
             updatePortfolio();
         }
+
         // FUNCIONES DE INTERFAZ Y LOCALES
         function setMarketFilter(filterType) {
             currentMarketFilter = filterType;
@@ -341,14 +310,11 @@
             }).join('');
         }
 
-     function makeBet(marketId, side, assetName) {
-            // ¡NUEVO! Candado de tiempo
+        function makeBet(marketId, side, assetName) {
             let market = allMarkets.find(m => m.id === marketId);
             if (market && market.resolution === 'AUTO' && market.endTime) {
                 let timeLeft = (market.endTime - Date.now()) / 1000;
-                if (timeLeft <= 15 && timeLeft > 0) {
-                    return alert("⏱️ MERCADO CERRADO: No se aceptan apuestas en los últimos 15 segundos.");
-                }
+                if (timeLeft <= 15 && timeLeft > 0) return alert("⏱️ MERCADO CERRADO: No se aceptan apuestas en los últimos 15 segundos.");
             }
 
             if (balance < 100) return alert("Saldo insuficiente.");
@@ -363,33 +329,17 @@
             localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
             updatePortfolio(); 
 
-            // Actualizar la nube
             const incPool = firebase.firestore.FieldValue.increment(100);
             const incCount = firebase.firestore.FieldValue.increment(1);
             const today = new Date().toISOString().split('T')[0];
 
             const marketRef = db.collection("markets").doc(marketId);
-            if (side === 'SÍ') {
-                marketRef.update({ poolYes: incPool, betsYes: incCount });
-            } else {
-                marketRef.update({ poolNo: incPool, betsNo: incCount });
-            }
+            if (side === 'SÍ') marketRef.update({ poolYes: incPool, betsYes: incCount });
+            else marketRef.update({ poolNo: incPool, betsNo: incCount });
 
-            // Actualizar la Caja Global
-            db.collection("stats").doc(today).set({
-                totalVol: incPool,
-                totalBets: incCount,
-                lastUpdate: Date.now()
-            }, { merge: true });
+            db.collection("stats").doc(today).set({ totalVol: incPool, totalBets: incCount, lastUpdate: Date.now() }, { merge: true });
         }
 
-            // 3. ¡NUEVO! Actualizar la Estadística Global del Día
-            db.collection("stats").doc(today).set({
-                totalVol: incPool,
-                totalBets: incCount,
-                lastUpdate: Date.now()
-            }, { merge: true });
-        }
         async function fetchRealPrice(symbol) {
             try {
                 let cleanSymbol = symbol.includes(':') ? symbol.split(':')[1] : symbol;
@@ -399,7 +349,7 @@
             } catch (e) { return null; }
         }
 
-function startGlobalClock() {
+        function startGlobalClock() {
             const tick = async () => {
                 for (let m of allMarkets) {
                     if (m.resolution === 'AUTO' && m.endTime) {
@@ -412,7 +362,6 @@ function startGlobalClock() {
                                 let mins = Math.floor(t/60).toString().padStart(2,'0');
                                 let secs = (t%60).toString().padStart(2,'0');
                                 
-                                // ¡NUEVO! Efecto visual de cierre en los últimos 15 segundos
                                 if (t <= 15) {
                                     tEl.className = "text-white font-bold font-mono tracking-widest text-sm bg-red-600 px-3 py-1 rounded-[5px] border border-red-500 animate-pulse";
                                     tEl.innerText = `🔒 ${mins}:${secs}`;
@@ -422,7 +371,6 @@ function startGlobalClock() {
                                 }
                             }
                             
-                            // Si acaba de iniciar un ciclo nuevo, busca el precio sin redibujar la gráfica
                             if (!m.startPrice && m.symbol && pEl && (pEl.innerText.includes('Calculando') || pEl.innerText.includes('Esperando'))) {
                                 m.startPrice = "buscando"; 
                                 fetchRealPrice(m.symbol).then(price => {
@@ -451,7 +399,8 @@ function startGlobalClock() {
             };
             tick(); setInterval(tick, 1000);
         }
-// PAGO AUTOMÁTICO CALCULANDO EL POZO REAL
+
+        // PAGO AUTOMÁTICO CALCULANDO EL POZO REAL
         async function autoLiquidateLocal(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
@@ -463,9 +412,7 @@ function startGlobalClock() {
             if (market.startPrice && fP) {
                 won = (ub.side === 'SÍ') ? (fP > market.startPrice) : (fP < market.startPrice);
                 resolutionDetails = `ENTRADA: $${market.startPrice} | SALIDA: $${fP}`;
-            } else {
-                won = Math.random() > 0.5; // Respaldo si falla la API
-            }
+            } else { won = Math.random() > 0.5; }
 
             let finalPayout = 0;
             if (won) {
@@ -477,25 +424,15 @@ function startGlobalClock() {
                     let commission = totalPool * 0.05;
                     let distributablePool = totalPool - commission;
                     let winningPool = (ub.side === 'SÍ') ? poolS : poolN;
-                    
                     let multiplier = distributablePool / winningPool;
                     finalPayout = ub.amount * multiplier;
-                } else {
-                    finalPayout = ub.amount; 
-                }
+                } else { finalPayout = ub.amount; }
                 
                 finalPayout = Math.round(finalPayout * 100) / 100;
                 balance += finalPayout;
             }
 
-            history.unshift({ 
-                win: won, 
-                amt: won ? finalPayout : ub.amount, 
-                side: ub.side, 
-                asset: market.asset, 
-                details: resolutionDetails 
-            });
-            
+            history.unshift({ win: won, amt: won ? finalPayout : ub.amount, side: ub.side, asset: market.asset, details: resolutionDetails });
             if(history.length > 10) history.pop();
             
             localStorage.setItem('q_bal_v13', balance); 
