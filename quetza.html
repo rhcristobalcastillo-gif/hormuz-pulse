@@ -174,17 +174,40 @@
             }
         }
 
-        // 4. RESOLUCIÓN MANUAL
+        // 4. PAGAR AL USUARIO (MANUAL) CALCULANDO EL POZO REAL
         function processManualWin(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
 
             let won = (ub.side === market.winningSide);
-            if (won) balance += (ub.amount * 2);
+            let finalPayout = 0;
+
+            if (won) {
+                let poolS = market.poolYes || 0;
+                let poolN = market.poolNo || 0;
+                let totalPool = poolS + poolN;
+
+                // Solo cobramos comisión y multiplicamos si hubo apuestas en ambos lados
+                if (poolS > 0 && poolN > 0) {
+                    let commission = totalPool * 0.05;
+                    let distributablePool = totalPool - commission;
+                    let winningPool = (ub.side === 'SÍ') ? poolS : poolN;
+                    
+                    let multiplier = distributablePool / winningPool;
+                    finalPayout = ub.amount * multiplier;
+                } else {
+                    // Si todos apostaron al SÍ y nadie al NO (o viceversa), 
+                    // simplemente se les devuelve su dinero original por ser justos
+                    finalPayout = ub.amount; 
+                }
+                
+                finalPayout = Math.round(finalPayout * 100) / 100; // Redondear a 2 decimales
+                balance += finalPayout;
+            }
             
             history.unshift({ 
                 win: won, 
-                amt: won ? ub.amount * 2 : ub.amount, 
+                amt: won ? finalPayout : ub.amount, 
                 side: ub.side, 
                 asset: market.asset, 
                 details: `Juez Admin: GANA ${market.winningSide}` 
@@ -203,7 +226,6 @@
             
             updatePortfolio();
         }
-
         // FUNCIONES DE INTERFAZ Y LOCALES
         function setMarketFilter(filterType) {
             currentMarketFilter = filterType;
@@ -398,7 +420,7 @@
             };
             tick(); setInterval(tick, 1000);
         }
-
+// PAGO AUTOMÁTICO CALCULANDO EL POZO REAL
         async function autoLiquidateLocal(market) {
             let ub = activeBets[market.id];
             if (!ub) return; 
@@ -411,12 +433,38 @@
                 won = (ub.side === 'SÍ') ? (fP > market.startPrice) : (fP < market.startPrice);
                 resolutionDetails = `ENTRADA: $${market.startPrice} | SALIDA: $${fP}`;
             } else {
-                won = Math.random() > 0.5;
+                won = Math.random() > 0.5; // Respaldo si falla la API
             }
 
-            if (won) balance += (ub.amount * 2);
+            let finalPayout = 0;
+            if (won) {
+                let poolS = market.poolYes || 0;
+                let poolN = market.poolNo || 0;
+                let totalPool = poolS + poolN;
+
+                if (poolS > 0 && poolN > 0) {
+                    let commission = totalPool * 0.05;
+                    let distributablePool = totalPool - commission;
+                    let winningPool = (ub.side === 'SÍ') ? poolS : poolN;
+                    
+                    let multiplier = distributablePool / winningPool;
+                    finalPayout = ub.amount * multiplier;
+                } else {
+                    finalPayout = ub.amount; 
+                }
+                
+                finalPayout = Math.round(finalPayout * 100) / 100;
+                balance += finalPayout;
+            }
+
+            history.unshift({ 
+                win: won, 
+                amt: won ? finalPayout : ub.amount, 
+                side: ub.side, 
+                asset: market.asset, 
+                details: resolutionDetails 
+            });
             
-            history.unshift({ win: won, amt: won ? ub.amount * 2 : ub.amount, side: ub.side, asset: market.asset, details: resolutionDetails });
             if(history.length > 10) history.pop();
             
             localStorage.setItem('q_bal_v13', balance); 
