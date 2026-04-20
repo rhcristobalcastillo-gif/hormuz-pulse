@@ -267,13 +267,15 @@
             }).join('');
         }
 
-        function renderMarkets() {
+       function renderMarkets() {
             const container = document.getElementById('markets-container');
             let markets = allMarkets;
 
             if(currentMarketFilter !== 'ALL') {
                 markets = allMarkets.filter(m => {
-                    let c = (m.cat || '').toUpperCase();
+                    // ¡NUEVO! Este código le quita los acentos a las palabras antes de filtrarlas
+                    let c = (m.cat || '').toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    
                     if(currentMarketFilter === 'CRIPTO' && (c.includes('CRIPTO') || c.includes('FINANZA') || c.includes('WEB3') || c.includes('ORO') || c.includes('METAL'))) return true;
                     if(currentMarketFilter === 'DEPORTES' && (c.includes('DEPORT') || c.includes('FUTBOL') || c.includes('LIGA') || c.includes('BOX') || c.includes('UFC'))) return true;
                     if(currentMarketFilter === 'POLITICA' && (c.includes('POLITIC') || c.includes('ELECCION') || c.includes('PRESIDENT'))) return true;
