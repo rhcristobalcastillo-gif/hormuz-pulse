@@ -319,7 +319,7 @@
             }).join('');
         }
 
-       function makeBet(marketId, side, assetName) {
+      function makeBet(marketId, side, assetName) {
             if (balance < 100) return alert("Saldo insuficiente.");
             let bet = activeBets[marketId] || { side: side, amount: 0, asset: assetName };
             if(bet.amount > 0 && bet.side !== side) return alert("Ya tienes una posición en el lado contrario.");
@@ -332,23 +332,26 @@
             localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
             updatePortfolio(); 
 
-            // ¡ESTO ES LO QUE FALTABA! Enviar la apuesta a la nube
-            const incrementAmount = firebase.firestore.FieldValue.increment(100);
-            const incrementCount = firebase.firestore.FieldValue.increment(1);
+            // 1. Preparar incrementos
+            const incPool = firebase.firestore.FieldValue.increment(100);
+            const incCount = firebase.firestore.FieldValue.increment(1);
+            const today = new Date().toISOString().split('T')[0]; // Genera "YYYY-MM-DD"
 
+            // 2. Actualizar el Mercado específico (Lo que ya hacíamos)
+            const marketRef = db.collection("markets").doc(marketId);
             if (side === 'SÍ') {
-                db.collection("markets").doc(marketId).update({
-                    poolYes: incrementAmount,
-                    betsYes: incrementCount
-                });
+                marketRef.update({ poolYes: incPool, betsYes: incCount });
             } else {
-                db.collection("markets").doc(marketId).update({
-                    poolNo: incrementAmount,
-                    betsNo: incrementCount
-                });
+                marketRef.update({ poolNo: incPool, betsNo: incCount });
             }
-        }
 
+            // 3. ¡NUEVO! Actualizar la Estadística Global del Día
+            db.collection("stats").doc(today).set({
+                totalVol: incPool,
+                totalBets: incCount,
+                lastUpdate: Date.now()
+            }, { merge: true });
+        }
         async function fetchRealPrice(symbol) {
             try {
                 let cleanSymbol = symbol.includes(':') ? symbol.split(':')[1] : symbol;
