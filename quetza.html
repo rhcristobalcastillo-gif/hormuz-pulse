@@ -319,14 +319,34 @@
             }).join('');
         }
 
-        function makeBet(marketId, side, assetName) {
+       function makeBet(marketId, side, assetName) {
             if (balance < 100) return alert("Saldo insuficiente.");
             let bet = activeBets[marketId] || { side: side, amount: 0, asset: assetName };
-            if(bet.amount > 0 && bet.side !== side) return alert("Ya tienes una posición contraria.");
-            balance -= 100; bet.amount += 100; activeBets[marketId] = bet;
+            if(bet.amount > 0 && bet.side !== side) return alert("Ya tienes una posición en el lado contrario.");
+            
+            balance -= 100; 
+            bet.amount += 100; 
+            activeBets[marketId] = bet;
+            
             localStorage.setItem('q_bal_v13', balance);
             localStorage.setItem('q_active_bets_v13', JSON.stringify(activeBets));
             updatePortfolio(); 
+
+            // ¡ESTO ES LO QUE FALTABA! Enviar la apuesta a la nube
+            const incrementAmount = firebase.firestore.FieldValue.increment(100);
+            const incrementCount = firebase.firestore.FieldValue.increment(1);
+
+            if (side === 'SÍ') {
+                db.collection("markets").doc(marketId).update({
+                    poolYes: incrementAmount,
+                    betsYes: incrementCount
+                });
+            } else {
+                db.collection("markets").doc(marketId).update({
+                    poolNo: incrementAmount,
+                    betsNo: incrementCount
+                });
+            }
         }
 
         async function fetchRealPrice(symbol) {
