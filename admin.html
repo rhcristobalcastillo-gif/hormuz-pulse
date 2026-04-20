@@ -25,14 +25,18 @@
             <p class="text-[10px] text-yellow-500 uppercase tracking-[0.2em] font-bold">Caja Global del Día</p>
             <h2 id="daily-date" class="text-xs text-slate-500 font-mono">---</h2>
         </div>
-        <div class="flex gap-8">
+        <div class="flex gap-6 md:gap-8">
             <div class="text-right">
                 <p class="text-[9px] text-slate-500 uppercase">Volumen Total</p>
                 <p id="daily-vol" class="text-xl font-black text-white font-mono">$0</p>
             </div>
-            <div class="text-right border-l border-slate-800 pl-8">
-                <p class="text-[9px] text-green-500 uppercase font-bold">Comisión Casa (5%)</p>
+            <div class="text-right border-l border-slate-800 pl-6 md:pl-8">
+                <p class="text-[9px] text-green-500 uppercase font-bold">Comisión (5%)</p>
                 <p id="daily-com" class="text-xl font-black text-green-400 font-mono">$0</p>
+            </div>
+            <div class="text-right border-l border-slate-800 pl-6 md:pl-8">
+                <p class="text-[9px] text-purple-500 uppercase font-bold">Pozos Huérfanos</p>
+                <p id="daily-orphan" class="text-xl font-black text-purple-400 font-mono">$0</p>
             </div>
         </div>
     </div>
@@ -97,10 +101,12 @@
             if (doc.exists) {
                 const data = doc.data();
                 const vol = data.totalVol || 0;
-                const com = vol * 0.05; // 5% de comisión
+                const com = vol * 0.05; 
+                const orphan = data.orphanPools || 0; 
 
                 document.getElementById('daily-vol').innerText = `$${vol.toLocaleString()}`;
                 document.getElementById('daily-com').innerText = `$${com.toLocaleString()}`;
+                document.getElementById('daily-orphan').innerText = `$${orphan.toLocaleString()}`;
             }
         });
 
@@ -118,13 +124,13 @@
                 const m = doc.data();
                 if (m.status === 'RESOLVED') return; 
 
-                // ¡NUEVO! Cálculos del Pozo y Comisión
+                // Cálculos del Pozo y Comisión
                 let poolS = m.poolYes || 0;
                 let poolN = m.poolNo || 0;
                 let betsS = m.betsYes || 0;
                 let betsN = m.betsNo || 0;
                 let totalPool = poolS + poolN;
-                let commission = totalPool * 0.05; // 5% de comisión para la casa
+                let commission = totalPool * 0.05; 
 
                 html += `
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
@@ -176,7 +182,6 @@
                 resolution: isAuto ? 'AUTO' : 'MANUAL',
                 endTime: endTime,
                 status: 'ACTIVE',
-                // ¡NUEVO! Inicializamos los pozos en cero
                 poolYes: 0,
                 poolNo: 0,
                 betsYes: 0,
@@ -188,35 +193,51 @@
             });
         }
 
-        // 4. RESOLVER MERCADO MANUALMENTE
+        // 4. RESOLVER MERCADO MANUALMENTE Y ATRAPAR HUÉRFANOS
         function resolveMarket(marketId, winningSide) {
             if(!confirm(`¿Lanzar señal a todos los jugadores de que GANA ${winningSide}?`)) return;
 
-            db.collection("markets").doc(marketId).update({
-                status: 'RESOLVED',
-                winningSide: winningSide
-            });
+            db.collection("markets").doc(marketId).get().then(doc => {
+                if(doc.exists) {
+                    let m = doc.data();
+                    let orphanAmount = 0;
+                    
+                    if (winningSide === 'SÍ' && (m.betsYes || 0) === 0 && (m.poolNo || 0) > 0) orphanAmount = m.poolNo;
+                    if (winningSide === 'NO' && (m.betsNo || 0) === 0 && (m.poolYes || 0) > 0) orphanAmount = m.poolYes;
 
-            setTimeout(() => {
-                db.collection("markets").doc(marketId).delete();
-            }, 5000);
+                    if (orphanAmount > 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        db.collection("stats").doc(today).set({
+                            orphanPools: firebase.firestore.FieldValue.increment(orphanAmount)
+                        }, { merge: true });
+                    }
+                }
+            }).then(() => {
+                db.collection("markets").doc(marketId).update({
+                    status: 'RESOLVED',
+                    winningSide: winningSide
+                });
+
+                setTimeout(() => {
+                    db.collection("markets").doc(marketId).delete();
+                }, 5000);
+            });
         }
 
-        // 5. BORRAR MERCADO (Si te equivocaste al crearlo)
+        // 5. BORRAR MERCADO
         function deleteMarket(marketId) {
             if(confirm("¿Cancelar y borrar mercado? (No reembolsa a los usuarios)")) {
                 db.collection("markets").doc(marketId).delete();
             }
         }
-       // 6. MOTOR DE AUTO-RENOVACIÓN (Exclusivo del Admin)
-        // Revisa cada 2 segundos si algún mercado automático ya caducó para reiniciarlo
+        
+        // 6. MOTOR DE AUTO-RENOVACIÓN
         setInterval(() => {
             db.collection("markets").get().then(snapshot => {
                 snapshot.forEach(doc => {
                     let m = doc.data();
-                    // Si es automático, está activo, y el tiempo ya se agotó...
                     if (m.resolution === 'AUTO' && m.status === 'ACTIVE' && m.endTime && Date.now() > m.endTime) {
-                        // Reiniciamos el reloj dándole 2 minutos nuevos Y VACIAMOS EL POZO
+                        // Reiniciamos el reloj y vaciamos el pozo
                         db.collection("markets").doc(doc.id).update({
                             endTime: Date.now() + 120000,
                             poolYes: 0,
@@ -228,6 +249,7 @@
                 });
             });
         }, 2000);
+        
     </script>
 </body>
 </html>
