@@ -86,14 +86,33 @@
                 const m = doc.data();
                 if (m.status === 'RESOLVED') return; 
 
+                // ¡NUEVO! Cálculos del Pozo y Comisión
+                let poolS = m.poolYes || 0;
+                let poolN = m.poolNo || 0;
+                let betsS = m.betsYes || 0;
+                let betsN = m.betsNo || 0;
+                let totalPool = poolS + poolN;
+                let commission = totalPool * 0.05; // 5% de comisión para la casa
+
                 html += `
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
-                    <div class="flex-1">
+                    <div class="flex-1 w-full">
                         <span class="text-[9px] bg-slate-800 px-2 py-1 rounded ${m.resolution === 'AUTO' ? 'text-blue-400' : 'text-yellow-500'} uppercase tracking-widest">
                             ${m.cat} [${m.resolution}]
                         </span>
                         <p class="font-bold text-white mt-2 leading-tight">${m.question}</p>
-                        <p class="text-[10px] text-slate-500 mt-1">ID: ${doc.id}</p>
+                        
+                        <div class="mt-3 bg-slate-950 p-2 rounded border border-slate-800 text-[10px] text-slate-400 w-full">
+                            <div class="flex justify-between mb-1 border-b border-slate-800 pb-1">
+                                <span class="text-green-400">📈 SÍ: ${betsS} apuestas ($${poolS})</span>
+                                <span class="text-red-400">📉 NO: ${betsN} apuestas ($${poolN})</span>
+                            </div>
+                            <div class="flex justify-between font-mono pt-1">
+                                <span class="text-white">💰 Pozo Total: <span class="font-bold text-yellow-500">$${totalPool}</span></span>
+                                <span class="text-slate-500">🏦 Comisión (5%): <span class="text-white">$${commission}</span></span>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="flex space-x-2 w-full md:w-auto">
                         <button onclick="resolveMarket('${doc.id}', 'SÍ')" class="flex-1 bg-green-800 hover:bg-green-700 text-white text-[10px] px-4 py-3 rounded-lg font-bold uppercase tracking-widest">Gana SÍ (SUBE)</button>
@@ -105,7 +124,7 @@
             list.innerHTML = html || `<p class="text-slate-500 italic text-sm">Procesando liquidaciones...</p>`;
         });
 
-        // 3. ENVIAR NUEVO MERCADO A FIREBASE
+       // 3. ENVIAR NUEVO MERCADO A FIREBASE
         function createMarket() {
             const cat = document.getElementById('m-cat').value;
             const asset = document.getElementById('m-asset').value;
@@ -124,7 +143,12 @@
                 symbol: symbol,
                 resolution: isAuto ? 'AUTO' : 'MANUAL',
                 endTime: endTime,
-                status: 'ACTIVE'
+                status: 'ACTIVE',
+                // ¡NUEVO! Inicializamos los pozos en cero
+                poolYes: 0,
+                poolNo: 0,
+                betsYes: 0,
+                betsNo: 0
             }).then(() => {
                 document.getElementById('m-asset').value = '';
                 document.getElementById('m-question').value = '';
