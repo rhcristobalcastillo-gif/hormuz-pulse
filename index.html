@@ -111,68 +111,67 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg transition-colors duration-500" id="card-me">
                     <div class="absolute inset-0 tactical-grid opacity-20 z-0 pointer-events-none"></div>
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-sm font-black text-white uppercase tracking-wider">Frente Medio Oriente</h3>
-                            <span class="bg-red-900/50 text-red-400 border border-red-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest">Alta Tensión</span>
+                            <span id="status-me" class="bg-slate-900/50 text-slate-400 border border-slate-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest">Calculando...</span>
                         </div>
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
                                     <span>Estrecho de Ormuz</span>
-                                    <span class="text-orange-400 font-bold">Riesgo 65%</span>
+                                    <span id="text-ormuz" class="text-white font-bold">--%</span>
                                 </div>
                                 <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
-                                    <div class="h-full bg-gradient-to-r from-orange-500 to-red-600 animate-pulse w-[65%]"></div>
+                                    <div id="bar-ormuz" class="h-full bg-blue-500 w-[0%] transition-all duration-1000"></div>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
-                                    <span>Intercambio Balístico</span>
-                                    <span class="text-red-500 font-bold">Crítico 85%</span>
+                                    <span id="label-me-2">Intercambio Balístico</span>
+                                    <span id="text-me-2" class="text-white font-bold">--%</span>
                                 </div>
                                 <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
-                                    <div class="h-full bg-red-600 animate-pulse w-[85%] shadow-[0_0_8px_rgba(220,38,38,0.8)]"></div>
+                                    <div id="bar-me-2" class="h-full bg-blue-500 w-[0%] transition-all duration-1000"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg">
+                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg transition-colors duration-500" id="card-eu">
                     <div class="absolute inset-0 tactical-grid opacity-20 z-0 pointer-events-none"></div>
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-sm font-black text-white uppercase tracking-wider">Europa Oriental</h3>
-                            <span class="bg-orange-900/50 text-orange-400 border border-orange-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest">Activo</span>
+                            <span id="status-eu" class="bg-slate-900/50 text-slate-400 border border-slate-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest">Calculando...</span>
                         </div>
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
                                     <span>Infraestructura Energética</span>
-                                    <span class="text-red-400 font-bold">Daño 78%</span>
+                                    <span id="text-infra" class="text-white font-bold">--%</span>
                                 </div>
                                 <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
-                                    <div class="h-full bg-gradient-to-r from-yellow-500 to-red-500 w-[78%]"></div>
+                                    <div id="bar-infra" class="h-full bg-blue-500 w-[0%] transition-all duration-1000"></div>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-400 mb-1">
                                     <span>Riesgo Nuclear Táctico</span>
-                                    <span class="text-yellow-500 font-bold">Bajo 30%</span>
+                                    <span id="text-nuke" class="text-white font-bold">--%</span>
                                 </div>
                                 <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
-                                    <div class="h-full bg-yellow-500 w-[30%]"></div>
+                                    <div id="bar-nuke" class="h-full bg-blue-500 w-[0%] transition-all duration-1000"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
         <div class="space-y-6 flex flex-col">
             
