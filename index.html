@@ -111,7 +111,7 @@
                 </div>
             </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg transition-colors duration-500" id="card-me">
                     <div class="absolute inset-0 tactical-grid opacity-20 z-0 pointer-events-none"></div>
                     <div class="relative z-10">
@@ -172,6 +172,7 @@
                     </div>
                 </div>
             </div>
+        </div>
 
         <div class="space-y-6 flex flex-col">
             
@@ -281,13 +282,13 @@
             { symbol: 'SOLUSDT', name: 'Solana', cat: 'Web3' }
         ];
 
-async function fetchMarketData() {
+        async function fetchMarketData() {
             try {
                 const container = document.getElementById('live-tickers');
-                const tickerTape = document.getElementById('ticker-tape'); // Seleccionamos la barra superior
+                const tickerTape = document.getElementById('ticker-tape'); 
                 
                 let htmlContent = '';
-                let tapeContent = ''; // Variable para guardar los datos de la cinta
+                let tapeContent = ''; 
                 
                 for (let asset of watchList) {
                     const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${asset.symbol}`);
@@ -298,7 +299,6 @@ async function fetchMarketData() {
                     
                     const sparkline = generateSparkline(isPositive);
 
-                    // 1. Armar la tarjeta para el Radar Lateral
                     htmlContent += `
                     <div class="flex justify-between items-center p-3 hover:bg-[#1e293b] rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-700" onclick="window.location.href='quetza.html'">
                         <div class="w-1/3">
@@ -314,16 +314,11 @@ async function fetchMarketData() {
                         </div>
                     </div>`;
                     
-                    // 2. Armar el texto para el Ticker Tape Superior
-                    // Limpiamos el nombre (ej. quitamos "USDT" para que se vea como "BTC" o "ETH")
                     let cleanSymbol = asset.symbol.replace('USDT', '');
                     tapeContent += `<span><strong class="text-white">${cleanSymbol}</strong> <span class="${isPositive ? 'text-green-500' : 'text-red-500'}">${isPositive ? '+' : ''}${change.toFixed(2)}%</span></span>`;
                 }
                 
-                // Inyectamos los datos en la pantalla
                 container.innerHTML = htmlContent;
-                
-                // Duplicamos el contenido varias veces para que la animación CSS sea un ciclo infinito perfecto
                 tickerTape.innerHTML = tapeContent + tapeContent + tapeContent + tapeContent;
                 
             } catch (error) {
@@ -331,41 +326,27 @@ async function fetchMarketData() {
             }
         }
 
-        window.onload = () => {
-            fetchTacoOracle();   
-            fetchMarketData();   
-            setInterval(fetchMarketData, 10000); 
-            setInterval(fetchTacoOracle, 15000); 
-        };
         // CONEXIÓN CON INTELIGENCIA ARTIFICIAL (GEMINI API)
         async function fetchHeatmapsFromGemini() {
             try {
-                // En el futuro, aquí pondrás la URL de tu servidor backend (ej. Firebase Cloud Functions)
-                // const response = await fetch('TU_URL_DEL_BACKEND_CON_GEMINI');
-                // const geminiData = await response.json();
-
-                // Mientras conectas tu backend, simulamos la respuesta que Gemini te dará en formato JSON:
+                // Simulamos la respuesta que Gemini te dará en formato JSON:
                 const geminiData = {
                     medioOriente: {
-                        ormuz: Math.floor(Math.random() * 40) + 50, // Riesgo 50-90%
-                        balistico: Math.floor(Math.random() * 50) + 40 // Riesgo 40-90%
+                        ormuz: Math.floor(Math.random() * 40) + 50,
+                        balistico: Math.floor(Math.random() * 50) + 40
                     },
                     europaOriental: {
-                        infraestructura: Math.floor(Math.random() * 40) + 60, // Riesgo 60-100%
-                        nuclear: Math.floor(Math.random() * 20) + 10 // Riesgo 10-30%
+                        infraestructura: Math.floor(Math.random() * 40) + 60,
+                        nuclear: Math.floor(Math.random() * 20) + 10
                     }
                 };
-
                 updateHeatmapUI(geminiData);
-
             } catch (error) {
                 console.error("Error conectando con Gemini:", error);
             }
         }
 
-        // Esta función traduce los datos de Gemini a colores y tamaños en tu pantalla
         function updateHeatmapUI(data) {
-            // Función de ayuda para los colores
             const getColor = (val) => val >= 80 ? 'bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.8)] animate-pulse' : 
                                       val >= 50 ? 'bg-orange-500 animate-pulse' : 
                                       'bg-yellow-500';
@@ -401,18 +382,16 @@ async function fetchMarketData() {
             document.getElementById('status-eu').innerText = avgEU > 70 ? 'Alta Tensión' : 'Activo';
             document.getElementById('status-eu').className = avgEU > 70 ? 'bg-red-900/50 text-red-400 border border-red-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest' : 'bg-orange-900/50 text-orange-400 border border-orange-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest';
         }
-        // ... aquí arriba está la función updateHeatmapUI() que acabamos de agregar ...
 
         window.onload = () => {
             fetchTacoOracle();   
             fetchMarketData();
-            fetchHeatmapsFromGemini(); // ¡Llamada inicial a la IA!
+            fetchHeatmapsFromGemini(); // Llamada inicial a la IA simulada
             
             setInterval(fetchMarketData, 10000); 
             setInterval(fetchTacoOracle, 15000); 
-            setInterval(fetchHeatmapsFromGemini, 20000); // Se actualiza cada 20 segundos
+            setInterval(fetchHeatmapsFromGemini, 20000); 
         };
     </script>
 </body>
 </html>
-  
