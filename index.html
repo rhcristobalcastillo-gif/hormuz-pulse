@@ -11,7 +11,6 @@
         ::-webkit-scrollbar-track { background: #0b111e; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         
-        /* Animaciones del Corazón y Radares */
         @keyframes heartbeat-slow {
             0%, 100% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
@@ -26,8 +25,6 @@
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        
-        /* Animaciones para el logo */
         @keyframes logo-entry {
             0% { transform: scale(0) rotate(-15deg); opacity: 0; }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
@@ -47,7 +44,6 @@
         }
         
         .ticker-content { animation: ticker 30s linear infinite; display: flex; width: max-content; }
-        
         .animate-logo-entry { animation: logo-entry 0.8s ease-out forwards; }
         .animate-logo-float { animation: logo-float 4s infinite ease-in-out; }
     </style>
@@ -73,9 +69,9 @@
         </div>
     </div>
 
-    <main class="flex-1 p-4 lg:p-6 grid grid-cols-1 xl:grid-cols-3 gap-6 max-w-[1600px] mx-auto w-full">
+    <main class="flex-1 p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-[1600px] mx-auto w-full">
         
-        <div class="xl:col-span-2 space-y-6 flex flex-col">
+        <div class="lg:col-span-2 space-y-6 flex flex-col">
             
             <div id="taco-container" class="bg-[#151e2d] border border-slate-800 p-5 rounded-xl shadow-lg transition-all duration-700 flex flex-col md:flex-row items-center gap-6">
                 <div class="flex items-center space-x-4 min-w-[200px]">
@@ -206,7 +202,6 @@
     </main>
 
     <script>
-        // MOTOR TACO TRADE (Inteligencia Geopolítica)
         async function fetchTacoOracle() {
             try {
                 const response = await fetch('/api/getTacoData');
@@ -249,7 +244,6 @@
             }
         }
 
-        // GENERADOR DE SPARKLINES (Líneas de tendencia en SVG)
         function generateSparkline(isPositive) {
             const color = isPositive ? '#22c55e' : '#ef4444'; 
             
@@ -273,7 +267,6 @@
             </svg>`;
         }
 
-        // ORÁCULO DE ACTIVOS (Binance API)
         const watchList = [
             { symbol: 'BTCUSDT', name: 'Bitcoin', cat: 'Cripto' },
             { symbol: 'ETHUSDT', name: 'Ethereum', cat: 'Web3' },
@@ -326,10 +319,8 @@
             }
         }
 
-        // CONEXIÓN CON INTELIGENCIA ARTIFICIAL (GEMINI API)
         async function fetchHeatmapsFromGemini() {
             try {
-                // Simulamos la respuesta que Gemini te dará en formato JSON:
                 const geminiData = {
                     medioOriente: {
                         ormuz: Math.floor(Math.random() * 40) + 50,
@@ -352,7 +343,6 @@
                                       'bg-yellow-500';
             const getTextColor = (val) => val >= 80 ? 'text-red-500' : val >= 50 ? 'text-orange-400' : 'text-yellow-400';
 
-            // Actualizar Medio Oriente
             document.getElementById('bar-ormuz').style.width = `${data.medioOriente.ormuz}%`;
             document.getElementById('bar-ormuz').className = `h-full transition-all duration-1000 ${getColor(data.medioOriente.ormuz)}`;
             document.getElementById('text-ormuz').innerText = `Riesgo ${data.medioOriente.ormuz}%`;
@@ -367,7 +357,6 @@
             document.getElementById('status-me').innerText = avgME > 70 ? 'Alta Tensión' : 'Activo';
             document.getElementById('status-me').className = avgME > 70 ? 'bg-red-900/50 text-red-400 border border-red-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest' : 'bg-orange-900/50 text-orange-400 border border-orange-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest';
 
-            // Actualizar Europa Oriental
             document.getElementById('bar-infra').style.width = `${data.europaOriental.infraestructura}%`;
             document.getElementById('bar-infra').className = `h-full transition-all duration-1000 ${getColor(data.europaOriental.infraestructura)}`;
             document.getElementById('text-infra').innerText = `Riesgo ${data.europaOriental.infraestructura}%`;
@@ -386,7 +375,7 @@
         window.onload = () => {
             fetchTacoOracle();   
             fetchMarketData();
-            fetchHeatmapsFromGemini(); // Llamada inicial a la IA simulada
+            fetchHeatmapsFromGemini(); 
             
             setInterval(fetchMarketData, 10000); 
             setInterval(fetchTacoOracle, 15000); 
