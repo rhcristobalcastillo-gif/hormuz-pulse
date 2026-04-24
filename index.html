@@ -337,6 +337,70 @@ async function fetchMarketData() {
             setInterval(fetchMarketData, 10000); 
             setInterval(fetchTacoOracle, 15000); 
         };
+        // CONEXIÓN CON INTELIGENCIA ARTIFICIAL (GEMINI API)
+        async function fetchHeatmapsFromGemini() {
+            try {
+                // En el futuro, aquí pondrás la URL de tu servidor backend (ej. Firebase Cloud Functions)
+                // const response = await fetch('TU_URL_DEL_BACKEND_CON_GEMINI');
+                // const geminiData = await response.json();
+
+                // Mientras conectas tu backend, simulamos la respuesta que Gemini te dará en formato JSON:
+                const geminiData = {
+                    medioOriente: {
+                        ormuz: Math.floor(Math.random() * 40) + 50, // Riesgo 50-90%
+                        balistico: Math.floor(Math.random() * 50) + 40 // Riesgo 40-90%
+                    },
+                    europaOriental: {
+                        infraestructura: Math.floor(Math.random() * 40) + 60, // Riesgo 60-100%
+                        nuclear: Math.floor(Math.random() * 20) + 10 // Riesgo 10-30%
+                    }
+                };
+
+                updateHeatmapUI(geminiData);
+
+            } catch (error) {
+                console.error("Error conectando con Gemini:", error);
+            }
+        }
+
+        // Esta función traduce los datos de Gemini a colores y tamaños en tu pantalla
+        function updateHeatmapUI(data) {
+            // Función de ayuda para los colores
+            const getColor = (val) => val >= 80 ? 'bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.8)] animate-pulse' : 
+                                      val >= 50 ? 'bg-orange-500 animate-pulse' : 
+                                      'bg-yellow-500';
+            const getTextColor = (val) => val >= 80 ? 'text-red-500' : val >= 50 ? 'text-orange-400' : 'text-yellow-400';
+
+            // Actualizar Medio Oriente
+            document.getElementById('bar-ormuz').style.width = `${data.medioOriente.ormuz}%`;
+            document.getElementById('bar-ormuz').className = `h-full transition-all duration-1000 ${getColor(data.medioOriente.ormuz)}`;
+            document.getElementById('text-ormuz').innerText = `Riesgo ${data.medioOriente.ormuz}%`;
+            document.getElementById('text-ormuz').className = `font-bold ${getTextColor(data.medioOriente.ormuz)}`;
+            
+            document.getElementById('bar-me-2').style.width = `${data.medioOriente.balistico}%`;
+            document.getElementById('bar-me-2').className = `h-full transition-all duration-1000 ${getColor(data.medioOriente.balistico)}`;
+            document.getElementById('text-me-2').innerText = `Riesgo ${data.medioOriente.balistico}%`;
+            document.getElementById('text-me-2').className = `font-bold ${getTextColor(data.medioOriente.balistico)}`;
+
+            let avgME = (data.medioOriente.ormuz + data.medioOriente.balistico) / 2;
+            document.getElementById('status-me').innerText = avgME > 70 ? 'Alta Tensión' : 'Activo';
+            document.getElementById('status-me').className = avgME > 70 ? 'bg-red-900/50 text-red-400 border border-red-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest' : 'bg-orange-900/50 text-orange-400 border border-orange-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest';
+
+            // Actualizar Europa Oriental
+            document.getElementById('bar-infra').style.width = `${data.europaOriental.infraestructura}%`;
+            document.getElementById('bar-infra').className = `h-full transition-all duration-1000 ${getColor(data.europaOriental.infraestructura)}`;
+            document.getElementById('text-infra').innerText = `Riesgo ${data.europaOriental.infraestructura}%`;
+            document.getElementById('text-infra').className = `font-bold ${getTextColor(data.europaOriental.infraestructura)}`;
+
+            document.getElementById('bar-nuke').style.width = `${data.europaOriental.nuclear}%`;
+            document.getElementById('bar-nuke').className = `h-full transition-all duration-1000 ${getColor(data.europaOriental.nuclear)}`;
+            document.getElementById('text-nuke').innerText = `Riesgo ${data.europaOriental.nuclear}%`;
+            document.getElementById('text-nuke').className = `font-bold ${getTextColor(data.europaOriental.nuclear)}`;
+
+            let avgEU = (data.europaOriental.infraestructura + data.europaOriental.nuclear) / 2;
+            document.getElementById('status-eu').innerText = avgEU > 70 ? 'Alta Tensión' : 'Activo';
+            document.getElementById('status-eu').className = avgEU > 70 ? 'bg-red-900/50 text-red-400 border border-red-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest' : 'bg-orange-900/50 text-orange-400 border border-orange-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest';
+        }
     </script>
 </body>
 </html>
