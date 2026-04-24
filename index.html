@@ -401,6 +401,20 @@ async function fetchMarketData() {
             document.getElementById('status-eu').innerText = avgEU > 70 ? 'Alta Tensión' : 'Activo';
             document.getElementById('status-eu').className = avgEU > 70 ? 'bg-red-900/50 text-red-400 border border-red-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest' : 'bg-orange-900/50 text-orange-400 border border-orange-800 text-[8px] px-2 py-1 rounded font-bold uppercase tracking-widest';
         }
+        // ... aquí arriba está la función updateHeatmapUI() que acabamos de agregar ...
+
+        window.onload = () => {
+            fetchTacoOracle();   
+            fetchMarketData();
+            fetchHeatmapsFromGemini(); // ¡Llamada inicial a la IA!
+            
+            setInterval(fetchMarketData, 10000); 
+            setInterval(fetchTacoOracle, 15000); 
+            setInterval(fetchHeatmapsFromGemini, 20000); // Se actualiza cada 20 segundos
+        };
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
