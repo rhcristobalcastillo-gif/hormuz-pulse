@@ -27,14 +27,14 @@
             100% { transform: translateX(-50%); }
         }
         
-        /* ¡NUEVAS ANIMACIONES PARA EL LOGO! */
+        /* Animaciones para el logo */
         @keyframes logo-entry {
-            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
         @keyframes logo-float {
-            0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.2)); }
-            50% { transform: translateY(-3px) scale(1.02); filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6)); }
+            0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3)); }
+            50% { transform: translateY(-4px); filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.7)); }
         }
 
         .pulse-normal { animation: heartbeat-slow 2s infinite ease-in-out; background-color: #eab308; }
@@ -48,27 +48,26 @@
         
         .ticker-content { animation: ticker 30s linear infinite; display: flex; width: max-content; }
         
-        /* Clases de animación para el logo */
-        .animate-logo-entry { animation: logo-entry 1s ease-out forwards; }
-        .animate-logo-float { animation: logo-float 3s infinite ease-in-out; animation-delay: 1s; } /* Empieza después de la entrada */
+        .animate-logo-entry { animation: logo-entry 0.8s ease-out forwards; }
+        .animate-logo-float { animation: logo-float 4s infinite ease-in-out; }
     </style>
 </head>
 <body class="bg-[#0b111e] text-slate-300 font-sans min-h-screen flex flex-col overflow-x-hidden">
 
-    <nav class="h-16 flex justify-between items-center px-4 lg:px-8 border-b border-slate-800 bg-[#0b111e] z-20">
-        <a href="index.html" class="flex items-center hover:opacity-80 transition-opacity space-x-3">
+    <nav class="h-20 lg:h-24 flex justify-between items-center px-4 lg:px-8 border-b border-slate-800 bg-[#0b111e] z-20 shadow-md">
+        <a href="index.html" class="flex items-center hover:opacity-80 transition-opacity space-x-4 lg:space-x-6">
             <div class="flex items-center justify-center animate-logo-entry">
-                <img src="(COPY)%20Logotipo%20500x500%20px.png" alt="Logo Hormuz Pulse" class="h-11 w-11 object-contain animate-logo-float">
+                <img src="(COPY)%20Logotipo%20500x500%20px.png" alt="Logo Hormuz Pulse" class="h-14 lg:h-20 w-auto object-contain animate-logo-float">
             </div>
-            <span class="text-white font-black tracking-tighter text-xl uppercase mt-0.5">Hormuz <span class="text-blue-500">Pulse</span></span>
+            <span class="text-white font-black tracking-tighter text-2xl lg:text-3xl uppercase mt-1">Hormuz <span class="text-blue-500">Pulse</span></span>
         </a>
         <div class="flex space-x-6 text-xs uppercase tracking-[0.2em] items-center font-bold">
-            <a href="index.html" class="tab-active py-5">Monitor Global</a>
-            <a href="quetza.html" class="py-5 text-slate-400 hover:text-white transition-all">Quetza Terminal</a>
+            <a href="index.html" class="tab-active py-6 lg:py-8">Monitor Global</a>
+            <a href="quetza.html" class="py-6 lg:py-8 text-slate-400 hover:text-white transition-all">Quetza Terminal</a>
         </div>
     </nav>
 
-    <div class="h-8 bg-[#151e2d] border-b border-slate-800 flex items-center overflow-hidden relative">
+    <div class="h-8 bg-[#151e2d] border-b border-slate-800 flex items-center overflow-hidden relative shadow-inner">
         <div class="ticker-content text-[10px] font-mono tracking-widest space-x-12 px-6">
             <span><strong class="text-white">USOIL</strong> <span class="text-green-500">+1.25%</span></span>
             <span><strong class="text-white">XAUUSD</strong> <span class="text-green-500">+0.80%</span></span>
@@ -102,7 +101,7 @@
                     <p id="taco-message" class="text-xs lg:text-sm text-slate-300 font-medium italic border-l-2 border-yellow-500 pl-3 py-1 mb-3">
                         Sincronizando con satélites y fuentes de noticias globales...
                     </p>
-                    <div class="w-full bg-[#0b111e] rounded-full h-1.5 border border-slate-800 overflow-hidden">
+                    <div class="w-full bg-[#0b111e] rounded-full h-1.5 border border-slate-800 overflow-hidden shadow-inner">
                         <div id="risk-bar" class="bg-yellow-500 h-full rounded-full transition-all duration-1000" style="width: 35%"></div>
                     </div>
                 </div>
@@ -111,7 +110,7 @@
             <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden shadow-lg flex flex-col flex-grow min-h-[400px]">
                 <div class="p-4 border-b border-slate-800 flex justify-between items-center">
                     <div>
-                        <span class="bg-slate-800 text-[9px] px-2 py-1 rounded text-slate-300 font-bold tracking-widest uppercase">Energía Global</span>
+                        <span class="bg-slate-800 text-[9px] px-2 py-1 rounded text-slate-300 font-bold tracking-widest uppercase shadow-sm">Energía Global</span>
                         <h3 class="text-lg font-black text-white mt-1">Petróleo Crudo WTI (USOIL)</h3>
                     </div>
                     <span class="text-[9px] text-green-500 border border-green-900 bg-green-900/20 px-2 py-1 rounded uppercase tracking-widest animate-pulse">Live</span>
@@ -122,7 +121,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5">
+                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg">
                     <div class="absolute inset-0 tactical-grid opacity-20 z-0 pointer-events-none"></div>
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-4">
@@ -135,7 +134,7 @@
                                     <span>Estrecho de Ormuz</span>
                                     <span class="text-orange-400 font-bold">Riesgo 65%</span>
                                 </div>
-                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800">
+                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
                                     <div class="h-full bg-gradient-to-r from-orange-500 to-red-600 animate-pulse w-[65%]"></div>
                                 </div>
                             </div>
@@ -144,7 +143,7 @@
                                     <span>Intercambio Balístico</span>
                                     <span class="text-red-500 font-bold">Crítico 85%</span>
                                 </div>
-                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800">
+                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
                                     <div class="h-full bg-red-600 animate-pulse w-[85%] shadow-[0_0_8px_rgba(220,38,38,0.8)]"></div>
                                 </div>
                             </div>
@@ -152,7 +151,7 @@
                     </div>
                 </div>
 
-                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5">
+                <div class="bg-[#151e2d] border border-slate-800 rounded-xl overflow-hidden relative p-5 shadow-lg">
                     <div class="absolute inset-0 tactical-grid opacity-20 z-0 pointer-events-none"></div>
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-4">
@@ -165,7 +164,7 @@
                                     <span>Infraestructura Energética</span>
                                     <span class="text-red-400 font-bold">Daño 78%</span>
                                 </div>
-                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800">
+                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
                                     <div class="h-full bg-gradient-to-r from-yellow-500 to-red-500 w-[78%]"></div>
                                 </div>
                             </div>
@@ -174,7 +173,7 @@
                                     <span>Riesgo Nuclear Táctico</span>
                                     <span class="text-yellow-500 font-bold">Bajo 30%</span>
                                 </div>
-                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800">
+                                <div class="w-full h-1.5 bg-[#0b111e] rounded-full overflow-hidden border border-slate-800 shadow-inner">
                                     <div class="h-full bg-yellow-500 w-[30%]"></div>
                                 </div>
                             </div>
@@ -186,7 +185,7 @@
 
         <div class="space-y-6 flex flex-col">
             
-            <div class="bg-[#151e2d] border border-slate-800 rounded-xl flex flex-col flex-grow">
+            <div class="bg-[#151e2d] border border-slate-800 rounded-xl flex flex-col flex-grow shadow-lg">
                 <div class="p-4 border-b border-slate-800 flex justify-between items-center">
                     <h2 class="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">Radar de Activos</h2>
                     <div class="flex items-center space-x-1">
@@ -200,14 +199,14 @@
                 </div>
             </div>
 
-            <div class="bg-[#151e2d] border border-slate-800 rounded-xl p-5 text-center shadow-lg relative overflow-hidden">
+            <div class="bg-[#151e2d] border border-slate-800 rounded-xl p-5 text-center shadow-xl relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl"></div>
                 
                 <h3 class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-4">Oportunidad de Mercado</h3>
                 <h2 class="text-2xl font-black text-white uppercase tracking-widest mb-1">Volatilidad Alta</h2>
-                <p class="text-[10px] text-slate-500 mb-6">Condiciones ideales para predicciones a corto plazo.</p>
+                <p class="text-[10px] text-slate-500 mb-6 relative z-10">Condiciones ideales para predicciones a corto plazo.</p>
                 
-                <a href="quetza.html" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-lg uppercase text-[10px] tracking-[0.2em] transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]">
+                <a href="quetza.html" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-lg uppercase text-[10px] tracking-[0.2em] transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)] hover:-translate-y-0.5 relative z-10">
                     Abrir Terminal de Trading ⚡
                 </a>
             </div>
@@ -263,7 +262,6 @@
         function generateSparkline(isPositive) {
             const color = isPositive ? '#22c55e' : '#ef4444'; 
             
-            // Vectores sutiles para simular subidas o bajadas
             const upPaths = [
                 "M0,25 Q15,20 20,10 T40,15 T60,5 L80,2",
                 "M0,25 L15,22 L30,12 L45,18 L65,5 L80,2",
